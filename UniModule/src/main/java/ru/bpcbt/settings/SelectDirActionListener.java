@@ -1,7 +1,7 @@
 package ru.bpcbt.settings;
 
 import ru.bpcbt.utils.FileUtils;
-import ru.bpcbt.utils.Narrator;
+import ru.bpcbt.logger.Narrator;
 
 import javax.swing.*;
 import java.awt.*;

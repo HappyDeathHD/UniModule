@@ -1,11 +1,14 @@
-package ru.bpcbt.misc;
+package ru.bpcbt.utils;
 
 import javax.swing.*;
 
 public class MiniFrame {
 
+    private MiniFrame() {// Utils class
+    }
+
     public static boolean confirmUnsavedChanges() {
-        return JOptionPane.showConfirmDialog(null, "Все внесенные изменения канут в лету, пофиг?") == 0;//0 — это ДА
+        return JOptionPane.showConfirmDialog(null, "Все внесенные изменения канут в Лету, пофиг?") == 0;//0 — это ДА
     }
 
     public static void showMessage(String message) {

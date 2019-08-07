@@ -1,7 +1,7 @@
 package ru.bpcbt.utils;
 
-public class Consts {
-    private Consts() { // Utils class
+public class Const {
+    private Const() { // Utils class
     }
 
     public static final String CONFLICT_PREFIX = "UniModule_";

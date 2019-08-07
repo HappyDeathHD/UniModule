@@ -2,7 +2,7 @@ package ru.bpcbt.rest;
 
 import com.grack.nanojson.JsonWriter;
 import ru.bpcbt.Program;
-import ru.bpcbt.misc.Style;
+import ru.bpcbt.utils.Style;
 import ru.bpcbt.utils.FileUtils;
 
 import java.io.BufferedReader;
@@ -63,7 +63,7 @@ public class UnimessageClient {
         return -1;
     }
 
-    public void setNewToken(String login, String password) {
+    private void setNewToken(String login, String password) {
         try {
             URL authUrl = new URL(coreUrl + "/api/v1.0/authenticate");
             HttpURLConnection connection = (HttpURLConnection) authUrl.openConnection();

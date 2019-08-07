@@ -8,7 +8,6 @@ import javax.swing.text.StyleContext;
 import java.awt.*;
 
 public class ReportPanel extends JPanel {
-
     private JTextPane report;
 
     public ReportPanel() {

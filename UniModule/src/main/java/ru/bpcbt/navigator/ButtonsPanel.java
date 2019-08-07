@@ -3,9 +3,9 @@ package ru.bpcbt.navigator;
 import ru.bpcbt.Program;
 import ru.bpcbt.utils.ReplaceJobsExecutor;
 import ru.bpcbt.misc.ColoredButton;
-import ru.bpcbt.misc.MiniFrame;
-import ru.bpcbt.misc.Style;
-import ru.bpcbt.utils.Narrator;
+import ru.bpcbt.utils.MiniFrame;
+import ru.bpcbt.utils.Style;
+import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.rest.TemplateUploader;
 
 import javax.imageio.ImageIO;

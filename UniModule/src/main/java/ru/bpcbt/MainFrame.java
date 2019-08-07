@@ -5,8 +5,8 @@ import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.navigator.NavigatorPanel;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.settings.SettingsPanel;
-import ru.bpcbt.utils.Consts;
-import ru.bpcbt.utils.Narrator;
+import ru.bpcbt.utils.Const;
+import ru.bpcbt.logger.Narrator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,18 +70,16 @@ public class MainFrame extends JFrame {
         return reportPanel;
     }
 
-    private JPanel getInfoPanel(){
+    private JPanel getInfoPanel() {
         JPanel hintsPanel = new JPanel();
         StringBuilder hints = new StringBuilder("<html><h1>Разделители</h1><table>");
         for (Delimiters delimiter : Delimiters.values()) {
             hints.append("<tr><td>").append(delimiter.getSymbol()).append("</td><td>").append(delimiter.getDescription()).append("</td></tr>");
         }
-        hints.append("</table><h1>Маппинг названий схем/заголовков писем</h1>");
-        hints.append("В корневой папке со скелетами может быть файл ").append(Consts.TEMPLATE_MAPPING_FILE).append(" со структурой:");
-        hints.append("<pre>").append("{<br/> \"НАЗВАНИЕ_ПАПКИ\": {<br/>  \"name\":\"НАЗВАНИЕ_ОБЩЕЙ_СХЕМЫ\",<br/>")
-                .append("  \"topics\": {<br/>   \"ЯЗЫК(ru/en/...)\":\"ТЕМА_ПИСЬМА\"<br/>  }<br/> }<br/>}")
-                .append("</pre>");
-        hints.append("</html>");
+        hints.append("</table><h1>Маппинг названий схем/заголовков писем</h1>")
+                .append("В корневой папке со скелетами может быть файл ").append(Const.TEMPLATE_MAPPING_FILE).append(" со структурой:")
+                .append("<pre>{<br/> \"НАЗВАНИЕ_ПАПКИ\": {<br/>  \"name\":\"НАЗВАНИЕ_ОБЩЕЙ_СХЕМЫ\",<br/>")
+                .append("  \"topics\": {<br/>   \"ЯЗЫК(ru/en/...)\":\"ТЕМА_ПИСЬМА\"<br/>  }<br/> }<br/>}</pre></html>");
         hintsPanel.add(new JLabel(hints.toString()));
         return hintsPanel;
     }

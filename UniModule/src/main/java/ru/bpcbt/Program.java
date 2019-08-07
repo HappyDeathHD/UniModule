@@ -1,10 +1,10 @@
 package ru.bpcbt;
 
 import ru.bpcbt.utils.ReplaceJobsExecutor;
-import ru.bpcbt.misc.Style;
+import ru.bpcbt.utils.Style;
 import ru.bpcbt.rest.TemplateUploader;
 import ru.bpcbt.settings.Settings;
-import ru.bpcbt.utils.Narrator;
+import ru.bpcbt.logger.Narrator;
 
 import javax.swing.*;
 import java.awt.*;

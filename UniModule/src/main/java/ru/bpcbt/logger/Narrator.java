@@ -1,6 +1,6 @@
-package ru.bpcbt.utils;
+package ru.bpcbt.logger;
 
-import ru.bpcbt.misc.Style;
+import ru.bpcbt.utils.Style;
 
 import javax.swing.*;
 
@@ -13,8 +13,7 @@ public class Narrator {
         label.setOpaque(true);
     }
 
-    private Narrator() {
-        //Utils class
+    private Narrator() {//Utils class
     }
 
     public static JLabel getLabel() {

@@ -6,12 +6,12 @@ import com.grack.nanojson.JsonParser;
 import com.grack.nanojson.JsonParserException;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
-import ru.bpcbt.misc.MiniFrame;
-import ru.bpcbt.misc.Style;
+import ru.bpcbt.utils.MiniFrame;
+import ru.bpcbt.utils.Style;
 import ru.bpcbt.settings.Settings;
-import ru.bpcbt.utils.Consts;
+import ru.bpcbt.utils.Const;
 import ru.bpcbt.utils.FileUtils;
-import ru.bpcbt.utils.Narrator;
+import ru.bpcbt.logger.Narrator;
 
 import javax.swing.*;
 import java.io.*;
@@ -128,7 +128,7 @@ public class TemplateUploader {
 
     private static void fillThemes() {
         String inputDir = Program.getProperties().get(Settings.INPUT_DIR);
-        File mappingFile = Paths.get(inputDir, Consts.TEMPLATE_MAPPING_FILE).toFile();
+        File mappingFile = Paths.get(inputDir, Const.TEMPLATE_MAPPING_FILE).toFile();
         if (mappingFile.exists()) {
             try {
                 JsonObject mainNode = JsonParser.object().from(FileUtils.readFile(mappingFile));
@@ -143,10 +143,10 @@ public class TemplateUploader {
                     }
                 }
             } catch (JsonParserException e) {
-                Program.appendToReport(Consts.TEMPLATE_MAPPING_FILE + " содержит ошибку: " + e.getMessage(), Style.RED);
+                Program.appendToReport(Const.TEMPLATE_MAPPING_FILE + " содержит ошибку: " + e.getMessage(), Style.RED);
             }
         } else {
-            Program.appendToReport(Consts.TEMPLATE_MAPPING_FILE + " не найден.", Style.YELLOW);
+            Program.appendToReport(Const.TEMPLATE_MAPPING_FILE + " не найден.", Style.YELLOW);
         }
     }
 

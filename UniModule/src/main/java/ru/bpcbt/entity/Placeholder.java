@@ -1,7 +1,9 @@
-package ru.bpcbt.misc;
+package ru.bpcbt.entity;
 
 import javafx.util.Pair;
 import ru.bpcbt.Program;
+import ru.bpcbt.misc.Delimiters;
+import ru.bpcbt.utils.Style;
 import ru.bpcbt.settings.Settings;
 
 import java.io.File;
@@ -56,14 +58,11 @@ public class Placeholder {
         }
     }
 
-    public String getWithReplaces() {
+    private String getWithReplaces() {
         String result = body;
         for (Map.Entry<String, String> variable : variables.entrySet()) {
             result = result.replace(wrapVar(variable.getKey()), variable.getValue());
         }
-       /* if(result.equals(body)){
-            return wrapPH(result);
-        }*/
         return result;
     }
 
@@ -95,7 +94,7 @@ public class Placeholder {
         return Delimiters.START_END.getSymbol() + rawPH + Delimiters.START_END.getSymbol();
     }
 
-    public static String wrapPH(String placeholder) {
+    private static String wrapPH(String placeholder) {
         return Delimiters.START_END.getSymbol() + placeholder + Delimiters.START_END.getSymbol();
     }
 
@@ -159,21 +158,6 @@ public class Placeholder {
         sb.append(" ~").append(links);
         return sb.toString();
     }
-/*
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Placeholder that = (Placeholder) o;
-        return Objects.equals(rawPH, that.rawPH);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(rawPH);
-    }
-
-*/
 
     @Override
     public boolean equals(Object o) {
@@ -188,5 +172,4 @@ public class Placeholder {
     public int hashCode() {
         return Objects.hash(body, variables);
     }
-
 }

@@ -6,7 +6,6 @@ import com.grack.nanojson.JsonParserException;
 import ru.bpcbt.Program;
 import ru.bpcbt.entity.ReplaceJob;
 import ru.bpcbt.misc.Delimiters;
-import ru.bpcbt.misc.Style;
 import ru.bpcbt.settings.Settings;
 
 import java.io.File;

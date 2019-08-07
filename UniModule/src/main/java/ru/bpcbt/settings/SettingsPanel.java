@@ -3,9 +3,9 @@ package ru.bpcbt.settings;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.misc.ColoredButton;
-import ru.bpcbt.misc.Style;
+import ru.bpcbt.utils.Style;
 import ru.bpcbt.utils.FileUtils;
-import ru.bpcbt.utils.Narrator;
+import ru.bpcbt.logger.Narrator;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -162,7 +162,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private ColoredButton getCommonSelectFileButton() {
-        ColoredButton button = new ColoredButton("\uD83D\uDD0D");
+        ColoredButton button = new ColoredButton("🔍");
         button.setBackground(Style.GREEN);
         button.setHoverBackgroundColor(Style.GREEN_B);
         button.setPressedBackgroundColor(Style.YELLOW);

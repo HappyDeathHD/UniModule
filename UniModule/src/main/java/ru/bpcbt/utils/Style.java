@@ -1,4 +1,4 @@
-package ru.bpcbt.misc;
+package ru.bpcbt.utils;
 
 import java.awt.*;
 
@@ -13,4 +13,7 @@ public class Style {
     public static final Color YELLOW_B = new Color(255, 247, 111);
     public static final Color GRAY = new Color(238, 238, 238);
     public static final Color WHITE = new Color(255, 255, 255);
+
+    private Style() {// Utils class
+    }
 }

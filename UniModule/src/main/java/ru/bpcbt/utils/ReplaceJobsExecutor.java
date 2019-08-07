@@ -4,9 +4,9 @@ import javafx.util.Pair;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.entity.ReplaceJob;
+import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.misc.Delimiters;
-import ru.bpcbt.misc.Placeholder;
-import ru.bpcbt.misc.Style;
+import ru.bpcbt.entity.Placeholder;
 import ru.bpcbt.settings.Settings;
 
 import javax.swing.*;
@@ -38,7 +38,7 @@ public class ReplaceJobsExecutor {
         Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
         //не json
         List<File> commonInputFiles = files.stream()
-                .filter(f -> !f.getPath().contains(Consts.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
+                .filter(f -> !f.getPath().contains(Const.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
                 .collect(Collectors.toList());
         commonInputFiles.forEach(f -> jobs.add(new ReplaceJob(cutThePath(f), FileUtils.readFile(f), new HashMap<>())));
         //json

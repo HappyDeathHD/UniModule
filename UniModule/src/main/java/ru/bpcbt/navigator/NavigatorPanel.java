@@ -1,12 +1,12 @@
 package ru.bpcbt.navigator;
 
 import ru.bpcbt.Program;
-import ru.bpcbt.misc.MiniFrame;
+import ru.bpcbt.utils.MiniFrame;
 import ru.bpcbt.misc.Delimiters;
-import ru.bpcbt.misc.Style;
+import ru.bpcbt.utils.Style;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.utils.FileUtils;
-import ru.bpcbt.utils.Narrator;
+import ru.bpcbt.logger.Narrator;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
