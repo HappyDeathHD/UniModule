@@ -3,17 +3,17 @@ package ru.bpcbt.entity;
 import java.util.Map;
 import java.util.Objects;
 
-public class ReplaceJob implements Comparable<ReplaceJob> {
+public class ReplaceTask implements Comparable<ReplaceTask> {
     private String rawPlaceholder;
     private String content;
     private Map<String, String> parentVariables;
     private int priority;
 
-    public ReplaceJob(String rawPlaceholder, String content, Map<String, String> parentVariables) {
+    public ReplaceTask(String rawPlaceholder, String content, Map<String, String> parentVariables) {
         this(rawPlaceholder, content, parentVariables, 0);
     }
 
-    public ReplaceJob(String rawPlaceholder, String content, Map<String, String> parentVariables, int priority) {
+    public ReplaceTask(String rawPlaceholder, String content, Map<String, String> parentVariables, int priority) {
         this.rawPlaceholder = rawPlaceholder;
         this.content = content;
         this.parentVariables = parentVariables;
@@ -40,10 +40,10 @@ public class ReplaceJob implements Comparable<ReplaceJob> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReplaceJob replaceJob = (ReplaceJob) o;
-        return Objects.equals(rawPlaceholder, replaceJob.getRawPlaceholder()) &&
-                Objects.equals(content, replaceJob.getContent()) &&
-                Objects.equals(parentVariables, replaceJob.getParentVariables());
+        ReplaceTask replaceTask = (ReplaceTask) o;
+        return Objects.equals(rawPlaceholder, replaceTask.getRawPlaceholder()) &&
+                Objects.equals(content, replaceTask.getContent()) &&
+                Objects.equals(parentVariables, replaceTask.getParentVariables());
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ReplaceJob implements Comparable<ReplaceJob> {
     }
 
     @Override
-    public int compareTo(ReplaceJob o) {
+    public int compareTo(ReplaceTask o) {
         return o.getPriority() - this.priority;
     }
 }

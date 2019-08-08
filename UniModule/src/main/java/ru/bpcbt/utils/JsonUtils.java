@@ -4,7 +4,7 @@ import com.grack.nanojson.JsonObject;
 import com.grack.nanojson.JsonParser;
 import com.grack.nanojson.JsonParserException;
 import ru.bpcbt.Program;
-import ru.bpcbt.entity.ReplaceJob;
+import ru.bpcbt.entity.ReplaceTask;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.settings.Settings;
 
@@ -45,12 +45,12 @@ public class JsonUtils {
         }
     }
 
-    public static List<ReplaceJob> parseSkeleton(File file) {
+    public static List<ReplaceTask> parseSkeleton(File file) {
         String jsonContent = FileUtils.readFile(file);
         return parseSkeleton(file, jsonContent);
     }
 
-    public static List<ReplaceJob> parseSkeleton(File file, String jsonContent) {
+    public static List<ReplaceTask> parseSkeleton(File file, String jsonContent) {
         try {
             JsonObject obj = JsonParser.object().from(jsonContent);
             return getJobsFromSkeletonJson(obj);
@@ -81,20 +81,20 @@ public class JsonUtils {
      * }
      * }}
      */
-    private static List<ReplaceJob> getJobsFromSkeletonJson(JsonObject jsonObject) {
-        List<ReplaceJob> replaceJobs = new ArrayList<>();
+    private static List<ReplaceTask> getJobsFromSkeletonJson(JsonObject jsonObject) {
+        List<ReplaceTask> replaceTasks = new ArrayList<>();
         for (Map.Entry<String, Object> jInputs : jsonObject.entrySet()) {
             for (Map.Entry<String, Object> jOutputs : ((JsonObject) jInputs.getValue()).entrySet()) {
                 HashMap<String, String> variables = new HashMap<>();
                 for (Map.Entry<String, Object> jVariables : ((JsonObject) jOutputs.getValue()).entrySet()) {
                     variables.put(jVariables.getKey(), String.valueOf(jVariables.getValue()));
                 }
-                replaceJobs.add(new ReplaceJob(jOutputs.getKey(),
+                replaceTasks.add(new ReplaceTask(jOutputs.getKey(),
                         FileUtils.readFile(Paths.get(Program.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile()),
                         variables));
             }
         }
-        return replaceJobs;
+        return replaceTasks;
     }
 
     public static void refresh() {

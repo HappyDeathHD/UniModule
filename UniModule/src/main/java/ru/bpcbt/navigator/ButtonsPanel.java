@@ -1,7 +1,7 @@
 package ru.bpcbt.navigator;
 
 import ru.bpcbt.Program;
-import ru.bpcbt.utils.ReplaceJobsExecutor;
+import ru.bpcbt.utils.ReplaceTasksExecutor;
 import ru.bpcbt.misc.ColoredButton;
 import ru.bpcbt.utils.MiniFrame;
 import ru.bpcbt.utils.Style;
@@ -72,7 +72,7 @@ public class ButtonsPanel extends JPanel {
                             System.lineSeparator() +
                             "Для этого нужно выделить что-нибудь из вкладки со скелетами.");
                 } else {
-                    ReplaceJobsExecutor.process(inputPanel.getSelectedFiles());
+                    ReplaceTasksExecutor.process(inputPanel.getSelectedFiles());
                 }
             });
             add(processSingleB);
@@ -84,7 +84,7 @@ public class ButtonsPanel extends JPanel {
             processAllB.setPressedBackgroundColor(Style.RED);
             processAllB.addActionListener(e -> {
                 NavigatorPanel inputPanel = Program.getMainFrame().getInputFilesPanel();
-                ReplaceJobsExecutor.process(inputPanel.getFileList());
+                ReplaceTasksExecutor.process(inputPanel.getFileList());
             });
             add(processAllB);
             //отправить одного

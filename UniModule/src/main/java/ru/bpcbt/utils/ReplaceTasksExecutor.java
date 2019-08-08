@@ -3,7 +3,7 @@ package ru.bpcbt.utils;
 import javafx.util.Pair;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
-import ru.bpcbt.entity.ReplaceJob;
+import ru.bpcbt.entity.ReplaceTask;
 import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.entity.Placeholder;
@@ -18,18 +18,17 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class ReplaceJobsExecutor {
-    private static final int MAX_WORKER_THREAD = 9; // одновременно могут работать 10 свинка-воркеров, но один из них менеджер среднего звена
+public class ReplaceTasksExecutor {
     private static AtomicInteger workersCount = new AtomicInteger(0);
 
-    private static PriorityBlockingQueue<ReplaceJob> jobs = new PriorityBlockingQueue<>();
+    private static PriorityBlockingQueue<ReplaceTask> tasks = new PriorityBlockingQueue<>();
     private static Map<Placeholder, String> foundReplacements = new ConcurrentHashMap<>();
     private static Queue<Placeholder> notFoundReplacements = new ConcurrentLinkedQueue<>();
 
     private static int mainJobsCount;
     private static AtomicInteger mainJobsDone = new AtomicInteger(0);
 
-    private ReplaceJobsExecutor() { // Utils class
+    private ReplaceTasksExecutor() { // Utils class
     }
 
     public static void process(List<File> files) {
@@ -40,10 +39,10 @@ public class ReplaceJobsExecutor {
         List<File> commonInputFiles = files.stream()
                 .filter(f -> !f.getPath().contains(Const.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
                 .collect(Collectors.toList());
-        commonInputFiles.forEach(f -> jobs.add(new ReplaceJob(cutThePath(f), FileUtils.readFile(f), new HashMap<>())));
+        commonInputFiles.forEach(f -> tasks.add(new ReplaceTask(cutThePath(f), FileUtils.readFile(f), new HashMap<>())));
         //json
-        files.stream().filter(f -> f.getPath().contains(".json")).forEach(file -> jobs.addAll(JsonUtils.parseSkeleton(file)));
-        mainJobsCount = ReplaceJobsExecutor.jobs.size();
+        files.stream().filter(f -> f.getPath().contains(".json")).forEach(file -> tasks.addAll(JsonUtils.parseSkeleton(file)));
+        mainJobsCount = ReplaceTasksExecutor.tasks.size();
         Narrator.normal("Сейчас мы соберем " + mainJobsCount + " файл(-ов)");
         createWorkersManager().execute();
     }
@@ -52,13 +51,21 @@ public class ReplaceJobsExecutor {
         return new SwingWorker() {
             @Override
             protected Object doInBackground() {
+                int maxThreadsCount = Runtime.getRuntime().availableProcessors();
+                long start = System.currentTimeMillis();
+                Program.appendToReport("Начало собрки: " + new Date(start) +
+                                System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount +
+                                System.lineSeparator() + "Количество файлов для сборки: " + mainJobsCount,
+                        Style.WHITE);
                 workersCount.set(0);
                 while (mainJobsCount > mainJobsDone.get()) {
-                    if (workersCount.get() < MAX_WORKER_THREAD && !jobs.isEmpty()) {
+                    if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {
                         workersCount.incrementAndGet();
-                        takeOneJob(jobs.poll()).execute();
+                        System.out.println("zapusk " + workersCount + " rabotnika");
+                        new ReplaceJob(tasks.poll()).start();
                     }
                 }
+                Program.appendToReport("На сборку ушло " + (System.currentTimeMillis() - start) + "мс.", Style.WHITE);
                 makeConclusion();
                 return null;
             }
@@ -67,59 +74,6 @@ public class ReplaceJobsExecutor {
 
     private static String cutThePath(File file) {
         return file.getPath().replace(Program.getProperties().get(Settings.INPUT_DIR), "").substring(1);
-    }
-
-    private static SwingWorker takeOneJob(ReplaceJob job) {
-        return new SwingWorker() {
-            private boolean isModule() {
-                return job.getPriority() > 0;
-            }
-
-            @Override
-            protected Object doInBackground() {
-                try {
-                    String newFileContent = job.getContent();
-                    Set<Placeholder> allPlaceholders = getAllPlaceholders(newFileContent);
-                    boolean jobDone = true;
-                    if (!allPlaceholders.isEmpty()) {
-                        for (Placeholder placeholder : allPlaceholders) {
-                            placeholder.mergeVariables(job.getParentVariables());
-                            if (isLinksDone(placeholder, job.getPriority())) {
-                                String phValue = getContentForPlaceholder(placeholder, job.getPriority());
-                                if (phValue != null) {
-                                    newFileContent = newFileContent.replace(placeholder.wrapPH(), phValue);
-                                } else {
-                                    jobDone = false;
-                                }
-                            }
-                        }
-                    }
-                    if (jobDone) {
-                        if (!isModule()) {
-                            FileUtils.writeResultFile(job.getRawPlaceholder(), newFileContent);
-                            mainJobsDone.incrementAndGet();
-                            Program.appendToReport("Файл " + job.getRawPlaceholder() + " успешно сгенерирован!", Style.GREEN);
-                        } else {
-                            Placeholder placeholder = new Placeholder(job.getRawPlaceholder());
-                            placeholder.mergeVariables(job.getParentVariables());
-                            foundReplacements.put(placeholder, newFileContent);
-                            Program.appendToReport("Плейсхолдер " + placeholder + " успешно собран", Style.GREEN_B);
-                        }
-                    } else {
-                        jobs.add(new ReplaceJob(job.getRawPlaceholder(), newFileContent, job.getParentVariables(), job.getPriority()));
-                    }
-                } catch (Exception e) {
-                    Program.appendToReport("Ошибка в потоке, обрабатывающем файл " + job.getRawPlaceholder(), e);
-                }
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                super.done();
-                workersCount.getAndDecrement();
-            }
-        };
     }
 
     private static boolean isLinksDone(Placeholder placeholder, int priority) {
@@ -159,7 +113,7 @@ public class ReplaceJobsExecutor {
                 Map<String, String> parsedJson = JsonUtils.parseModule(placeholder.getFile());
                 if (parsedJson.containsKey(jsonAndInnerPH.getValue())) {
                     content = parsedJson.get(jsonAndInnerPH.getValue());
-                    jobs.add(new ReplaceJob(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
+                    tasks.add(new ReplaceTask(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
                 } else {
                     notFoundReplacements.add(placeholder);
                     Program.appendToReport("Плейсхолдер " + placeholder + " не был найден в json", Style.RED_B);
@@ -172,7 +126,7 @@ public class ReplaceJobsExecutor {
                     Program.appendToReport("Плейсхолдер " + placeholder + " не был найден в файле", Style.RED_B);
                     return placeholder.wrapPH();
                 } else {
-                    jobs.add(new ReplaceJob(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
+                    tasks.add(new ReplaceTask(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
                 }
             }
             return null;
@@ -224,11 +178,63 @@ public class ReplaceJobsExecutor {
     public static void refresh() {
         foundReplacements.clear();
         notFoundReplacements.clear();
-        jobs.clear();
+        tasks.clear();
         workersCount.set(0);
         mainJobsDone.set(0);
         JsonUtils.refresh();
         FileUtils.refresh();
         Program.setEnabledToProcessButtons(true);
+    }
+
+    private static class ReplaceJob extends Thread {
+        ReplaceTask task;
+
+        ReplaceJob(ReplaceTask task) {
+            this.task = task;
+        }
+
+        @Override
+        public void run() {
+            try {
+                String newFileContent = task.getContent();
+                Set<Placeholder> allPlaceholders = getAllPlaceholders(newFileContent);
+                boolean jobDone = true;
+                if (!allPlaceholders.isEmpty()) {
+                    for (Placeholder placeholder : allPlaceholders) {
+                        placeholder.mergeVariables(task.getParentVariables());
+                        if (isLinksDone(placeholder, task.getPriority())) {
+                            String phValue = getContentForPlaceholder(placeholder, task.getPriority());
+                            if (phValue != null) {
+                                newFileContent = newFileContent.replace(placeholder.wrapPH(), phValue);
+                            } else {
+                                jobDone = false;
+                            }
+                        }
+                    }
+                }
+                if (jobDone) {
+                    if (!isModule()) {
+                        FileUtils.writeResultFile(task.getRawPlaceholder(), newFileContent);
+                        mainJobsDone.incrementAndGet();
+                        Program.appendToReport("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!", Style.GREEN);
+                    } else {
+                        Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
+                        placeholder.mergeVariables(task.getParentVariables());
+                        foundReplacements.put(placeholder, newFileContent);
+                        //Program.appendToReport("Плейсхолдер " + placeholder + " успешно собран", Style.GREEN_B);
+                    }
+                } else {
+                    tasks.add(new ReplaceTask(task.getRawPlaceholder(), newFileContent, task.getParentVariables(), task.getPriority()));
+                }
+            } catch (Exception e) {
+                Program.appendToReport("Ошибка в потоке, обрабатывающем файл " + task.getRawPlaceholder(), e);
+            } finally {
+                workersCount.getAndDecrement();
+            }
+        }
+
+        private boolean isModule() {
+            return task.getPriority() > 0;
+        }
     }
 }

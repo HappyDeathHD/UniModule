@@ -1,6 +1,6 @@
 package ru.bpcbt;
 
-import ru.bpcbt.utils.ReplaceJobsExecutor;
+import ru.bpcbt.utils.ReplaceTasksExecutor;
 import ru.bpcbt.utils.Style;
 import ru.bpcbt.rest.TemplateUploader;
 import ru.bpcbt.settings.Settings;
@@ -34,7 +34,7 @@ public class Program {
         mainFrame.getInputFilesPanel().refreshFiles();
         mainFrame.getModulesPanel().refreshFiles();
         mainFrame.getOutputFilesPanel().refreshFiles();
-        ReplaceJobsExecutor.refresh();
+        ReplaceTasksExecutor.refresh();
         TemplateUploader.refresh();
     }
 
