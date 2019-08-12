@@ -1,8 +1,8 @@
 package ru.bpcbt.entity;
 
 import javafx.util.Pair;
-import ru.bpcbt.Program;
 import ru.bpcbt.misc.Delimiters;
+import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.Style;
 import ru.bpcbt.settings.Settings;
 
@@ -13,6 +13,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Плейсхолдер — ссылка до текста, которым он сам должен быть заменен.
+ * <p/>
+ * <ul>
+ * <li>Все плейсхолдеры начинаются и оканчиваются на {@link Delimiters#START_END}</li>
+ * <li>Корневая директория определяется {@link Settings#MODULE_DIR}</li>
+ * <li>Плейсхолдер может содержать один путь разделенный при помощи {@link Delimiters#DELIMITER} и любое количество переменных. Переменные выделяются {@link Delimiters#VARIABLE_START_END}</li>
+ * <li>Переменные бывают 3 видов:<ul>
+ * <li>"название=значение" — объявление переменной</li>
+ * <li>только название — место для подстановки значение объявленной ранее переменной</li>
+ * <li>"название={@link Delimiters#LINK_START_END}ссылка{@link Delimiters#LINK_START_END}" — объявление переменной плейсхолдером без использования {@link Delimiters#START_END}</li>
+ * </ul>
+ * </li>
+ * <li>Текст для замены берется в корневой директории с добавлением личного пути плейсхолдера</li>
+ * <li>В найденном тексте переменные состоящие только из названия заменятся значениями</li>
+ * </ul>
+ */
 public class Placeholder {
     private String rawPH;
     private String body;
@@ -26,7 +43,7 @@ public class Placeholder {
         try {
             setVariables(placeholder.trim());
         } catch (Exception e) {
-            Program.appendToReport("Плохой плейсхолдер " + placeholder, Style.RED);
+            GlobalUtils.appendToReport("Плохой плейсхолдер " + placeholder, Style.RED);
             body = placeholder;
         }
     }
@@ -78,32 +95,12 @@ public class Placeholder {
         return Delimiters.VARIABLE_START_END.getSymbol() + variable + Delimiters.VARIABLE_START_END.getSymbol();
     }
 
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public Map<String, String> getVariables() {
-        return variables;
-    }
-
     public String wrapPH() {
         return Delimiters.START_END.getSymbol() + rawPH + Delimiters.START_END.getSymbol();
     }
 
     private static String wrapPH(String placeholder) {
         return Delimiters.START_END.getSymbol() + placeholder + Delimiters.START_END.getSymbol();
-    }
-
-    public String getRawPH() {
-        return rawPH;
-    }
-
-    public Map<String, Placeholder> getLinks() {
-        return links;
     }
 
     public boolean isJson() {
@@ -131,10 +128,16 @@ public class Placeholder {
 
     private File getFile(String pathStr) {
         String[] pathPieces = pathStr.split(Delimiters.DELIMITER.getSymbol());
-        Path fullPath = Paths.get(Program.getProperties().get(Settings.MODULE_DIR), pathPieces);
+        Path fullPath = Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), pathPieces);
         return fullPath.toFile();
     }
 
+    /**
+     * Объединяет объявленные переменные плейсхолдера с переменными, определенные его прородителем.<br/>
+     * Значения не перетирают значений данного плейсхолдера.
+     *
+     * @param parentVariables результат объединения
+     */
     public void mergeVariables(Map<String, String> parentVariables) {
         for (Map.Entry<String, String> variable : parentVariables.entrySet()) {
             if (!variables.containsKey(variable.getKey())) {
@@ -172,4 +175,26 @@ public class Placeholder {
     public int hashCode() {
         return Objects.hash(body, variables);
     }
+
+    /*Getters & Setters*/
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public String getRawPH() {
+        return rawPH;
+    }
+
+    public Map<String, Placeholder> getLinks() {
+        return links;
+    }
+
 }

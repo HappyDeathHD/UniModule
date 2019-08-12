@@ -1,7 +1,7 @@
 package ru.bpcbt.rest;
 
 import com.grack.nanojson.JsonWriter;
-import ru.bpcbt.Program;
+import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.Style;
 import ru.bpcbt.utils.FileUtils;
 
@@ -29,7 +29,7 @@ public class UnimessageClient {
 
     public int uploadFileToTemplate(File file, long templateId, String language, String topic) {
         try {
-            Program.appendToReport("Начинаю загрузку " + file.getName() + " в " + templateId + " c языком " + language, Style.GREEN);
+            GlobalUtils.appendToReport("Начинаю загрузку " + file.getName() + " в " + templateId + " c языком " + language, Style.GREEN);
             URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
             HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
             connection.setDoOutput(true);
@@ -51,14 +51,14 @@ public class UnimessageClient {
 
             int httpResult = connection.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK) {
-                Program.appendToReport(file.getName() + " успешно загрузился", Style.GREEN);
+                GlobalUtils.appendToReport(file.getName() + " успешно загрузился", Style.GREEN);
                 return httpResult;
             } else {
-                Program.appendToReport(file.getName() + " не загрузился:" + System.lineSeparator() +
+                GlobalUtils.appendToReport(file.getName() + " не загрузился:" + System.lineSeparator() +
                         connection.getResponseCode() + " " + connection.getResponseMessage(), Style.RED);
             }
         } catch (Exception e) {
-            Program.appendToReport("Файл " + file.getName() + " не загрузился:", e);
+            GlobalUtils.appendToReport("Файл " + file.getName() + " не загрузился:", e);
         }
         return -1;
     }
@@ -87,14 +87,14 @@ public class UnimessageClient {
                     sb.append(line);
                 }
                 reader.close();
-                Program.appendToReport("Получен новый токен", Style.GREEN);
+                GlobalUtils.appendToReport("Получен новый токен", Style.GREEN);
                 token = substringBetween(sb.toString(), "\"token\":\"", "\"");
             } else {
-                Program.appendToReport("Не удалось получить токен:" + System.lineSeparator() +
+                GlobalUtils.appendToReport("Не удалось получить токен:" + System.lineSeparator() +
                         connection.getResponseCode() + " " + connection.getResponseMessage(), Style.RED);
             }
         } catch (Exception e) {
-            Program.appendToReport("Не удалось получить токен:", e);
+            GlobalUtils.appendToReport("Не удалось получить токен:", e);
         }
     }
 
@@ -114,14 +114,14 @@ public class UnimessageClient {
                     sb.append(line);
                 }
                 reader.close();
-                Program.appendToReport("Список схем успешно загрузился", Style.GREEN);
+                GlobalUtils.appendToReport("Список схем успешно загрузился", Style.GREEN);
                 return sb.toString();
             } else {
-                Program.appendToReport("Не удалось загрузить список схем:" + System.lineSeparator() +
+                GlobalUtils.appendToReport("Не удалось загрузить список схем:" + System.lineSeparator() +
                         connection.getResponseCode() + " " + connection.getResponseMessage(), Style.RED);
             }
         } catch (Exception e) {
-            Program.appendToReport("Не удалось загрузить список схем:", e);
+            GlobalUtils.appendToReport("Не удалось загрузить список схем:", e);
         }
         return null;
     }

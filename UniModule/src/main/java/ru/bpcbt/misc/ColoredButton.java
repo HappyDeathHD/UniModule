@@ -10,13 +10,17 @@ public class ColoredButton extends JButton {
 
     public ColoredButton(String text) {
         super(text);
-        super.setContentAreaFilled(false);
+        setContentAreaFilled(false);
     }
 
-    public ColoredButton(Icon icon) {
+    public ColoredButton(Icon icon, String toolTip, Color bgColor, Color bgColorHover, Color bgColorPressed) {
         super(icon);
-        super.setContentAreaFilled(false);
-        super.setPreferredSize(new Dimension(45,45));
+        setContentAreaFilled(false);
+        setPreferredSize(new Dimension(45, 45));
+        setToolTipText(toolTip);
+        setBackground(bgColor);
+        setHoverBackgroundColor(bgColorHover);
+        setPressedBackgroundColor(bgColorPressed);
     }
 
     @Override
@@ -36,6 +40,7 @@ public class ColoredButton extends JButton {
     public void setContentAreaFilled(boolean b) {
     }
 
+    /*Getters & Setters*/
     public void setHoverBackgroundColor(Color hoverBackgroundColor) {
         this.hoverBackgroundColor = hoverBackgroundColor;
     }

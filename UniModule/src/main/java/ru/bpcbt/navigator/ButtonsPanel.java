@@ -11,6 +11,7 @@ import ru.bpcbt.rest.TemplateUploader;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class ButtonsPanel extends JPanel {
 
@@ -27,44 +28,34 @@ public class ButtonsPanel extends JPanel {
         try {
             setLayout(new FlowLayout(FlowLayout.LEFT));
             //обновить
-            refreshB = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/refresh.png"))));
-            refreshB.setToolTipText("Обновить список файлов");
-            refreshB.setBackground(Style.GREEN);
-            refreshB.setHoverBackgroundColor(Style.GREEN_B);
-            refreshB.setPressedBackgroundColor(Style.YELLOW);
+            refreshB = new ColoredButton(getIconFromResource("/images/refresh.png"),
+                    "Обновить список файлов",
+                    Style.GREEN, Style.GREEN_B, Style.YELLOW);
             refreshB.addActionListener(e -> parent.refreshFiles());
             add(refreshB);
             //сохранить
-            saveB = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/save.png"))));
-            saveB.setToolTipText("Сохранить открытый файл");
+            saveB = new ColoredButton(getIconFromResource("/images/save.png"),
+                    "Сохранить открытый файл",
+                    Style.GREEN, Style.GREEN_B, Style.YELLOW);
             saveB.addActionListener(e -> parent.saveCurrentFile());
-            saveB.setBackground(Style.GREEN);
-            saveB.setHoverBackgroundColor(Style.GREEN_B);
-            saveB.setPressedBackgroundColor(Style.YELLOW);
             saveB.setEnabled(false);
             add(saveB);
             //выделить
-            markB = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/mark.png"))));
-            markB.setToolTipText("Разукрасить. Ну да, пока в ручную");
-            markB.setBackground(Style.YELLOW);
-            markB.setHoverBackgroundColor(Style.RED);
-            markB.setPressedBackgroundColor(Style.BLUE);
+            markB = new ColoredButton(getIconFromResource("/images/mark.png"),
+                    "Разукрасить. Ну да, пока в ручную",
+                    Style.YELLOW, Style.RED, Style.BLUE);
             markB.addActionListener(e -> parent.repaintTextToDisplay());
             add(markB);
             //открыть в проводнике
-            openDir = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/folder.png"))));
-            openDir.setToolTipText("Открыть текущую папку в проводнике");
-            openDir.setBackground(Style.BLUE);
-            openDir.setHoverBackgroundColor(Style.BLUE_B);
-            openDir.setPressedBackgroundColor(Style.YELLOW);
+            openDir = new ColoredButton(getIconFromResource("/images/folder.png"),
+                    "Открыть текущую папку в проводнике",
+                    Style.BLUE, Style.BLUE_B, Style.YELLOW);
             openDir.addActionListener(e -> parent.openCurrentDir());
             add(openDir);
             //заменить для выбранного скелета
-            processSingleB = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/buildOne.png"))));
-            processSingleB.setToolTipText("Сгенерировать файлы с заменой плейсхолдеров для выбранных скелетов");
-            processSingleB.setBackground(Style.GREEN);
-            processSingleB.setHoverBackgroundColor(Style.GREEN_B);
-            processSingleB.setPressedBackgroundColor(Style.RED);
+            processSingleB = new ColoredButton(getIconFromResource("/images/buildOne.png"),
+                    "Сгенерировать файлы с заменой плейсхолдеров для выбранных скелетов",
+                    Style.GREEN, Style.GREEN_B, Style.RED);
             processSingleB.addActionListener(e -> {
                 NavigatorPanel inputPanel = Program.getMainFrame().getInputFilesPanel();
                 if (inputPanel.getSelectedFiles().isEmpty()) {
@@ -77,22 +68,18 @@ public class ButtonsPanel extends JPanel {
             });
             add(processSingleB);
             //заменить для всех скелетов
-            processAllB = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/buildMultiple.png"))));
-            processAllB.setToolTipText("Сгенерировать все файлы с заменой плейсхолдеров для всех скелетов");
-            processAllB.setBackground(Style.GREEN);
-            processAllB.setHoverBackgroundColor(Style.GREEN_B);
-            processAllB.setPressedBackgroundColor(Style.RED);
+            processAllB = new ColoredButton(getIconFromResource("/images/buildMultiple.png"),
+                    "Сгенерировать все файлы с заменой плейсхолдеров для всех скелетов",
+                    Style.GREEN, Style.GREEN_B, Style.RED);
             processAllB.addActionListener(e -> {
                 NavigatorPanel inputPanel = Program.getMainFrame().getInputFilesPanel();
                 ReplaceTasksExecutor.process(inputPanel.getFileList());
             });
             add(processAllB);
             //отправить одного
-            uploadSingleB = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/uploadOne.png"))));
-            uploadSingleB.setToolTipText("Отправить выбранных во вкладке результатов на сервер");
-            uploadSingleB.setBackground(Style.YELLOW);
-            uploadSingleB.setHoverBackgroundColor(Style.YELLOW_B);
-            uploadSingleB.setPressedBackgroundColor(Style.YELLOW);
+            uploadSingleB = new ColoredButton(getIconFromResource("/images/uploadOne.png"),
+                    "Отправить выбранных во вкладке результатов на сервер",
+                    Style.YELLOW, Style.YELLOW_B, Style.YELLOW);
             uploadSingleB.addActionListener(e -> {
                 NavigatorPanel outputPanel = Program.getMainFrame().getOutputFilesPanel();
                 if (outputPanel.getSelectedFiles().isEmpty()) {
@@ -105,11 +92,9 @@ public class ButtonsPanel extends JPanel {
             });
             add(uploadSingleB);
             //отправить всех
-            uploadAllB = new ColoredButton(new ImageIcon(ImageIO.read(Program.class.getResourceAsStream("/images/uploadMultiple.png"))));
-            uploadAllB.setToolTipText("Отправить всех с вкладки результатов на сервер");
-            uploadAllB.setBackground(Style.YELLOW);
-            uploadAllB.setHoverBackgroundColor(Style.YELLOW_B);
-            uploadAllB.setPressedBackgroundColor(Style.YELLOW);
+            uploadAllB = new ColoredButton(getIconFromResource("/images/uploadMultiple.png"),
+                    "Отправить всех с вкладки результатов на сервер",
+                    Style.YELLOW, Style.YELLOW_B, Style.YELLOW);
             uploadAllB.addActionListener(e -> {
                 NavigatorPanel outputPanel = Program.getMainFrame().getOutputFilesPanel();
                 TemplateUploader.uploadJob(outputPanel.getFileList()).execute();
@@ -120,8 +105,8 @@ public class ButtonsPanel extends JPanel {
         }
     }
 
-    public ColoredButton getSaveB() {
-        return saveB;
+    private ImageIcon getIconFromResource(String path) throws IOException {
+        return new ImageIcon(ImageIO.read(Program.class.getResourceAsStream(path)));
     }
 
     public void setEnabledToProcessButtons(boolean isEnabled) {
@@ -129,5 +114,10 @@ public class ButtonsPanel extends JPanel {
         processAllB.setEnabled(isEnabled);
         uploadSingleB.setEnabled(isEnabled);
         uploadAllB.setEnabled(isEnabled);
+    }
+
+    /*Getters & Setters*/
+    public ColoredButton getSaveB() {
+        return saveB;
     }
 }

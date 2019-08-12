@@ -1,6 +1,6 @@
 package ru.bpcbt.navigator;
 
-import ru.bpcbt.Program;
+import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.MiniFrame;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.utils.Style;
@@ -97,7 +97,7 @@ public class NavigatorPanel extends JPanel {
     }
 
     public void refreshFiles() {
-        String workingDir = Program.getProperties().get(workingDirType);
+        String workingDir = GlobalUtils.getProperties().get(workingDirType);
         fileList = FileUtils.getFilesByTypeRecursively(workingDir);
         Vector<String> htmlFilesVector = fileList.stream().map(file -> FileUtils.makeTitleFromFile(file, workingDir))
                 .collect(Collectors.toCollection(Vector::new));
@@ -147,7 +147,7 @@ public class NavigatorPanel extends JPanel {
 
     public void openCurrentDir() {
         try {
-            Desktop.getDesktop().open(new File(Program.getProperties().get(workingDirType)));
+            Desktop.getDesktop().open(new File(GlobalUtils.getProperties().get(workingDirType)));
         } catch (IOException e) {
             Narrator.error("Не удалось открыть проводник");
         }

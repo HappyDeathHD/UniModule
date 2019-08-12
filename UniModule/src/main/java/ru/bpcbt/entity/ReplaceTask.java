@@ -20,22 +20,6 @@ public class ReplaceTask implements Comparable<ReplaceTask> {
         this.priority = priority;
     }
 
-    public String getRawPlaceholder() {
-        return rawPlaceholder;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Map<String, String> getParentVariables() {
-        return parentVariables;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,5 +38,22 @@ public class ReplaceTask implements Comparable<ReplaceTask> {
     @Override
     public int compareTo(ReplaceTask o) {
         return o.getPriority() - this.priority;
+    }
+
+    /*Getters & Setters*/
+    public String getRawPlaceholder() {
+        return rawPlaceholder;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Map<String, String> getParentVariables() {
+        return parentVariables;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 }

@@ -1,6 +1,5 @@
 package ru.bpcbt.utils;
 
-import ru.bpcbt.Program;
 import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.settings.Settings;
@@ -137,7 +136,7 @@ public class FileUtils {
     public static void mkDir(File file) {
         if (!file.exists()) {
             if (!file.mkdir()) {
-                Program.appendToReport("Не удалось создать директорию " + file.getPath(), Style.RED);
+                GlobalUtils.appendToReport("Не удалось создать директорию " + file.getPath(), Style.RED);
             }
         }
     }
@@ -162,9 +161,9 @@ public class FileUtils {
     }
 
     public static void writeResultFile(String fileName, String newFileContent) {
-        String outputDir = Program.getProperties().get(Settings.OUTPUT_DIR);
+        String outputDir = GlobalUtils.getProperties().get(Settings.OUTPUT_DIR);
         String[] separatedPath = FileUtils.separatePlaceholders(fileName);
-        if (Program.getProperties().get(Settings.INPUT_DIR).equals(outputDir)) {
+        if (GlobalUtils.getProperties().get(Settings.INPUT_DIR).equals(outputDir)) {
             separatedPath[0] = Const.CONFLICT_PREFIX + separatedPath[0];
         }
         Path newPath = Paths.get(outputDir, separatedPath);

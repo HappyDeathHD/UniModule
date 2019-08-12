@@ -3,7 +3,6 @@ package ru.bpcbt.utils;
 import com.grack.nanojson.JsonObject;
 import com.grack.nanojson.JsonParser;
 import com.grack.nanojson.JsonParserException;
-import ru.bpcbt.Program;
 import ru.bpcbt.entity.ReplaceTask;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.settings.Settings;
@@ -33,7 +32,7 @@ public class JsonUtils {
                 JsonObject obj = JsonParser.object().from(jsonContent);
                 fillMapFromModuleJson(result, obj, "");
             } catch (JsonParserException e) {
-                Program.appendToReport("Ошибка в дочернем json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
+                GlobalUtils.appendToReport("Ошибка в дочернем json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
             }
             cachedJson.put(file, result);
             jsonProcessStatus.put(file, true);
@@ -45,6 +44,28 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * Парсит json скелет скелетов вида:
+     * <pre>
+     * {
+     *   "путь@к@основному@скелету.html": {
+     *     "путь@для@результов@результат1.html": {
+     *       "переменная1": "значение1",
+     *       "переменная2": "значение2"
+     *     },
+     *     "путь@для@результов@результат2.html": {
+     *       "переменная1": "значение1",
+     *       "переменная2": "значение2"
+     *     }
+     *   }
+     * }
+     * </pre>
+     * Создает и возвращает лист из ReplaceTask
+     *
+     * @param file файл скелета скелетов
+     * @return лист ReplaceTask
+     * @see ReplaceTask
+     */
     public static List<ReplaceTask> parseSkeleton(File file) {
         String jsonContent = FileUtils.readFile(file);
         return parseSkeleton(file, jsonContent);
@@ -55,7 +76,7 @@ public class JsonUtils {
             JsonObject obj = JsonParser.object().from(jsonContent);
             return getJobsFromSkeletonJson(obj);
         } catch (Exception e) {
-            Program.appendToReport("Ошибка в родительском json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
+            GlobalUtils.appendToReport("Ошибка в родительском json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
             return new ArrayList<>();
         }
     }
@@ -70,21 +91,6 @@ public class JsonUtils {
         }
     }
 
-    /**
-     * Пример:
-     * <pre>
-     * {
-     *  "input1.html":{
-     *        "output1.html":{
-     *            "var1":1
-     *         },
-     *         "output2.html":{
-     *             "var1":2
-     *         }
-     *  }
-     * }
-     * </pre>
-     */
     private static List<ReplaceTask> getJobsFromSkeletonJson(JsonObject jsonObject) {
         List<ReplaceTask> replaceTasks = new ArrayList<>();
         for (Map.Entry<String, Object> jInputs : jsonObject.entrySet()) {
@@ -94,7 +100,7 @@ public class JsonUtils {
                     variables.put(jVariables.getKey(), String.valueOf(jVariables.getValue()));
                 }
                 replaceTasks.add(new ReplaceTask(jOutputs.getKey(),
-                        FileUtils.readFile(Paths.get(Program.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile()),
+                        FileUtils.readFile(Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile()),
                         variables));
             }
         }

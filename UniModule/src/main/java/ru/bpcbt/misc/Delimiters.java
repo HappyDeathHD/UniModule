@@ -14,6 +14,7 @@ public enum Delimiters {
         this.description = description;
     }
 
+    /*Getters & Setters*/
     public String getSymbol() {
         return symbol;
     }

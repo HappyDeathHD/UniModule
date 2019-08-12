@@ -40,7 +40,7 @@ public class SelectDirActionListener implements ActionListener {
             String newWorkingDir = String.valueOf(chooser.getSelectedFile());
             selectedDirTF.setText(newWorkingDir);
         } else {
-            Narrator.normal("Для смены дирекории надо нажать на \"Выбрать\"");
+            Narrator.normal("Для смены дирекории надо нажать на \"" + UIManager.get("FileChooser.openButtonText") + "\"");
         }
     }
 }

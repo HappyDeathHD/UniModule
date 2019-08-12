@@ -3,6 +3,7 @@ package ru.bpcbt.settings;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.misc.ColoredButton;
+import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.Style;
 import ru.bpcbt.utils.FileUtils;
 import ru.bpcbt.logger.Narrator;
@@ -145,10 +146,10 @@ public class SettingsPanel extends JPanel {
                 properties.put(CORE_URL, coreUrlTF.getText());
                 properties.put(USERNAME, usernameTF.getText());
                 Font font = new Font(fontNameCB.getSelectedItem().toString(), Font.PLAIN, (int) fontSizeS.getValue());
-                Program.setNavigatorsFont(font);
+                GlobalUtils.setNavigatorsFont(font);
                 FileUtils.setProperties(properties);
                 Narrator.success("Схоронил!");
-                Program.refreshAllFiles();
+                GlobalUtils.refreshAllFiles();
                 Program.getMainFrame().setPaneTab(MainFrame.INPUTS_TAB);
             } catch (Exception ex) {
                 Narrator.yell("Не удалось сохранить настройки", ex);
@@ -194,7 +195,7 @@ public class SettingsPanel extends JPanel {
             int size = Integer.parseInt(properties.get(FONT_SIZE));
             fontSizeS.setValue(size);
             Font font = new Font(fonts[selectedFont], Font.PLAIN, (int) fontSizeS.getValue());
-            Program.setNavigatorsFont(font);
+            GlobalUtils.setNavigatorsFont(font);
         }
         if (properties.containsKey(CORE_URL)) {
             coreUrlTF.setText(properties.get(CORE_URL));
