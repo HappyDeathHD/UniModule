@@ -50,7 +50,7 @@ public class JsonUtils {
         return parseSkeleton(file, jsonContent);
     }
 
-    public static List<ReplaceTask> parseSkeleton(File file, String jsonContent) {
+    private static List<ReplaceTask> parseSkeleton(File file, String jsonContent) {
         try {
             JsonObject obj = JsonParser.object().from(jsonContent);
             return getJobsFromSkeletonJson(obj);
@@ -72,14 +72,18 @@ public class JsonUtils {
 
     /**
      * Пример:
-     * {"input1.html":{
-     * "output1.html":{
-     * "var1":1
-     * },
-     * "output2.html":{
-     * "var1":2
+     * <pre>
+     * {
+     *  "input1.html":{
+     *        "output1.html":{
+     *            "var1":1
+     *         },
+     *         "output2.html":{
+     *             "var1":2
+     *         }
+     *  }
      * }
-     * }}
+     * </pre>
      */
     private static List<ReplaceTask> getJobsFromSkeletonJson(JsonObject jsonObject) {
         List<ReplaceTask> replaceTasks = new ArrayList<>();

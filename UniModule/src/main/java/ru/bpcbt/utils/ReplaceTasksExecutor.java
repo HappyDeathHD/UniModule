@@ -19,6 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class ReplaceTasksExecutor {
+    /**
+     * Одновременно могут работать 10 свинка-воркеров, но один из них менеджер среднего звена
+     */
+    private static final int MAX_WORKER_THREAD = 9;
     private static AtomicInteger workersCount = new AtomicInteger(0);
 
     private static PriorityBlockingQueue<ReplaceTask> tasks = new PriorityBlockingQueue<>();
@@ -51,18 +55,22 @@ public class ReplaceTasksExecutor {
         return new SwingWorker() {
             @Override
             protected Object doInBackground() {
-                int maxThreadsCount = Runtime.getRuntime().availableProcessors();
+                int maxThreadsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
                 long start = System.currentTimeMillis();
                 Program.appendToReport("Начало собрки: " + new Date(start) +
-                                System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount +
+                                System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount,
+                        Style.WHITE);
+                if (maxThreadsCount > MAX_WORKER_THREAD) {
+                    maxThreadsCount = MAX_WORKER_THREAD;
+                }
+                Program.appendToReport("Количество потоков: " + maxThreadsCount +
                                 System.lineSeparator() + "Количество файлов для сборки: " + mainJobsCount,
                         Style.WHITE);
                 workersCount.set(0);
                 while (mainJobsCount > mainJobsDone.get()) {
                     if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {
                         workersCount.incrementAndGet();
-                        System.out.println("zapusk " + workersCount + " rabotnika");
-                        new ReplaceJob(tasks.poll()).start();
+                        getSwingWorkerWithTask(tasks.poll()).execute();
                     }
                 }
                 Program.appendToReport("На сборку ушло " + (System.currentTimeMillis() - start) + "мс.", Style.WHITE);
@@ -186,55 +194,52 @@ public class ReplaceTasksExecutor {
         Program.setEnabledToProcessButtons(true);
     }
 
-    private static class ReplaceJob extends Thread {
-        ReplaceTask task;
-
-        ReplaceJob(ReplaceTask task) {
-            this.task = task;
-        }
-
-        @Override
-        public void run() {
-            try {
-                String newFileContent = task.getContent();
-                Set<Placeholder> allPlaceholders = getAllPlaceholders(newFileContent);
-                boolean jobDone = true;
-                if (!allPlaceholders.isEmpty()) {
-                    for (Placeholder placeholder : allPlaceholders) {
-                        placeholder.mergeVariables(task.getParentVariables());
-                        if (isLinksDone(placeholder, task.getPriority())) {
-                            String phValue = getContentForPlaceholder(placeholder, task.getPriority());
-                            if (phValue != null) {
-                                newFileContent = newFileContent.replace(placeholder.wrapPH(), phValue);
-                            } else {
-                                jobDone = false;
+    private static SwingWorker getSwingWorkerWithTask(ReplaceTask task) {
+        return new SwingWorker() {
+            @Override
+            protected Object doInBackground() {
+                try {
+                    String newFileContent = task.getContent();
+                    Set<Placeholder> allPlaceholders = getAllPlaceholders(newFileContent);
+                    boolean jobDone = true;
+                    if (!allPlaceholders.isEmpty()) {
+                        for (Placeholder placeholder : allPlaceholders) {
+                            placeholder.mergeVariables(task.getParentVariables());
+                            if (isLinksDone(placeholder, task.getPriority())) {
+                                String phValue = getContentForPlaceholder(placeholder, task.getPriority());
+                                if (phValue != null) {
+                                    newFileContent = newFileContent.replace(placeholder.wrapPH(), phValue);
+                                } else {
+                                    jobDone = false;
+                                }
                             }
                         }
                     }
-                }
-                if (jobDone) {
-                    if (!isModule()) {
-                        FileUtils.writeResultFile(task.getRawPlaceholder(), newFileContent);
-                        mainJobsDone.incrementAndGet();
-                        Program.appendToReport("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!", Style.GREEN);
+                    if (jobDone) {
+                        if (!isModule()) {
+                            FileUtils.writeResultFile(task.getRawPlaceholder(), newFileContent);
+                            mainJobsDone.incrementAndGet();
+                            Program.appendToReport("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!", Style.GREEN);
+                        } else {
+                            Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
+                            placeholder.mergeVariables(task.getParentVariables());
+                            foundReplacements.put(placeholder, newFileContent);
+                            //Program.appendToReport("Плейсхолдер " + placeholder + " успешно собран", Style.GREEN_B);
+                        }
                     } else {
-                        Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
-                        placeholder.mergeVariables(task.getParentVariables());
-                        foundReplacements.put(placeholder, newFileContent);
-                        //Program.appendToReport("Плейсхолдер " + placeholder + " успешно собран", Style.GREEN_B);
+                        tasks.add(new ReplaceTask(task.getRawPlaceholder(), newFileContent, task.getParentVariables(), task.getPriority()));
                     }
-                } else {
-                    tasks.add(new ReplaceTask(task.getRawPlaceholder(), newFileContent, task.getParentVariables(), task.getPriority()));
+                } catch (Exception e) {
+                    Program.appendToReport("Ошибка в потоке, обрабатывающем файл " + task.getRawPlaceholder(), e);
+                } finally {
+                    workersCount.getAndDecrement();
                 }
-            } catch (Exception e) {
-                Program.appendToReport("Ошибка в потоке, обрабатывающем файл " + task.getRawPlaceholder(), e);
-            } finally {
-                workersCount.getAndDecrement();
+                return null;
             }
-        }
 
-        private boolean isModule() {
-            return task.getPriority() > 0;
-        }
+            private boolean isModule() {
+                return task.getPriority() > 0;
+            }
+        };
     }
 }
