@@ -75,20 +75,24 @@ public class TemplateUploader {
                     Narrator.warn("Нечего грузить!");
                     return null;
                 }
-                int errorsCount = 0;
                 if (!checkAndPrepareConnectionSettings()) {
                     Narrator.error("Не удалось получить токен, проверь данные для подключения");
                     return null;
                 }
+                int errorsCount = 0;
                 fillTemplates();
                 for (File file : files) {
-                    String templateName = templateNameMap.get(getTemplateName(file));
-                    if (templateName != null && templateIdMap.containsKey(templateName)) {
+                    String templateName = getTemplateName(file);
+                    if (templateNameMap.containsKey(templateName)) {
+                        templateName = templateNameMap.get(getTemplateName(file));
+                    }
+                    if (templateIdMap.containsKey(templateName)) {
                         if (!upload(templateName, file)) {
                             errorsCount++;
                         }
                     } else {
-                        GlobalUtils.appendToReport("Схема " + templateName + " не найдена", Style.RED);
+                        GlobalUtils.appendToReport("Схема " + templateName + " (" + file.getName() + ")" + " не найдена", Style.RED);
+                        errorsCount++;
                     }
                 }
                 if (errorsCount == 0) {
@@ -115,7 +119,7 @@ public class TemplateUploader {
             JsonArray templateArray = obj.getArray("key");
             for (Object o : templateArray) {
                 JsonObject templateObj = (JsonObject) o;
-                templateIdMap.put(templateObj.get("code").toString(), Long.parseLong(templateObj.get("id").toString()));
+                templateIdMap.put(templateObj.get("code").toString().toUpperCase(), Long.parseLong(templateObj.get("id").toString()));
             }
         } catch (JsonParserException e) {
             GlobalUtils.appendToReport("Ошибка в полученном json'e со схемами" + e.getMessage(), Style.RED);
@@ -154,6 +158,9 @@ public class TemplateUploader {
         }
         long templateId = templateIdMap.get(templateName);
         String topic = templateTopicMap.get(templateName + language.toUpperCase());
+        if(topic == null){
+            topic = file.getName();
+        }
         int httpResult = client.uploadFileToTemplate(file, templateId, language, topic);
 
         if (httpResult == HttpURLConnection.HTTP_OK) {
@@ -191,6 +198,6 @@ public class TemplateUploader {
     }
 
     private static String getTemplateName(File file) {
-        return file.getParentFile().getName();
+        return file.getParentFile().getName().toUpperCase();
     }
 }
