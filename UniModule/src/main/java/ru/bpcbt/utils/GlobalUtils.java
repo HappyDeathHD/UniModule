@@ -11,6 +11,9 @@ import java.util.Map;
 
 public class GlobalUtils {
 
+    private GlobalUtils() { //Utils class
+    }
+
     public static MainFrame getMainFrame() {
         return Program.getMainFrame();
     }
