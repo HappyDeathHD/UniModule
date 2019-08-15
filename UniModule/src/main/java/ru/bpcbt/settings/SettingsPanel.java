@@ -11,6 +11,7 @@ import ru.bpcbt.logger.Narrator;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Map;
 
 import static ru.bpcbt.settings.Settings.*;
@@ -20,13 +21,13 @@ public class SettingsPanel extends JPanel {
     private JTextField modulesDirTF;
     private JTextField outputDirTF;
     private JComboBox fontNameCB;
+    private JComboBox styleCB;
     private JSpinner fontSizeS;
     private JTextField coreUrlTF;
     private JTextField usernameTF;
 
     private final JPasswordField passwordPF = new JPasswordField();
 
-    private Map<Settings, String> properties;
     private GridBagConstraints gridBag;
     private String[] fonts;
 
@@ -36,14 +37,14 @@ public class SettingsPanel extends JPanel {
         gridBag.insets = new Insets(3, 3, 3, 3);
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(new Insets(10, 10, 10, 10)));
-
-        addOptionDir(INPUT_DIR, inputDirTF = new JTextField());
-        addOptionDir(MODULE_DIR, modulesDirTF = new JTextField());
-        addOptionDir(OUTPUT_DIR, outputDirTF = new JTextField());
         fonts = GraphicsEnvironment
                 .getLocalGraphicsEnvironment()
                 .getAvailableFontFamilyNames();
-        addFontSelector(fonts);
+        addOptionDir(INPUT_DIR, inputDirTF = new JTextField());
+        addOptionDir(MODULE_DIR, modulesDirTF = new JTextField());
+        addOptionDir(OUTPUT_DIR, outputDirTF = new JTextField());
+        addFontSelector();
+        addLookAndFeelSelector();
         addApiBlock();
         addSaveButton();
     }
@@ -95,12 +96,12 @@ public class SettingsPanel extends JPanel {
         gridBag.gridwidth = 1;
     }
 
-    private void addFontSelector(String[] fonts) {
-        JLabel workingDirL = new JLabel(FONT_NAME.getDescription());
+    private void addFontSelector() {
+        JLabel fontNameL = new JLabel(FONT_NAME.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
         gridBag.gridwidth = 2;
-        add(workingDirL, gridBag);
+        add(fontNameL, gridBag);
 
         fontNameCB = new JComboBox(fonts);
         gridBag.gridwidth = 1;
@@ -110,6 +111,21 @@ public class SettingsPanel extends JPanel {
         fontSizeS = new JSpinner();
         gridBag.gridx = 1;
         add(fontSizeS, gridBag);
+    }
+
+    private void addLookAndFeelSelector() {
+        JLabel styleL = new JLabel(STYLE.getDescription());
+        gridBag.gridx = 0;
+        gridBag.gridy++;
+        gridBag.gridwidth = 2;
+        add(styleL, gridBag);
+
+        Object[] lafNames = Arrays.stream(Style.getLafs()).map(UIManager.LookAndFeelInfo::getName).toArray();
+        styleCB = new JComboBox(lafNames);
+        gridBag.gridy++;
+        add(styleCB, gridBag);
+
+        gridBag.gridwidth = 1;
     }
 
     private void addOptionDir(Settings property, JTextField field) {
@@ -138,6 +154,7 @@ public class SettingsPanel extends JPanel {
         saveB.setPressedBackgroundColor(Style.YELLOW);
         saveB.addActionListener(e -> {
             try {
+                Map<Settings, String> properties = Program.getProperties();
                 properties.put(INPUT_DIR, inputDirTF.getText());
                 properties.put(MODULE_DIR, modulesDirTF.getText());
                 properties.put(OUTPUT_DIR, outputDirTF.getText());
@@ -145,9 +162,12 @@ public class SettingsPanel extends JPanel {
                 properties.put(FONT_SIZE, String.valueOf(fontSizeS.getValue()));
                 properties.put(CORE_URL, coreUrlTF.getText());
                 properties.put(USERNAME, usernameTF.getText());
+                properties.put(STYLE, String.valueOf(styleCB.getSelectedIndex()));
                 Font font = new Font(fontNameCB.getSelectedItem().toString(), Font.PLAIN, (int) fontSizeS.getValue());
                 GlobalUtils.setNavigatorsFont(font);
                 FileUtils.setProperties(properties);
+                UIManager.setLookAndFeel(Style.getLafs()[styleCB.getSelectedIndex()].getClassName());
+                SwingUtilities.updateComponentTreeUI(Program.getMainFrame());
                 Narrator.success("Схоронил!");
                 GlobalUtils.refreshAllFiles();
                 Program.getMainFrame().setPaneTab(MainFrame.INPUTS_TAB);
@@ -173,7 +193,7 @@ public class SettingsPanel extends JPanel {
 
     public void loadConfigurations() {
         boolean allMandatoryParamsExist = true;
-        properties = FileUtils.getProperties();
+        Map<Settings, String> properties = Program.getProperties();
         if (properties.containsKey(INPUT_DIR)) {
             inputDirTF.setText(properties.get(INPUT_DIR));
         } else {
@@ -206,15 +226,15 @@ public class SettingsPanel extends JPanel {
         if (properties.containsKey(USERNAME)) {
             usernameTF.setText(properties.get(USERNAME));
         }
+        if (properties.containsKey(STYLE)) {
+            int lafIndex = Integer.parseInt(properties.get(STYLE));
+            styleCB.setSelectedIndex(lafIndex);
+        }
         if (allMandatoryParamsExist) {
             Narrator.normal("С возвращением!");
         } else {
             Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
         }
-    }
-
-    public Map<Settings, String> getProperties() {
-        return properties;
     }
 
     public String getPassword() {

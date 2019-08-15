@@ -27,7 +27,7 @@ public class GlobalUtils {
     }
 
     public static Map<Settings, String> getProperties() {
-        return getMainFrame().getSettingsPanel().getProperties();
+        return Program.getProperties();
     }
 
     public static void appendToReport(String message, Color color) {
