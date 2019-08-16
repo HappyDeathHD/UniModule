@@ -50,17 +50,17 @@ public class SettingsPanel extends JPanel {
     }
 
     private void addApiBlock() {
-        Dimension perfectTFSize = new Dimension(0, 26);
-        Dimension perfectLSize = new Dimension(0, 13);
+        final Dimension perfectTFSize = new Dimension(0, 26);
+        final Dimension perfectLSize = new Dimension(0, 13);
 
-        JPanel apiPanel = new JPanel(new GridBagLayout());
+        final JPanel apiPanel = new JPanel(new GridBagLayout());
         apiPanel.setBorder(BorderFactory.createTitledBorder("Данные для подключения к API"));
-        GridBagConstraints apiGridBag = new GridBagConstraints();
+        final GridBagConstraints apiGridBag = new GridBagConstraints();
         apiGridBag.fill = GridBagConstraints.BOTH;
         apiGridBag.insets = new Insets(3, 3, 3, 3);
         apiGridBag.weightx = 1;
 
-        JLabel coreUrlL = new JLabel(CORE_URL.getDescription());
+        final JLabel coreUrlL = new JLabel(CORE_URL.getDescription());
         apiGridBag.gridwidth = 2;
         apiGridBag.gridy = 0;
         apiGridBag.gridx = 0;
@@ -70,7 +70,7 @@ public class SettingsPanel extends JPanel {
         apiGridBag.gridy = 1;
         apiPanel.add(coreUrlTF, apiGridBag);
 
-        JLabel loginL = new JLabel(USERNAME.getDescription());
+        final JLabel loginL = new JLabel(USERNAME.getDescription());
         loginL.setPreferredSize(perfectLSize);
         apiGridBag.gridwidth = 1;
         apiGridBag.gridy = 2;
@@ -80,7 +80,7 @@ public class SettingsPanel extends JPanel {
         apiGridBag.gridy = 3;
         apiPanel.add(usernameTF, apiGridBag);
 
-        JLabel passwordL = new JLabel(PASSWORD.getDescription());
+        final JLabel passwordL = new JLabel(PASSWORD.getDescription());
         passwordL.setPreferredSize(perfectLSize);
         apiGridBag.gridx = 1;
         apiGridBag.gridy = 2;
@@ -97,7 +97,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private void addFontSelector() {
-        JLabel fontNameL = new JLabel(FONT_NAME.getDescription());
+        final JLabel fontNameL = new JLabel(FONT_NAME.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
         gridBag.gridwidth = 2;
@@ -114,13 +114,13 @@ public class SettingsPanel extends JPanel {
     }
 
     private void addLookAndFeelSelector() {
-        JLabel styleL = new JLabel(STYLE.getDescription());
+        final JLabel styleL = new JLabel(STYLE.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
         gridBag.gridwidth = 2;
         add(styleL, gridBag);
 
-        Object[] lafNames = Arrays.stream(Style.getLafs()).map(UIManager.LookAndFeelInfo::getName).toArray();
+        final Object[] lafNames = Arrays.stream(Style.getLafs()).map(UIManager.LookAndFeelInfo::getName).toArray();
         styleCB = new JComboBox(lafNames);
         gridBag.gridy++;
         add(styleCB, gridBag);
@@ -129,7 +129,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private void addOptionDir(Settings property, JTextField field) {
-        JLabel workingDirL = new JLabel(property.getDescription());
+        final JLabel workingDirL = new JLabel(property.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
         gridBag.gridwidth = 2;
@@ -141,14 +141,14 @@ public class SettingsPanel extends JPanel {
         gridBag.gridy++;
         add(field, gridBag);
 
-        ColoredButton button = getCommonSelectFileButton();
+        final ColoredButton button = getCommonSelectFileButton();
         button.addActionListener(new SelectDirActionListener(this, field, property));
         gridBag.gridx = 1;
         add(button, gridBag);
     }
 
     private void addSaveButton() {
-        ColoredButton saveB = new ColoredButton("Сохрани и Примени");
+        final ColoredButton saveB = new ColoredButton("Сохрани и Примени");
         saveB.setBackground(Style.GREEN);
         saveB.setHoverBackgroundColor(Style.GREEN_B);
         saveB.setPressedBackgroundColor(Style.YELLOW);
@@ -183,7 +183,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private ColoredButton getCommonSelectFileButton() {
-        ColoredButton button = new ColoredButton("🔍");
+        final ColoredButton button = new ColoredButton("🔍");
         button.setBackground(Style.GREEN);
         button.setHoverBackgroundColor(Style.GREEN_B);
         button.setPressedBackgroundColor(Style.YELLOW);
@@ -193,7 +193,7 @@ public class SettingsPanel extends JPanel {
 
     public void loadConfigurations() {
         boolean allMandatoryParamsExist = true;
-        Map<Settings, String> properties = Program.getProperties();
+        final Map<Settings, String> properties = Program.getProperties();
         if (properties.containsKey(INPUT_DIR)) {
             inputDirTF.setText(properties.get(INPUT_DIR));
         } else {

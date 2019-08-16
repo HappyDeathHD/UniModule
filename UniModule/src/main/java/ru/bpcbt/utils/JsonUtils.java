@@ -26,10 +26,10 @@ public class JsonUtils {
         if (!jsonProcessStatus.containsKey(file)) {
             jsonProcessStatus.put(file, false);
 
-            Map<String, String> result = new HashMap<>();
-            String jsonContent = FileUtils.readFile(file);
+            final Map<String, String> result = new HashMap<>();
+            final String jsonContent = FileUtils.readFile(file);
             try {
-                JsonObject obj = JsonParser.object().from(jsonContent);
+                final JsonObject obj = JsonParser.object().from(jsonContent);
                 fillMapFromModuleJson(result, obj, "");
             } catch (JsonParserException e) {
                 GlobalUtils.appendToReport("Ошибка в дочернем json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
@@ -67,13 +67,13 @@ public class JsonUtils {
      * @see ReplaceTask
      */
     public static List<ReplaceTask> parseSkeleton(File file) {
-        String jsonContent = FileUtils.readFile(file);
+        final String jsonContent = FileUtils.readFile(file);
         return parseSkeleton(file, jsonContent);
     }
 
     private static List<ReplaceTask> parseSkeleton(File file, String jsonContent) {
         try {
-            JsonObject obj = JsonParser.object().from(jsonContent);
+            final JsonObject obj = JsonParser.object().from(jsonContent);
             return getJobsFromSkeletonJson(obj);
         } catch (Exception e) {
             GlobalUtils.appendToReport("Ошибка в родительском json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
@@ -92,10 +92,10 @@ public class JsonUtils {
     }
 
     private static List<ReplaceTask> getJobsFromSkeletonJson(JsonObject jsonObject) {
-        List<ReplaceTask> replaceTasks = new ArrayList<>();
+        final List<ReplaceTask> replaceTasks = new ArrayList<>();
         for (Map.Entry<String, Object> jInputs : jsonObject.entrySet()) {
             for (Map.Entry<String, Object> jOutputs : ((JsonObject) jInputs.getValue()).entrySet()) {
-                HashMap<String, String> variables = new HashMap<>();
+                final HashMap<String, String> variables = new HashMap<>();
                 for (Map.Entry<String, Object> jVariables : ((JsonObject) jOutputs.getValue()).entrySet()) {
                     variables.put(jVariables.getKey(), String.valueOf(jVariables.getValue()));
                 }

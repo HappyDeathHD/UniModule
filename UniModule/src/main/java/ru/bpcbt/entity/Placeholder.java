@@ -55,16 +55,16 @@ public class Placeholder {
             String subPH = placeholder.substring(0, placeholder.length() - varDelimiter.length());
             if (subPH.endsWith(linkDelimiter)) { //это ссылка
                 subPH = placeholder.substring(0, subPH.length() - linkDelimiter.length());
-                int startValue = subPH.lastIndexOf(linkDelimiter);
-                String linkValue = subPH.substring(startValue + linkDelimiter.length());
-                int startKey = subPH.substring(0, startValue).lastIndexOf(varDelimiter);
-                String keyValue = subPH.substring(startKey + varDelimiter.length()).split("=")[0];
+                final int startValue = subPH.lastIndexOf(linkDelimiter);
+                final String linkValue = subPH.substring(startValue + linkDelimiter.length());
+                final int startKey = subPH.substring(0, startValue).lastIndexOf(varDelimiter);
+                final String keyValue = subPH.substring(startKey + varDelimiter.length()).split("=")[0];
                 links.put(keyValue, new Placeholder(linkValue));
                 setVariables(subPH.substring(0, startKey));
             } else { //это обычная переменная
-                int start = subPH.lastIndexOf(varDelimiter);
-                String rawVariable = subPH.substring(start + varDelimiter.length());
-                String[] split = rawVariable.split("=");
+                final int start = subPH.lastIndexOf(varDelimiter);
+                final String rawVariable = subPH.substring(start + varDelimiter.length());
+                final String[] split = rawVariable.split("=");
                 if (split.length == 2) {
                     variables.put(split[0].trim(), split[1].trim());
                 }
@@ -84,7 +84,7 @@ public class Placeholder {
     }
 
     public String getVariableWithReplaces() {
-        String result = getWithReplaces();
+        final String result = getWithReplaces();
         if (result.equals(body)) {
             return wrapPH(result);
         }
@@ -111,7 +111,7 @@ public class Placeholder {
      * @return пара путь/значение, вида docs@data.json/@var1@var2
      */
     public Pair<String, String> getJsonAndInnerPH() {
-        String[] untilAndAfterJson = getWithReplaces().split(".json");
+        final String[] untilAndAfterJson = getWithReplaces().split(".json");
         if (untilAndAfterJson.length != 2) {
             return null;
         }
@@ -127,8 +127,8 @@ public class Placeholder {
     }
 
     private File getFile(String pathStr) {
-        String[] pathPieces = pathStr.split(Delimiters.DELIMITER.getSymbol());
-        Path fullPath = Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), pathPieces);
+        final String[] pathPieces = pathStr.split(Delimiters.DELIMITER.getSymbol());
+        final Path fullPath = Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), pathPieces);
         return fullPath.toFile();
     }
 
@@ -152,7 +152,7 @@ public class Placeholder {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(body);
+        final StringBuilder sb = new StringBuilder(body);
         for (Map.Entry<String, String> variable : variables.entrySet()) {
             sb.append(Delimiters.VARIABLE_START_END.getSymbol())
                     .append(variable.getKey()).append("=").append(variable.getValue())

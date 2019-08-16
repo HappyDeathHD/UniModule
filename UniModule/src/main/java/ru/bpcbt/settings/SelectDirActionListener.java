@@ -24,10 +24,10 @@ public class SelectDirActionListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JFileChooser chooser = new JFileChooser();
+        final JFileChooser chooser = new JFileChooser();
         chooser.setLocale(Locale.getDefault());
         chooser.updateUI();
-        String workingDir = selectedDirTF.getText().trim();
+        final String workingDir = selectedDirTF.getText().trim();
         if (FileUtils.isDirExists(workingDir)) {
             chooser.setCurrentDirectory(new File(workingDir));
         } else {
@@ -37,7 +37,7 @@ public class SelectDirActionListener implements ActionListener {
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-            String newWorkingDir = String.valueOf(chooser.getSelectedFile());
+            final String newWorkingDir = String.valueOf(chooser.getSelectedFile());
             selectedDirTF.setText(newWorkingDir);
         } else {
             Narrator.normal("Для смены дирекории надо нажать на \"" + UIManager.get("FileChooser.openButtonText") + "\"");

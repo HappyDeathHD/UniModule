@@ -30,7 +30,7 @@ public class FileUtils {
         if (pathToFile == null || pathToFile.trim().isEmpty()) {
             return false;
         }
-        File file = new File(pathToFile);
+        final File file = new File(pathToFile);
         return file.exists() && !file.isDirectory();
     }
 
@@ -45,12 +45,12 @@ public class FileUtils {
         if (pathToDir == null || pathToDir.trim().isEmpty()) {
             return false;
         }
-        File file = new File(pathToDir);
+        final File file = new File(pathToDir);
         return file.exists() && file.isDirectory();
     }
 
     public static void setProperties(Map<Settings, String> properties) {
-        Properties configFile = new Properties();
+        final Properties configFile = new Properties();
         if (isFileExists(CONFIGURATION_FILE)) {
             try (InputStream is = new FileInputStream(CONFIGURATION_FILE)) {
                 configFile.loadFromXML(is);
@@ -80,7 +80,7 @@ public class FileUtils {
     }
 
     public static List<File> getFilesByTypeRecursively(String workingDir) {
-        List<File> neededFiles = new ArrayList<>();
+        final List<File> neededFiles = new ArrayList<>();
         if (isDirExists(workingDir)) {
             File dir = new File(workingDir);
             for (File file : dir.listFiles()) {
@@ -143,7 +143,7 @@ public class FileUtils {
 
     public static String makeTitleFromFile(File file, String dirPath) {
         if (file.getPath().contains(dirPath)) {
-            String desiredPath = file.getPath().replace(dirPath, "")
+            final String desiredPath = file.getPath().replace(dirPath, "")
                     .replace(SEPARATOR, Delimiters.DELIMITER.getSymbol());
             return desiredPath.startsWith(Delimiters.DELIMITER.getSymbol())
                     ? desiredPath.replaceFirst(Delimiters.DELIMITER.getSymbol(), "")
@@ -161,12 +161,12 @@ public class FileUtils {
     }
 
     public static void writeResultFile(String fileName, String newFileContent) {
-        String outputDir = GlobalUtils.getProperties().get(Settings.OUTPUT_DIR);
-        String[] separatedPath = FileUtils.separatePlaceholders(fileName);
+        final String outputDir = GlobalUtils.getProperties().get(Settings.OUTPUT_DIR);
+        final String[] separatedPath = FileUtils.separatePlaceholders(fileName);
         if (GlobalUtils.getProperties().get(Settings.INPUT_DIR).equals(outputDir)) {
             separatedPath[0] = Const.CONFLICT_PREFIX + separatedPath[0];
         }
-        Path newPath = Paths.get(outputDir, separatedPath);
+        final Path newPath = Paths.get(outputDir, separatedPath);
         mkDir(newPath.toFile().getParentFile());
         createFile(newPath.toString(), newFileContent);
     }

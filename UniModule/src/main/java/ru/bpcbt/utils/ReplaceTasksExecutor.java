@@ -23,14 +23,14 @@ public class ReplaceTasksExecutor {
      * Одновременно могут работать 10 свинка-воркеров, но один из них менеджер среднего звена
      */
     private static final int MAX_WORKER_THREAD = 9;
-    private static AtomicInteger workersCount = new AtomicInteger(0);
+    private static final AtomicInteger workersCount = new AtomicInteger(0);
 
-    private static PriorityBlockingQueue<ReplaceTask> tasks = new PriorityBlockingQueue<>();
-    private static Map<Placeholder, String> foundReplacements = new ConcurrentHashMap<>();
-    private static Queue<Placeholder> notFoundReplacements = new ConcurrentLinkedQueue<>();
+    private static final PriorityBlockingQueue<ReplaceTask> tasks = new PriorityBlockingQueue<>();
+    private static final Map<Placeholder, String> foundReplacements = new ConcurrentHashMap<>();
+    private static final Queue<Placeholder> notFoundReplacements = new ConcurrentLinkedQueue<>();
 
     private static int mainJobsCount;
-    private static AtomicInteger mainJobsDone = new AtomicInteger(0);
+    private static final AtomicInteger mainJobsDone = new AtomicInteger(0);
 
     private ReplaceTasksExecutor() { // Utils class
     }
@@ -40,7 +40,7 @@ public class ReplaceTasksExecutor {
         GlobalUtils.setEnabledToProcessButtons(false);
         Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
         //не json
-        List<File> commonInputFiles = files.stream()
+        final List<File> commonInputFiles = files.stream()
                 .filter(f -> !f.getPath().contains(Const.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
                 .collect(Collectors.toList());
         commonInputFiles.forEach(f -> tasks.add(new ReplaceTask(cutThePath(f), FileUtils.readFile(f), new HashMap<>())));
@@ -56,7 +56,7 @@ public class ReplaceTasksExecutor {
             @Override
             protected Object doInBackground() {
                 int maxThreadsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
-                long start = System.currentTimeMillis();
+                final long start = System.currentTimeMillis();
                 GlobalUtils.appendToReport("Начало собрки: " + new Date(start) +
                                 System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount,
                         Style.WHITE);
@@ -88,8 +88,8 @@ public class ReplaceTasksExecutor {
         boolean linksDone = true;
         for (Map.Entry<String, Placeholder> link : placeholder.getLinks().entrySet()) {
             link.getValue().mergeVariables(placeholder.getVariables());
-            Map<String, String> linkVariables = new HashMap<>();
-            String linkValue = getContentForPlaceholder(link.getValue(), priority + 1);
+            final Map<String, String> linkVariables = new HashMap<>();
+            final String linkValue = getContentForPlaceholder(link.getValue(), priority + 1);
             if (linkValue != null) {
                 linkVariables.put(link.getKey(), linkValue);
                 placeholder.mergeVariables(linkVariables);
@@ -102,7 +102,7 @@ public class ReplaceTasksExecutor {
 
     private static String getContentForPlaceholder(Placeholder placeholder, int priority) {
         if (placeholder.isVariable()) {
-            String variable = placeholder.getVariableWithReplaces();
+            final String variable = placeholder.getVariableWithReplaces();
             if (variable.startsWith(Delimiters.START_END.getSymbol())) { // не все переменные были определены
                 notFoundReplacements.add(placeholder);
                 GlobalUtils.appendToReport("Не все переменные плейсхолдера " + placeholder + " были определены", Style.RED_B);
@@ -117,8 +117,8 @@ public class ReplaceTasksExecutor {
         if (FileUtils.isFileExists(placeholder.getFile())) {
             String content;
             if (placeholder.isJson()) {
-                Pair<String, String> jsonAndInnerPH = placeholder.getJsonAndInnerPH();
-                Map<String, String> parsedJson = JsonUtils.parseModule(placeholder.getFile());
+                final Pair<String, String> jsonAndInnerPH = placeholder.getJsonAndInnerPH();
+                final Map<String, String> parsedJson = JsonUtils.parseModule(placeholder.getFile());
                 if (parsedJson.containsKey(jsonAndInnerPH.getValue())) {
                     content = parsedJson.get(jsonAndInnerPH.getValue());
                     tasks.add(new ReplaceTask(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
@@ -146,8 +146,8 @@ public class ReplaceTasksExecutor {
     }
 
     private static Set<Placeholder> getAllPlaceholders(String text) {
-        Set<Placeholder> placeholders = new HashSet<>();
-        String sym = Delimiters.START_END.getSymbol();
+        final Set<Placeholder> placeholders = new HashSet<>();
+        final String sym = Delimiters.START_END.getSymbol();
         boolean isOdd = false;
         for (String pieceOfText : text.split(sym)) {
             if (isOdd) {
@@ -200,13 +200,13 @@ public class ReplaceTasksExecutor {
             protected Object doInBackground() {
                 try {
                     String newFileContent = task.getContent();
-                    Set<Placeholder> allPlaceholders = getAllPlaceholders(newFileContent);
+                    final Set<Placeholder> allPlaceholders = getAllPlaceholders(newFileContent);
                     boolean jobDone = true;
                     if (!allPlaceholders.isEmpty()) {
                         for (Placeholder placeholder : allPlaceholders) {
                             placeholder.mergeVariables(task.getParentVariables());
                             if (isLinksDone(placeholder, task.getPriority())) {
-                                String phValue = getContentForPlaceholder(placeholder, task.getPriority());
+                                final String phValue = getContentForPlaceholder(placeholder, task.getPriority());
                                 if (phValue != null) {
                                     newFileContent = newFileContent.replace(placeholder.wrapPH(), phValue);
                                 } else {
@@ -221,7 +221,7 @@ public class ReplaceTasksExecutor {
                             mainJobsDone.incrementAndGet();
                             GlobalUtils.appendToReport("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!", Style.GREEN);
                         } else {
-                            Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
+                            final Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
                             placeholder.mergeVariables(task.getParentVariables());
                             foundReplacements.put(placeholder, newFileContent);
                             //Program.appendToReport("Плейсхолдер " + placeholder + " успешно собран", Style.GREEN_B);
