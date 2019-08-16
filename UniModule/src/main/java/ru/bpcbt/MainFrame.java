@@ -72,7 +72,7 @@ public class MainFrame extends JFrame {
 
     private JPanel getInfoPanel() {
         JPanel hintsPanel = new JPanel();
-        StringBuilder hints = new StringBuilder("<html><h1>Разделители</h1><table>");
+        final StringBuilder hints = new StringBuilder("<html><h1>Разделители</h1><table>");
         for (Delimiters delimiter : Delimiters.values()) {
             hints.append("<tr><td>").append(delimiter.getSymbol()).append("</td><td>").append(delimiter.getDescription()).append("</td></tr>");
         }

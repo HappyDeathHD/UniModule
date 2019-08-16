@@ -13,25 +13,25 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class UnimessageClient {
+class UnimessageClient {
 
     private String coreUrl;
     private String token;
 
-    public UnimessageClient(String coreUrl, String login, String password) {
+    UnimessageClient(String coreUrl, String login, String password) {
         this.coreUrl = coreUrl;
         setNewToken(login, password);
     }
 
-    public boolean isAuth() {
+    boolean isAuth() {
         return token != null;
     }
 
-    public int uploadFileToTemplate(File file, long templateId, String language, String topic) {
+    int uploadFileToTemplate(File file, long templateId, String language, String topic) {
         try {
             GlobalUtils.appendToReport("Начинаю загрузку " + file.getName() + " в " + templateId + " c языком " + language, Style.GREEN);
-            URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
-            HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
+            final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
+            final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setRequestProperty("Authorization", "Bearer " + token);
@@ -39,8 +39,8 @@ public class UnimessageClient {
             connection.setRequestProperty("Accept", "application/json,text/plain");
             connection.setRequestProperty("Method", "POST");
 
-            OutputStream os = connection.getOutputStream();
-            String params = JsonWriter.string()
+            final OutputStream os = connection.getOutputStream();
+            final String params = JsonWriter.string()
                     .object()
                     .value("body", FileUtils.readFile(file))
                     .value("fileName", topic)
@@ -49,7 +49,7 @@ public class UnimessageClient {
             os.write(params.getBytes(StandardCharsets.UTF_8));
             os.close();
 
-            int httpResult = connection.getResponseCode();
+            final int httpResult = connection.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK) {
                 GlobalUtils.appendToReport(file.getName() + " успешно загрузился", Style.GREEN);
                 return httpResult;
@@ -65,23 +65,23 @@ public class UnimessageClient {
 
     private void setNewToken(String login, String password) {
         try {
-            URL authUrl = new URL(coreUrl + "/api/v1.0/authenticate");
-            HttpURLConnection connection = (HttpURLConnection) authUrl.openConnection();
+            final URL authUrl = new URL(coreUrl + "/api/v1.0/authenticate");
+            final HttpURLConnection connection = (HttpURLConnection) authUrl.openConnection();
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json,text/plain");
             connection.setRequestProperty("Method", "POST");
 
-            OutputStream os = connection.getOutputStream();
-            String params = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
+            final OutputStream os = connection.getOutputStream();
+            final String params = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
             os.write(params.getBytes(StandardCharsets.UTF_8));
             os.close();
 
-            StringBuilder sb = new StringBuilder();
-            int HttpResult = connection.getResponseCode();
+            final StringBuilder sb = new StringBuilder();
+            final int HttpResult = connection.getResponseCode();
             if (HttpResult == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
@@ -100,15 +100,15 @@ public class UnimessageClient {
 
     public String getRawTemplates() {
         try {
-            URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/headers");
-            HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
+            final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/headers");
+            final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setRequestProperty("Method", "GET");
 
-            StringBuilder sb = new StringBuilder();
-            int HttpResult = connection.getResponseCode();
+            final StringBuilder sb = new StringBuilder();
+            final int HttpResult = connection.getResponseCode();
             if (HttpResult == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
@@ -127,7 +127,7 @@ public class UnimessageClient {
     }
 
     private static String substringBetween(String victim, String prefix, String postfix) {
-        String withTrash = victim.substring(victim.indexOf(prefix)).substring(prefix.length());
+        final String withTrash = victim.substring(victim.indexOf(prefix)).substring(prefix.length());
         return withTrash.substring(0, withTrash.indexOf(postfix));
     }
 }

@@ -97,17 +97,17 @@ public class NavigatorPanel extends JPanel {
     }
 
     public void refreshFiles() {
-        String workingDir = GlobalUtils.getProperties().get(workingDirType);
+        final String workingDir = GlobalUtils.getProperties().get(workingDirType);
         fileList = FileUtils.getFilesByTypeRecursively(workingDir);
-        Vector<String> htmlFilesVector = fileList.stream().map(file -> FileUtils.makeTitleFromFile(file, workingDir))
+        final Vector<String> htmlFilesVector = fileList.stream().map(file -> FileUtils.makeTitleFromFile(file, workingDir))
                 .collect(Collectors.toCollection(Vector::new));
         navigatorList.setListData(htmlFilesVector);
     }
 
     private void appendToDisplay(String message, Color color) {
         StyleContext sc = StyleContext.getDefaultStyleContext();
-        AttributeSet attributeSet = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, color);
-        int length = display.getDocument().getLength();
+        final AttributeSet attributeSet = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, color);
+        final int length = display.getDocument().getLength();
         display.setCaretPosition(length);
         display.setCharacterAttributes(attributeSet, false);
         display.replaceSelection(message);
@@ -115,11 +115,11 @@ public class NavigatorPanel extends JPanel {
 
     private void setColoredTextToDisplay(String text) {
         display.setText("");
-        String sym = Delimiters.START_END.getSymbol();
+        final String symbol = Delimiters.START_END.getSymbol();
         boolean isOdd = false;
-        for (String pieceOfText : text.split(sym)) {
+        for (String pieceOfText : text.split(symbol)) {
             if (isOdd) {
-                appendToDisplay(sym + pieceOfText + sym, Style.BLUE_B);
+                appendToDisplay(symbol + pieceOfText + symbol, Style.BLUE_B);
             } else {
                 appendToDisplay(pieceOfText, Style.WHITE);
             }
@@ -154,7 +154,7 @@ public class NavigatorPanel extends JPanel {
     }
 
     public List<File> getSelectedFiles() {
-        List<File> selectedFiles = new ArrayList<>();
+        final List<File> selectedFiles = new ArrayList<>();
         Arrays.stream(navigatorList.getSelectedIndices()).forEach(index -> selectedFiles.add(fileList.get(index)));
         return selectedFiles;
     }

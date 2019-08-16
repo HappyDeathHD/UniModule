@@ -1,5 +1,6 @@
 package ru.bpcbt.utils;
 
+import javax.swing.*;
 import java.awt.*;
 
 public class Style {
@@ -14,6 +15,12 @@ public class Style {
     public static final Color GRAY = new Color(238, 238, 238);
     public static final Color WHITE = new Color(255, 255, 255);
 
+    private static final UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
+
     private Style() {// Utils class
+    }
+
+    public static UIManager.LookAndFeelInfo[] getLafs() {
+        return lafs;
     }
 }

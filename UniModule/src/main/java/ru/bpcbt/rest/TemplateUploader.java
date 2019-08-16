@@ -37,7 +37,7 @@ public class TemplateUploader {
             if (coreUrl.endsWith("/")) {
                 coreUrl = coreUrl.substring(0, coreUrl.length() - 1);
             }
-            String login = GlobalUtils.getProperties().get(Settings.USERNAME).trim();
+            final String login = GlobalUtils.getProperties().get(Settings.USERNAME).trim();
             String password = Program.getMainFrame().getSettingsPanel().getPassword().trim();
             if (login.isEmpty()) {
                 Narrator.yell("Нужно заполнить логин/пароль для подключения к api");
@@ -45,7 +45,7 @@ public class TemplateUploader {
                 return false;
             }
             if (password.isEmpty()) {
-                String newPassword = MiniFrame.askPassword();
+                final String newPassword = MiniFrame.askPassword();
                 if (newPassword == null) {
                     Narrator.error("Без пароля ничего делать не буду!");
                     return false;
@@ -109,16 +109,16 @@ public class TemplateUploader {
     }
 
     private static void fillTemplates() {
-        String rawJson = client.getRawTemplates();
+        final String rawJson = client.getRawTemplates();
         if (rawJson == null) {
             templateIdMap.clear();
             return;
         }
         try {
-            JsonObject obj = JsonParser.object().from("{\"key\":" + rawJson + "}");
-            JsonArray templateArray = obj.getArray("key");
+            final JsonObject obj = JsonParser.object().from("{\"key\":" + rawJson + "}");
+            final JsonArray templateArray = obj.getArray("key");
             for (Object o : templateArray) {
-                JsonObject templateObj = (JsonObject) o;
+                final JsonObject templateObj = (JsonObject) o;
                 templateIdMap.put(templateObj.get("code").toString().toUpperCase(), Long.parseLong(templateObj.get("id").toString()));
             }
         } catch (JsonParserException e) {
@@ -128,17 +128,17 @@ public class TemplateUploader {
     }
 
     private static void fillThemes() {
-        String inputDir = GlobalUtils.getProperties().get(Settings.INPUT_DIR);
-        File mappingFile = Paths.get(inputDir, Const.TEMPLATE_MAPPING_FILE).toFile();
+        final String inputDir = GlobalUtils.getProperties().get(Settings.INPUT_DIR);
+        final File mappingFile = Paths.get(inputDir, Const.TEMPLATE_MAPPING_FILE).toFile();
         if (mappingFile.exists()) {
             try {
-                JsonObject mainNode = JsonParser.object().from(FileUtils.readFile(mappingFile));
+                final JsonObject mainNode = JsonParser.object().from(FileUtils.readFile(mappingFile));
                 for (Map.Entry<String, Object> folderMap : mainNode.entrySet()) {
-                    String folderName = folderMap.getKey();
-                    JsonObject properties = (JsonObject) folderMap.getValue();
-                    String templateName = properties.get("name").toString();
+                    final String folderName = folderMap.getKey();
+                    final JsonObject properties = (JsonObject) folderMap.getValue();
+                    final String templateName = properties.get("name").toString();
                     templateNameMap.put(folderName, templateName);
-                    JsonObject topics = (JsonObject) properties.get("topics");
+                    final JsonObject topics = (JsonObject) properties.get("topics");
                     for (Map.Entry<String, Object> topic : topics.entrySet()) {
                         templateTopicMap.put(templateName + topic.getKey().toUpperCase(), topic.getValue().toString());
                     }
@@ -152,17 +152,17 @@ public class TemplateUploader {
     }
 
     private static boolean upload(String templateName, File file) {
-        String language = getLanguage(file.getName());
+        final String language = getLanguage(file.getName());
         if (language == null) {
             return false;
         }
-        long templateId = templateIdMap.get(templateName);
+        final long templateId = templateIdMap.get(templateName);
         String topic = templateTopicMap.get(templateName + language.toUpperCase());
         if(topic == null){
             topic = file.getName();
         }
-        int httpResult = client.uploadFileToTemplate(file, templateId, language, topic);
 
+        final int httpResult = client.uploadFileToTemplate(file, templateId, language, topic);
         if (httpResult == HttpURLConnection.HTTP_OK) {
             return true;
         } else if (httpResult == HttpURLConnection.HTTP_FORBIDDEN || httpResult == HttpURLConnection.HTTP_UNAUTHORIZED) {
@@ -184,8 +184,8 @@ public class TemplateUploader {
 
     private static String getLanguage(String fileName) {
         try {
-            String[] split = fileName.split("_");
-            String language = split[split.length - 1].split("\\.")[0].toUpperCase();
+            final String[] split = fileName.split("_");
+            final String language = split[split.length - 1].split("\\.")[0].toUpperCase();
             if (language.length() != 2) {
                 GlobalUtils.appendToReport("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:", Style.RED);
                 return null;

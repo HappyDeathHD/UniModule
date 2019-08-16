@@ -21,7 +21,7 @@ public class ReportPanel extends JPanel {
     public void appendToReport(String message, Color color) {
         SwingUtilities.invokeLater(() -> {
             StyleContext sc = StyleContext.getDefaultStyleContext();
-            AttributeSet attributeSet = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, color);
+            final AttributeSet attributeSet = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, color);
             int length = report.getDocument().getLength();
             report.setCaretPosition(length);
             report.setCharacterAttributes(attributeSet, false);

@@ -16,18 +16,18 @@ public class MiniFrame {
     }
 
     public static String askPassword() {
-        JPanel panel = new JPanel();
-        JLabel label = new JLabel("Введите пароль:");
-        JPasswordField pass = new JPasswordField(20);
+        final JPanel panel = new JPanel();
+        final JLabel label = new JLabel("Введите пароль:");
+        final JPasswordField pass = new JPasswordField(20);
         panel.add(label);
         panel.add(pass);
-        String[] options = new String[]{"Готово", "Не буду"};
+        final String[] options = new String[]{"Готово", "Не буду"};
         pass.grabFocus();
-        int option = JOptionPane.showOptionDialog(null, panel, "Пароль для доступа к api",
+        final int option = JOptionPane.showOptionDialog(null, panel, "Пароль для доступа к api",
                 JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, options, pass);
         if (option == 0) {
-            char[] password = pass.getPassword();
+            final char[] password = pass.getPassword();
             return new String(password);
         }
         return null;
