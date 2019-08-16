@@ -104,6 +104,11 @@ public class NavigatorPanel extends JPanel {
         navigatorList.setListData(htmlFilesVector);
     }
 
+    /**
+     * TODO
+     *
+     * @see ru.bpcbt.logger.ReportPane
+     */
     private void appendToDisplay(String message, Color color) {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         final AttributeSet attributeSet = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, color);

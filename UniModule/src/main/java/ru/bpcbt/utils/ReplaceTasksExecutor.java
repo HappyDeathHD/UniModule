@@ -5,6 +5,7 @@ import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.entity.ReplaceTask;
 import ru.bpcbt.logger.Narrator;
+import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.entity.Placeholder;
 import ru.bpcbt.settings.Settings;
@@ -36,7 +37,7 @@ public class ReplaceTasksExecutor {
     }
 
     public static void process(List<File> files) {
-        GlobalUtils.clearReport();
+        ReportPane.clearReport();
         GlobalUtils.setEnabledToProcessButtons(false);
         Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
         //не json
@@ -57,15 +58,13 @@ public class ReplaceTasksExecutor {
             protected Object doInBackground() {
                 int maxThreadsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
                 final long start = System.currentTimeMillis();
-                GlobalUtils.appendToReport("Начало собрки: " + new Date(start) +
-                                System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount,
-                        Style.WHITE);
+                ReportPane.normal("Начало собрки: " + new Date(start) +
+                                System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount);
                 if (maxThreadsCount > MAX_WORKER_THREAD) {
                     maxThreadsCount = MAX_WORKER_THREAD;
                 }
-                GlobalUtils.appendToReport("Количество потоков: " + maxThreadsCount +
-                                System.lineSeparator() + "Количество файлов для сборки: " + mainJobsCount,
-                        Style.WHITE);
+                ReportPane.normal("Количество потоков: " + maxThreadsCount +
+                                System.lineSeparator() + "Количество файлов для сборки: " + mainJobsCount);
                 workersCount.set(0);
                 while (mainJobsCount > mainJobsDone.get()) {
                     if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {
@@ -73,7 +72,7 @@ public class ReplaceTasksExecutor {
                         getSwingWorkerWithTask(tasks.poll()).execute();
                     }
                 }
-                GlobalUtils.appendToReport("На сборку ушло " + (System.currentTimeMillis() - start) + "мс.", Style.WHITE);
+                ReportPane.normal("На сборку ушло " + (System.currentTimeMillis() - start) + "мс.");
                 makeConclusion();
                 return null;
             }
@@ -105,7 +104,7 @@ public class ReplaceTasksExecutor {
             final String variable = placeholder.getVariableWithReplaces();
             if (variable.startsWith(Delimiters.START_END.getSymbol())) { // не все переменные были определены
                 notFoundReplacements.add(placeholder);
-                GlobalUtils.appendToReport("Не все переменные плейсхолдера " + placeholder + " были определены", Style.RED_B);
+                ReportPane.warning("Не все переменные плейсхолдера " + placeholder + " были определены");
             }
             return variable;
         }
@@ -124,14 +123,14 @@ public class ReplaceTasksExecutor {
                     tasks.add(new ReplaceTask(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
                 } else {
                     notFoundReplacements.add(placeholder);
-                    GlobalUtils.appendToReport("Плейсхолдер " + placeholder + " не был найден в json", Style.RED_B);
+                    ReportPane.error("Плейсхолдер " + placeholder + " не был найден в json");
                     return placeholder.wrapPH();
                 }
             } else {
                 content = FileUtils.readAndCacheFileContent(placeholder.getFile());
                 if (content.isEmpty()) {
                     notFoundReplacements.add(placeholder);
-                    GlobalUtils.appendToReport("Плейсхолдер " + placeholder + " не был найден в файле", Style.RED_B);
+                    ReportPane.error("Плейсхолдер " + placeholder + " не был найден в файле");
                     return placeholder.wrapPH();
                 } else {
                     tasks.add(new ReplaceTask(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
@@ -140,7 +139,7 @@ public class ReplaceTasksExecutor {
             return null;
         } else {
             notFoundReplacements.add(placeholder);
-            GlobalUtils.appendToReport("Плейсхолдер " + placeholder + " ведет к несуществующему файлу", Style.RED_B);
+            ReportPane.error("Плейсхолдер " + placeholder + " ведет к несуществующему файлу");
             return placeholder.wrapPH();
         }
     }
@@ -162,21 +161,19 @@ public class ReplaceTasksExecutor {
         Program.getMainFrame().getOutputFilesPanel().refreshFiles();
         if (notFoundReplacements.isEmpty()) {
             if (foundReplacements.isEmpty()) {
-                GlobalUtils.appendToReport(System.lineSeparator() + "Не было ни одного плейсхолдера!", Style.YELLOW);
+                ReportPane.warning(System.lineSeparator() + "Не было ни одного плейсхолдера!");
                 Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
                 Narrator.warn("Не было ни одного плейсхолдера!");
             } else {
-                GlobalUtils.appendToReport(System.lineSeparator() + "Все необходимые модули были найдены (" + foundReplacements.size() + " шт.)",
-                        Style.GREEN);
+                ReportPane.success(System.lineSeparator() + "Все необходимые модули были найдены (" + foundReplacements.size() + " шт.)");
                 Program.getMainFrame().setPaneTab(MainFrame.OUTPUTS_TAB);
                 Narrator.success("Все готово без ошибок!");
             }
         } else {
-            GlobalUtils.appendToReport(System.lineSeparator() +
+            ReportPane.error(System.lineSeparator() +
                             "Есть не найденные модули (" + notFoundReplacements.size() + " шт) (" + foundReplacements.size() + " найдено):" +
                             System.lineSeparator() + notFoundReplacements.stream().map(Placeholder::toString)
-                            .collect(Collectors.joining(System.lineSeparator())),
-                    Style.RED);
+                            .collect(Collectors.joining(System.lineSeparator())));
             Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
             Narrator.error("Все прошло не очень гладко!");
         }
@@ -219,18 +216,18 @@ public class ReplaceTasksExecutor {
                         if (!isModule()) {
                             FileUtils.writeResultFile(task.getRawPlaceholder(), newFileContent);
                             mainJobsDone.incrementAndGet();
-                            GlobalUtils.appendToReport("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!", Style.GREEN);
+                            ReportPane.success("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!");
                         } else {
                             final Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
                             placeholder.mergeVariables(task.getParentVariables());
                             foundReplacements.put(placeholder, newFileContent);
-                            //Program.appendToReport("Плейсхолдер " + placeholder + " успешно собран", Style.GREEN_B);
+                            //ReportPane.fine("Плейсхолдер " + placeholder + " успешно собран"); //узкое место
                         }
                     } else {
                         tasks.add(new ReplaceTask(task.getRawPlaceholder(), newFileContent, task.getParentVariables(), task.getPriority()));
                     }
                 } catch (Exception e) {
-                    GlobalUtils.appendToReport("Ошибка в потоке, обрабатывающем файл " + task.getRawPlaceholder(), e);
+                    ReportPane.error("Ошибка в потоке, обрабатывающем файл " + task.getRawPlaceholder(), e);
                 } finally {
                     workersCount.getAndDecrement();
                 }

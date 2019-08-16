@@ -4,6 +4,7 @@ import com.grack.nanojson.JsonObject;
 import com.grack.nanojson.JsonParser;
 import com.grack.nanojson.JsonParserException;
 import ru.bpcbt.entity.ReplaceTask;
+import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.settings.Settings;
 
@@ -32,7 +33,7 @@ public class JsonUtils {
                 final JsonObject obj = JsonParser.object().from(jsonContent);
                 fillMapFromModuleJson(result, obj, "");
             } catch (JsonParserException e) {
-                GlobalUtils.appendToReport("Ошибка в дочернем json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
+                ReportPane.error("Ошибка в дочернем json'e " + file.getPath() + " " + e.getMessage());
             }
             cachedJson.put(file, result);
             jsonProcessStatus.put(file, true);
@@ -76,7 +77,7 @@ public class JsonUtils {
             final JsonObject obj = JsonParser.object().from(jsonContent);
             return getJobsFromSkeletonJson(obj);
         } catch (Exception e) {
-            GlobalUtils.appendToReport("Ошибка в родительском json'e " + file.getPath() + " " + e.getMessage(), Style.RED);
+            ReportPane.error("Ошибка в родительском json'e " + file.getPath() + " " + e.getMessage());
             return new ArrayList<>();
         }
     }

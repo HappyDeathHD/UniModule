@@ -1,6 +1,7 @@
 package ru.bpcbt.utils;
 
 import ru.bpcbt.logger.Narrator;
+import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.settings.Settings;
 
@@ -136,7 +137,7 @@ public class FileUtils {
     public static void mkDir(File file) {
         if (!file.exists()) {
             if (!file.mkdir()) {
-                GlobalUtils.appendToReport("Не удалось создать директорию " + file.getPath(), Style.RED);
+                ReportPane.error("Не удалось создать директорию " + file.getPath());
             }
         }
     }
