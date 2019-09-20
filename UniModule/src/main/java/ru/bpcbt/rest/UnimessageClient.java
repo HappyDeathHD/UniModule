@@ -28,7 +28,6 @@ class UnimessageClient {
 
     int uploadFileToTemplate(File file, long templateId, String language, String topic) {
         try {
-            ReportPane.normal("Начинаю загрузку " + file.getName() + " в " + templateId + " c языком " + language);
             final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
             final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
             connection.setDoOutput(true);
@@ -50,7 +49,6 @@ class UnimessageClient {
 
             final int httpResult = connection.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK) {
-                ReportPane.success(file.getName() + " успешно загрузился");
                 return httpResult;
             } else {
                 ReportPane.error(file.getName() + " не загрузился:" + System.lineSeparator() +
@@ -86,8 +84,9 @@ class UnimessageClient {
                     sb.append(line);
                 }
                 reader.close();
-                ReportPane.success("Получен новый токен");
-                token = substringBetween(sb.toString(), "\"token\":\"", "\"");
+                ReportPane.fine("Получен новый токен");
+                final String rawResponse = sb.toString().substring(sb.toString().indexOf("\"token\":\"")).substring(9);
+                token =  rawResponse.substring(0, rawResponse.indexOf("\""));
             } else {
                 ReportPane.error("Не удалось получить токен:" + System.lineSeparator() +
                         connection.getResponseCode() + " " + connection.getResponseMessage());
@@ -97,7 +96,7 @@ class UnimessageClient {
         }
     }
 
-    public String getRawTemplates() {
+    String getRawTemplates() {
         try {
             final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/headers");
             final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
@@ -113,7 +112,7 @@ class UnimessageClient {
                     sb.append(line);
                 }
                 reader.close();
-                ReportPane.success("Список схем успешно загрузился");
+                ReportPane.fine("Список схем успешно загрузился");
                 return sb.toString();
             } else {
                 ReportPane.error("Не удалось загрузить список схем:" + System.lineSeparator() +
@@ -123,10 +122,5 @@ class UnimessageClient {
             ReportPane.error("Не удалось загрузить список схем:", e);
         }
         return null;
-    }
-
-    private static String substringBetween(String victim, String prefix, String postfix) {
-        final String withTrash = victim.substring(victim.indexOf(prefix)).substring(prefix.length());
-        return withTrash.substring(0, withTrash.indexOf(postfix));
     }
 }

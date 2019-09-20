@@ -180,7 +180,7 @@ public class ReplaceTasksExecutor {
         refresh();
     }
 
-    public static void refresh() {
+    static void refresh() {
         foundReplacements.clear();
         notFoundReplacements.clear();
         tasks.clear();

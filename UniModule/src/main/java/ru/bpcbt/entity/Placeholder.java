@@ -4,7 +4,6 @@ import javafx.util.Pair;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.utils.GlobalUtils;
-import ru.bpcbt.utils.Style;
 import ru.bpcbt.settings.Settings;
 
 import java.io.File;

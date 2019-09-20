@@ -24,25 +24,25 @@ public class Style {
     private static SimpleAttributeSet success;
     private static SimpleAttributeSet warning;
     private static SimpleAttributeSet fine;
+    private static SimpleAttributeSet mark;
 
     static {
         error = new SimpleAttributeSet();
-        //StyleConstants.setForeground(error, BLACK);
         StyleConstants.setBackground(error, RED_B);
         StyleConstants.setBold(error, true);
 
         success = new SimpleAttributeSet();
-        //StyleConstants.setForeground(success, BLACK);
         StyleConstants.setBackground(success, GREEN);
         StyleConstants.setBold(success, true);
 
         warning = new SimpleAttributeSet();
-        //StyleConstants.setForeground(warning, BLACK);
         StyleConstants.setBackground(warning, YELLOW_B);
 
         fine = new SimpleAttributeSet();
-        //StyleConstants.setForeground(fine, BLACK);
         StyleConstants.setBackground(fine, GREEN_B);
+
+        mark = new SimpleAttributeSet();
+        StyleConstants.setBackground(mark, BLUE_B);
     }
 
     private Style() {// Utils class
@@ -52,6 +52,7 @@ public class Style {
         return lafs;
     }
 
+    /*Getters & Setters*/
     public static SimpleAttributeSet getError() {
         return error;
     }
@@ -66,5 +67,9 @@ public class Style {
 
     public static SimpleAttributeSet getFine() {
         return fine;
+    }
+
+    public static SimpleAttributeSet getMark() {
+        return mark;
     }
 }

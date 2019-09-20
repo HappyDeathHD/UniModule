@@ -85,7 +85,7 @@ public class TemplateUploader {
                 for (File file : files) {
                     String templateName = getTemplateName(file);
                     if (templateNameMap.containsKey(templateName)) {
-                        templateName = templateNameMap.get(getTemplateName(file));
+                        templateName = templateNameMap.get(templateName);
                     }
                     if (templateIdMap.containsKey(templateName)) {
                         if (!upload(templateName, file)) {
@@ -162,9 +162,10 @@ public class TemplateUploader {
         if(topic == null){
             topic = file.getName();
         }
-
+        ReportPane.normal("Начинаю загрузку " + file.getName() + " в " + templateName + "(" + templateId + ") c языком " + language);
         final int httpResult = client.uploadFileToTemplate(file, templateId, language, topic);
         if (httpResult == HttpURLConnection.HTTP_OK) {
+            ReportPane.success(file.getName() + " успешно загрузился");
             return true;
         } else if (httpResult == HttpURLConnection.HTTP_FORBIDDEN || httpResult == HttpURLConnection.HTTP_UNAUTHORIZED) {
             if (++attemptsCount <= 1) {

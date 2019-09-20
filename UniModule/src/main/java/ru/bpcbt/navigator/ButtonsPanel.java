@@ -15,20 +15,17 @@ import java.io.IOException;
 
 public class ButtonsPanel extends JPanel {
 
-    private ColoredButton refreshB;
     private ColoredButton saveB;
-    private ColoredButton markB;
-    private ColoredButton openDir;
     private ColoredButton processSingleB;
     private ColoredButton processAllB;
     private ColoredButton uploadSingleB;
     private ColoredButton uploadAllB;
 
-    public ButtonsPanel(NavigatorPanel parent) {
+    ButtonsPanel(NavigatorPanel parent) {
         try {
             setLayout(new FlowLayout(FlowLayout.LEFT));
             //обновить
-            refreshB = new ColoredButton(getIconFromResource("/images/refresh.png"),
+            ColoredButton refreshB = new ColoredButton(getIconFromResource("/images/refresh.png"),
                     "Обновить список файлов",
                     Style.GREEN, Style.GREEN_B, Style.YELLOW);
             refreshB.addActionListener(e -> parent.refreshFiles());
@@ -41,13 +38,13 @@ public class ButtonsPanel extends JPanel {
             saveB.setEnabled(false);
             add(saveB);
             //выделить
-            markB = new ColoredButton(getIconFromResource("/images/mark.png"),
+            ColoredButton markB = new ColoredButton(getIconFromResource("/images/mark.png"),
                     "Разукрасить. Ну да, пока в ручную",
                     Style.YELLOW, Style.RED, Style.BLUE);
             markB.addActionListener(e -> parent.repaintTextToDisplay());
             add(markB);
             //открыть в проводнике
-            openDir = new ColoredButton(getIconFromResource("/images/folder.png"),
+            ColoredButton openDir = new ColoredButton(getIconFromResource("/images/folder.png"),
                     "Открыть текущую папку в проводнике",
                     Style.BLUE, Style.BLUE_B, Style.YELLOW);
             openDir.addActionListener(e -> parent.openCurrentDir());
@@ -117,7 +114,7 @@ public class ButtonsPanel extends JPanel {
     }
 
     /*Getters & Setters*/
-    public ColoredButton getSaveB() {
+    ColoredButton getSaveB() {
         return saveB;
     }
 }

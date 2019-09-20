@@ -55,7 +55,7 @@ public class ReportPane extends JTextPane {
         try {
             doc.insertString(doc.getLength(), message + System.lineSeparator(), simpleAttributeSet);
         } catch (BadLocationException e) {
-            Narrator.yell("Не удалось добавить текст в отчет", e);
+            Narrator.error("Не удалось добавить текст в отчет!");
         }
     }
 
