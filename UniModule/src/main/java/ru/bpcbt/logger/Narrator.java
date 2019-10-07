@@ -1,5 +1,6 @@
 package ru.bpcbt.logger;
 
+import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.Style;
 
 import javax.swing.*;
@@ -21,17 +22,7 @@ public class Narrator {
     }
 
     public static void yell(String message, Exception e) {
-        final StringBuilder builder = new StringBuilder(message);
-        if (e != null) {
-            builder.append(System.lineSeparator()).append(e.getClass().getCanonicalName());
-            if (e.getMessage() != null) {
-                builder.append(System.lineSeparator()).append(e.getMessage());
-            }
-            if (e.getStackTrace().length != 0) {
-                builder.append(System.lineSeparator()).append(e.getStackTrace()[0]);
-            }
-        }
-        yell(builder.toString());
+        yell(GlobalUtils.getErrorMessageWithException(message, e));
     }
 
     public static void yell(String message) {

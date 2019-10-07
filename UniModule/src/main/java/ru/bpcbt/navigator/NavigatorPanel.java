@@ -11,10 +11,7 @@ import ru.bpcbt.logger.Narrator;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -40,7 +37,7 @@ public class NavigatorPanel extends JPanel {
         this.workingDirType = workingDirType;
         setLayout(new BorderLayout());
         //контент файлов
-        JPanel contentPanel = new JPanel();
+        final JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
         display = new JTextPane();
         display.getDocument().addDocumentListener(new DocumentListener() {
@@ -59,7 +56,7 @@ public class NavigatorPanel extends JPanel {
                 isChanged = true;
             }
         });
-        JScrollPane scroll = new JScrollPane(display);
+        final JScrollPane scroll = new JScrollPane(display);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         contentPanel.add(scroll);
         //сами файлы
@@ -83,9 +80,9 @@ public class NavigatorPanel extends JPanel {
                 }
             }
         });
-        JScrollPane scrollPane = new JScrollPane(navigatorList);
+        final JScrollPane scrollPane = new JScrollPane(navigatorList);
         //единение!
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 scrollPane, contentPanel);
         splitPane.setResizeWeight(0.1);
         splitPane.setOneTouchExpandable(true);
@@ -104,13 +101,13 @@ public class NavigatorPanel extends JPanel {
         navigatorList.setListData(htmlFilesVector);
     }
 
-    private void appendToDisplay(String message, Color color) {
-        StyleContext sc = StyleContext.getDefaultStyleContext();
-        final AttributeSet attributeSet = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, color);
-        final int length = display.getDocument().getLength();
-        display.setCaretPosition(length);
-        display.setCharacterAttributes(attributeSet, false);
-        display.replaceSelection(message);
+    private void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
+        try {
+            display.getStyledDocument().insertString(display.getStyledDocument().getLength(),
+                    message + System.lineSeparator(), simpleAttributeSet);
+        } catch (BadLocationException e) {
+            Narrator.error("Не удалось вывести содержимое файла!");
+        }
     }
 
     private void setColoredTextToDisplay(String text) {
@@ -119,15 +116,15 @@ public class NavigatorPanel extends JPanel {
         boolean isOdd = false;
         for (String pieceOfText : text.split(symbol)) {
             if (isOdd) {
-                appendToDisplay(symbol + pieceOfText + symbol, Style.BLUE_B);
+                insertString(symbol + pieceOfText + symbol, Style.getMark());
             } else {
-                appendToDisplay(pieceOfText, Style.WHITE);
+                insertString(pieceOfText, null);
             }
             isOdd = !isOdd;
         }
     }
 
-    public void repaintTextToDisplay() {
+    void repaintTextToDisplay() {
         setColoredTextToDisplay(display.getText());
     }
 
@@ -136,7 +133,7 @@ public class NavigatorPanel extends JPanel {
         display.repaint();
     }
 
-    public void saveCurrentFile() {
+    void saveCurrentFile() {
         if (FileUtils.createFile(currentFile.getPath(), display.getText())) {
             isChanged = false;
             Narrator.success("Файл \"" + currentFile.getName() + "\" успешно сохранен!");
@@ -145,7 +142,7 @@ public class NavigatorPanel extends JPanel {
         }
     }
 
-    public void openCurrentDir() {
+    void openCurrentDir() {
         try {
             Desktop.getDesktop().open(new File(GlobalUtils.getProperties().get(workingDirType)));
         } catch (IOException e) {
@@ -153,17 +150,13 @@ public class NavigatorPanel extends JPanel {
         }
     }
 
-    public List<File> getSelectedFiles() {
+    List<File> getSelectedFiles() {
         final List<File> selectedFiles = new ArrayList<>();
         Arrays.stream(navigatorList.getSelectedIndices()).forEach(index -> selectedFiles.add(fileList.get(index)));
         return selectedFiles;
     }
 
-    public File getCurrentFile() {
-        return currentFile;
-    }
-
-    public List<File> getFileList() {
+    List<File> getFileList() {
         return fileList;
     }
 

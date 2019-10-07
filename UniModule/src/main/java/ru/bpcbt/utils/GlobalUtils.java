@@ -2,6 +2,7 @@ package ru.bpcbt.utils;
 
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
+import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.rest.TemplateUploader;
 import ru.bpcbt.settings.Settings;
 
@@ -30,11 +31,20 @@ public class GlobalUtils {
         return Program.getProperties();
     }
 
-    public static void appendToReport(String message, Color color) {
-        Program.getMainFrame().getReportPanel().appendToReport(message, color);
+    public static void setNavigatorsFont(Font font) {
+        getMainFrame().getInputFilesPanel().setFontToDisplay(font);
+        getMainFrame().getModulesPanel().setFontToDisplay(font);
+        getMainFrame().getOutputFilesPanel().setFontToDisplay(font);
+        ReportPane.setFontToReport(font);
     }
 
-    public static void appendToReport(String message, Exception e) {
+    public static void setEnabledToProcessButtons(boolean isEnabled) {
+        getMainFrame().getInputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        getMainFrame().getModulesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        getMainFrame().getOutputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+    }
+
+    public static String getErrorMessageWithException(String message, Exception e){
         final StringBuilder builder = new StringBuilder(message);
         if (e != null) {
             builder.append(System.lineSeparator()).append(e.getClass().getCanonicalName());
@@ -45,24 +55,7 @@ public class GlobalUtils {
                 builder.append(System.lineSeparator()).append(e.getStackTrace()[0]);
             }
         }
-        Program.getMainFrame().getReportPanel().appendToReport(System.lineSeparator() + builder.toString(), Style.RED);
-    }
-
-    public static void clearReport() {
-        Program.getMainFrame().getReportPanel().clearReport();
-    }
-
-    public static void setNavigatorsFont(Font font) {
-        getMainFrame().getInputFilesPanel().setFontToDisplay(font);
-        getMainFrame().getModulesPanel().setFontToDisplay(font);
-        getMainFrame().getOutputFilesPanel().setFontToDisplay(font);
-        getMainFrame().getReportPanel().setFontToReport(font);
-    }
-
-    public static void setEnabledToProcessButtons(boolean isEnabled) {
-        getMainFrame().getInputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
-        getMainFrame().getModulesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
-        getMainFrame().getOutputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        return builder.toString();
     }
 
     public static void makeSovietRussiaButtons() {

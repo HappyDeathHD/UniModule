@@ -6,6 +6,7 @@ import com.grack.nanojson.JsonParser;
 import com.grack.nanojson.JsonParserException;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
+import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.utils.*;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.logger.Narrator;
@@ -64,14 +65,14 @@ public class TemplateUploader {
     }
 
     public static SwingWorker uploadJob(List<File> files) {
-        GlobalUtils.clearReport();
+        ReportPane.clearReport();
         attemptsCount = 0;
         return new SwingWorker() {
             @Override
             protected Object doInBackground() {
                 Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
                 if (files.isEmpty()) {
-                    GlobalUtils.appendToReport("Нечего грузить! Проверь вкладку результатов!", Style.YELLOW);
+                    ReportPane.warning("Нечего грузить! Проверь вкладку результатов!");
                     Narrator.warn("Нечего грузить!");
                     return null;
                 }
@@ -84,23 +85,23 @@ public class TemplateUploader {
                 for (File file : files) {
                     String templateName = getTemplateName(file);
                     if (templateNameMap.containsKey(templateName)) {
-                        templateName = templateNameMap.get(getTemplateName(file));
+                        templateName = templateNameMap.get(templateName);
                     }
                     if (templateIdMap.containsKey(templateName)) {
                         if (!upload(templateName, file)) {
                             errorsCount++;
                         }
                     } else {
-                        GlobalUtils.appendToReport("Схема " + templateName + " (" + file.getName() + ")" + " не найдена", Style.RED);
+                        ReportPane.error("Схема " + templateName + " (" + file.getName() + ")" + " не найдена");
                         errorsCount++;
                     }
                 }
                 if (errorsCount == 0) {
-                    GlobalUtils.appendToReport("Все схемы загружены!", Style.GREEN);
+                    ReportPane.success("Все схемы загружены!");
                     Narrator.success("Все схемы загружены!");
                 } else {
                     String errorMessage = "Не удалось загрузить " + errorsCount + " из " + files.size() + " схем!";
-                    GlobalUtils.appendToReport(errorMessage, Style.RED);
+                    ReportPane.error(errorMessage);
                     Narrator.error(errorMessage);
                 }
                 return null;
@@ -122,7 +123,7 @@ public class TemplateUploader {
                 templateIdMap.put(templateObj.get("code").toString().toUpperCase(), Long.parseLong(templateObj.get("id").toString()));
             }
         } catch (JsonParserException e) {
-            GlobalUtils.appendToReport("Ошибка в полученном json'e со схемами" + e.getMessage(), Style.RED);
+            ReportPane.error("Ошибка в полученном json'e со схемами" + e.getMessage());
         }
         fillThemes();
     }
@@ -144,10 +145,10 @@ public class TemplateUploader {
                     }
                 }
             } catch (JsonParserException e) {
-                GlobalUtils.appendToReport(Const.TEMPLATE_MAPPING_FILE + " содержит ошибку: " + e.getMessage(), Style.RED);
+                ReportPane.error(Const.TEMPLATE_MAPPING_FILE + " содержит ошибку: " + e.getMessage());
             }
         } else {
-            GlobalUtils.appendToReport(Const.TEMPLATE_MAPPING_FILE + " не найден.", Style.YELLOW);
+            ReportPane.warning(Const.TEMPLATE_MAPPING_FILE + " не найден.");
         }
     }
 
@@ -161,20 +162,21 @@ public class TemplateUploader {
         if(topic == null){
             topic = file.getName();
         }
-
+        ReportPane.normal("Начинаю загрузку " + file.getName() + " в " + templateName + "(" + templateId + ") c языком " + language);
         final int httpResult = client.uploadFileToTemplate(file, templateId, language, topic);
         if (httpResult == HttpURLConnection.HTTP_OK) {
+            ReportPane.success(file.getName() + " успешно загрузился");
             return true;
         } else if (httpResult == HttpURLConnection.HTTP_FORBIDDEN || httpResult == HttpURLConnection.HTTP_UNAUTHORIZED) {
             if (++attemptsCount <= 1) {
-                GlobalUtils.appendToReport("Похоже что-то с токеном, попробую обновить", Style.YELLOW_B);
+                ReportPane.warning("Похоже что-то с токеном, попробую обновить");
                 if (!checkAndPrepareConnectionSettings()) {
                     return false;
                 } else {
                     return upload(templateName, file);
                 }
             } else {
-                GlobalUtils.appendToReport("Идея с обновлением токена не помогла", Style.RED_B);
+                ReportPane.error("Идея с обновлением токена не помогла");
                 return false;
             }
         } else {
@@ -187,17 +189,17 @@ public class TemplateUploader {
             final String[] split = fileName.split("_");
             final String language = split[split.length - 1].split("\\.")[0].toUpperCase();
             if (language.length() != 2) {
-                GlobalUtils.appendToReport("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:", Style.RED);
+                ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:");
                 return null;
             }
             return language;
         } catch (Exception e) {
-            GlobalUtils.appendToReport("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:", e);
+            ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:", e);
         }
         return null;
     }
 
     private static String getTemplateName(File file) {
-        return file.getParentFile().getName().toUpperCase();
+        return file.getParentFile().getName();
     }
 }

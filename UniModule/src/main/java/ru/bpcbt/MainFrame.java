@@ -22,7 +22,6 @@ public class MainFrame extends JFrame {
     private NavigatorPanel inputFilesPanel;
     private NavigatorPanel modulesPanel;
     private NavigatorPanel outputFilesPanel;
-    private ReportPanel reportPanel;
     private SettingsPanel settingsPanel;
 
     MainFrame() {
@@ -37,7 +36,7 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Плоть", modulesPanel);
         outputFilesPanel = new NavigatorPanel(Settings.OUTPUT_DIR);
         tabbedPane.addTab("Результаты", outputFilesPanel);
-        reportPanel = new ReportPanel();
+        ReportPanel reportPanel = new ReportPanel();
         tabbedPane.addTab("Отчет", reportPanel);
         settingsPanel = new SettingsPanel();
         tabbedPane.addTab("Настройки", settingsPanel);
@@ -50,6 +49,7 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    /*Getters & Setters*/
     public void setPaneTab(int index) {
         tabbedPane.setSelectedIndex(index);
     }
@@ -64,10 +64,6 @@ public class MainFrame extends JFrame {
 
     public NavigatorPanel getOutputFilesPanel() {
         return outputFilesPanel;
-    }
-
-    public ReportPanel getReportPanel() {
-        return reportPanel;
     }
 
     private JPanel getInfoPanel() {

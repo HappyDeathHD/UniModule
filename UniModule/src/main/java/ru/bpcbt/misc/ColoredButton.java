@@ -19,8 +19,10 @@ public class ColoredButton extends JButton {
         setPreferredSize(new Dimension(45, 45));
         setToolTipText(toolTip);
         setBackground(bgColor);
+//        setForeground(bgColor);
         setHoverBackgroundColor(bgColorHover);
         setPressedBackgroundColor(bgColorPressed);
+        //setOpaque(true);
     }
 
     @Override

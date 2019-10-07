@@ -32,7 +32,7 @@ public class Program {
                 mainFrame.getSettingsPanel().loadConfigurations();
                 GlobalUtils.refreshAllFiles();
             } catch (Exception e) {
-                Narrator.yell("Вот это поворот!", e);
+                Narrator.yell("Ошибка:", e);
             }
         });
     }
