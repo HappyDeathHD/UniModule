@@ -44,6 +44,20 @@ public class GlobalUtils {
         getMainFrame().getOutputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
     }
 
+    public static String getErrorMessageWithException(String message, Exception e){
+        final StringBuilder builder = new StringBuilder(message);
+        if (e != null) {
+            builder.append(System.lineSeparator()).append(e.getClass().getCanonicalName());
+            if (e.getMessage() != null) {
+                builder.append(System.lineSeparator()).append(e.getMessage());
+            }
+            if (e.getStackTrace().length != 0) {
+                builder.append(System.lineSeparator()).append(e.getStackTrace()[0]);
+            }
+        }
+        return builder.toString();
+    }
+
     public static void makeSovietRussiaButtons() {
         UIManager.put("OptionPane.cancelButtonText", "Отмена");
         UIManager.put("OptionPane.noButtonText", "Никак нет");

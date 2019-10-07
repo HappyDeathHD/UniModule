@@ -1,5 +1,6 @@
 package ru.bpcbt.logger;
 
+import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.Style;
 
 import javax.swing.*;
@@ -38,17 +39,7 @@ public class ReportPane extends JTextPane {
     }
 
     public static void error(String message, Exception e) {
-        final StringBuilder builder = new StringBuilder(message);
-        if (e != null) {
-            builder.append(System.lineSeparator()).append(e.getClass().getCanonicalName());
-            if (e.getMessage() != null) {
-                builder.append(System.lineSeparator()).append(e.getMessage());
-            }
-            if (e.getStackTrace().length != 0) {
-                builder.append(System.lineSeparator()).append(e.getStackTrace()[0]);
-            }
-        }
-        ReportPane.error(System.lineSeparator() + builder.toString());
+        ReportPane.error(System.lineSeparator() + GlobalUtils.getErrorMessageWithException(message, e));
     }
 
     private static void insertString(String message, SimpleAttributeSet simpleAttributeSet) {

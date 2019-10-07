@@ -200,6 +200,6 @@ public class TemplateUploader {
     }
 
     private static String getTemplateName(File file) {
-        return file.getParentFile().getName().toUpperCase();
+        return file.getParentFile().getName();
     }
 }
