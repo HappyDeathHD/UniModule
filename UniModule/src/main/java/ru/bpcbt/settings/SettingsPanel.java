@@ -216,6 +216,8 @@ public class SettingsPanel extends JPanel {
             fontSizeS.setValue(size);
             Font font = new Font(fonts[selectedFont], Font.PLAIN, (int) fontSizeS.getValue());
             GlobalUtils.setNavigatorsFont(font);
+        } else {
+            fontSizeS.setValue(14);
         }
         if (properties.containsKey(CORE_URL)) {
             coreUrlTF.setText(properties.get(CORE_URL));
