@@ -19,7 +19,7 @@ public class FileUtils {
     private static Map<File, String> cachedFiles = new HashMap<>();
     private static Map<File, Boolean> fileProcessStatus = new ConcurrentHashMap<>();
 
-    private static final String CONFIGURATION_FILE = "configuration.xml";
+    private static final String CONFIGURATION_FILE = "configurations.xml";
 
     private static final String SEPARATOR = FileSystems.getDefault().getSeparator();
 
@@ -87,7 +87,7 @@ public class FileUtils {
             for (File file : dir.listFiles()) {
                 if (file.isFile() && !Const.TEMPLATE_MAPPING_FILE.equals(file.getName())) {
                     neededFiles.add(file);
-                } else if (file.isDirectory()) {
+                } else if (file.isDirectory() && !file.getName().startsWith(".")) {
                     neededFiles.addAll(getFilesByTypeRecursively(file.getPath()));
                 }
             }
@@ -101,7 +101,7 @@ public class FileUtils {
             fis.read(data);
             return new String(data, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            Narrator.yell("Пытался прочитать " + file.getName() + ". Не повезло", e);
+            ReportPane.error("Пытался прочитать " + file.getName() + ". Не повезло", e);
         }
         return "";
     }
@@ -129,7 +129,7 @@ public class FileUtils {
             writer.write(content);
             return true;
         } catch (IOException e) {
-            Narrator.yell("Пытался создать " + fileName + ". Не повезло", e);
+            ReportPane.error("Пытался создать " + fileName + ". Не повезло", e);
         }
         return false;
     }

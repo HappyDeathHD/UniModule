@@ -103,8 +103,10 @@ public class NavigatorPanel extends JPanel {
 
     private void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
         try {
+            //костыль, призванный убрать бесконечное дублирование CR+LF и CR. Уктуально для винды, не тестилось на других системах.
+            String crlfNormalizedMessage= message.replace(System.lineSeparator(),"\n");
             display.getStyledDocument().insertString(display.getStyledDocument().getLength(),
-                    message + System.lineSeparator(), simpleAttributeSet);
+                    crlfNormalizedMessage, simpleAttributeSet);
         } catch (BadLocationException e) {
             Narrator.error("Не удалось вывести содержимое файла!");
         }

@@ -59,12 +59,12 @@ public class ReplaceTasksExecutor {
                 int maxThreadsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
                 final long start = System.currentTimeMillis();
                 ReportPane.normal("Начало собрки: " + new Date(start) +
-                                System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount);
+                        System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount);
                 if (maxThreadsCount > MAX_WORKER_THREAD) {
                     maxThreadsCount = MAX_WORKER_THREAD;
                 }
                 ReportPane.normal("Количество потоков: " + maxThreadsCount +
-                                System.lineSeparator() + "Количество файлов для сборки: " + mainJobsCount);
+                        System.lineSeparator() + "Количество файлов для сборки: " + mainJobsCount);
                 workersCount.set(0);
                 while (mainJobsCount > mainJobsDone.get()) {
                     if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {
@@ -171,9 +171,9 @@ public class ReplaceTasksExecutor {
             }
         } else {
             ReportPane.error(System.lineSeparator() +
-                            "Есть не найденные модули (" + notFoundReplacements.size() + " шт) (" + foundReplacements.size() + " найдено):" +
-                            System.lineSeparator() + notFoundReplacements.stream().map(Placeholder::toString)
-                            .collect(Collectors.joining(System.lineSeparator())));
+                    "Есть не найденные модули (" + notFoundReplacements.size() + " шт) (" + foundReplacements.size() + " найдено):" +
+                    System.lineSeparator() + notFoundReplacements.stream().map(Placeholder::toString)
+                    .collect(Collectors.joining(System.lineSeparator())));
             Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
             Narrator.error("Все прошло не очень гладко!");
         }
@@ -209,6 +209,8 @@ public class ReplaceTasksExecutor {
                                 } else {
                                     jobDone = false;
                                 }
+                            } else {
+                                jobDone = false;
                             }
                         }
                     }
