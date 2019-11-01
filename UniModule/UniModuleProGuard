@@ -1,9 +1,4 @@
-
--libraryjars 'C:\Program Files\Java\jre1.8.0_211\lib\rt.jar'
-
 -ignorewarnings
-
-
 
 # Keep - Applications. Keep all application classes, along with their 'main' methods.
 -keepclasseswithmembers public class * {
