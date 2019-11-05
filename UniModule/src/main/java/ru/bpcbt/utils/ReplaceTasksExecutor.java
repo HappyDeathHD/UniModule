@@ -44,7 +44,8 @@ public class ReplaceTasksExecutor {
         final List<File> commonInputFiles = files.stream()
                 .filter(f -> !f.getPath().contains(Const.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
                 .collect(Collectors.toList());
-        commonInputFiles.forEach(f -> tasks.add(new ReplaceTask(cutThePath(f), FileUtils.readFile(f), new HashMap<>())));
+        commonInputFiles.stream().map(file -> new ReplaceTask(cutThePath(file), FileUtils.readFile(file), FileUtils.getVariableMapWithLocale(file)))
+                .forEach(tasks::add);
         //json
         files.stream().filter(f -> f.getPath().contains(".json")).forEach(file -> tasks.addAll(JsonUtils.parseSkeleton(file)));
         mainJobsCount = ReplaceTasksExecutor.tasks.size();

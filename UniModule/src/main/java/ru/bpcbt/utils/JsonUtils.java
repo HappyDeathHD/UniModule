@@ -96,12 +96,13 @@ public class JsonUtils {
         final List<ReplaceTask> replaceTasks = new ArrayList<>();
         for (Map.Entry<String, Object> jInputs : jsonObject.entrySet()) {
             for (Map.Entry<String, Object> jOutputs : ((JsonObject) jInputs.getValue()).entrySet()) {
-                final HashMap<String, String> variables = new HashMap<>();
+                File file = Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile();
+                final HashMap<String, String> variables = FileUtils.getVariableMapWithLocale(file);
                 for (Map.Entry<String, Object> jVariables : ((JsonObject) jOutputs.getValue()).entrySet()) {
                     variables.put(jVariables.getKey(), String.valueOf(jVariables.getValue()));
                 }
                 replaceTasks.add(new ReplaceTask(jOutputs.getKey(),
-                        FileUtils.readFile(Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile()),
+                        FileUtils.readFile(file),
                         variables));
             }
         }
