@@ -186,13 +186,12 @@ public class TemplateUploader {
 
     private static String getLanguage(String fileName) {
         try {
-            final String[] split = fileName.split("_");
-            final String language = split[split.length - 1].split("\\.")[0].toUpperCase();
-            if (language.length() != 2) {
+            final String language = FileUtils.getLanguage(fileName);
+            if (language == null) {
                 ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:");
                 return null;
             }
-            return language;
+            return language.toUpperCase();
         } catch (Exception e) {
             ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:", e);
         }

@@ -172,6 +172,27 @@ public class FileUtils {
         createFile(newPath.toString(), newFileContent);
     }
 
+    public static String getLanguage(String fileName) {
+        try {
+            final String[] split = fileName.split("_");
+            final String language = split[split.length - 1].split("\\.")[0];
+            if (language.length() == 2) {
+                return language;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public static HashMap<String, String> getVariableMapWithLocale(File file) {
+        String language = FileUtils.getLanguage(file.getName());
+        HashMap<String, String> variables = new HashMap<>();
+        if (language != null) {
+            variables.put("locale", language);
+        }
+        return variables;
+    }
+
     public static void refresh() {
         cachedFiles.clear();
         fileProcessStatus.clear();
