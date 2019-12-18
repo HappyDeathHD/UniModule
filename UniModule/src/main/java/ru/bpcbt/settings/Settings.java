@@ -9,7 +9,8 @@ public enum Settings {
     FONT_SIZE("Размер шрифта"),
     CORE_URL("Адрес до api"),
     USERNAME("Логин"),
-    PASSWORD("Пароль (не сохраняется)");
+    PASSWORD("Пароль (не сохраняется)"),
+    DEBUG("Выводить в отчет отладочную информацию (Замедляет процесс сборки)");
 
     private String description;
 

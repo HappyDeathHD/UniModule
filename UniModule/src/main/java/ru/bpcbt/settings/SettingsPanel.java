@@ -25,6 +25,7 @@ public class SettingsPanel extends JPanel {
     private JSpinner fontSizeS;
     private JTextField coreUrlTF;
     private JTextField usernameTF;
+    private JCheckBox debugFlag;
 
     private final JPasswordField passwordPF = new JPasswordField();
 
@@ -47,6 +48,7 @@ public class SettingsPanel extends JPanel {
         addLookAndFeelSelector();
         addApiBlock();
         addSaveButton();
+        addDebugFlag();
     }
 
     private void addApiBlock() {
@@ -182,6 +184,14 @@ public class SettingsPanel extends JPanel {
         gridBag.gridwidth = 1;
     }
 
+    public void addDebugFlag() {
+        debugFlag = new JCheckBox(DEBUG.getDescription());
+        gridBag.gridx = 0;
+        gridBag.gridy++;
+        gridBag.gridwidth = 2;
+        add(debugFlag, gridBag);
+    }
+
     private ColoredButton getCommonSelectFileButton() {
         final ColoredButton button = new ColoredButton("🔍");
         button.setBackground(Style.GREEN);
@@ -245,5 +255,9 @@ public class SettingsPanel extends JPanel {
 
     public void setPassword(String password) {
         passwordPF.setText(password);
+    }
+
+    public boolean isDebug(){
+        return debugFlag.isSelected();
     }
 }

@@ -224,7 +224,7 @@ public class ReplaceTasksExecutor {
                             final Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
                             placeholder.mergeVariables(task.getParentVariables());
                             foundReplacements.put(placeholder, newFileContent);
-                            //ReportPane.fine("Плейсхолдер " + placeholder + " успешно собран"); //узкое место
+                            ReportPane.debug("Плейсхолдер " + placeholder + " успешно собран"); //узкое место
                         }
                     } else {
                         tasks.add(new ReplaceTask(task.getRawPlaceholder(), newFileContent, task.getParentVariables(), task.getPriority()));
