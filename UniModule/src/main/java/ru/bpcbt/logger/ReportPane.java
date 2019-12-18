@@ -39,14 +39,14 @@ public class ReportPane extends JTextPane {
         insertString(message, Style.getError());
     }
 
+    public static void error(String message, Exception e) {
+        ReportPane.error(System.lineSeparator() + GlobalUtils.getErrorMessageWithException(message, e));
+    }
+
     public static void debug(String message) {
         if (Program.getMainFrame().getSettingsPanel().isDebug()) {
             insertString(message, Style.getMark());
         }
-    }
-
-    public static void error(String message, Exception e) {
-        ReportPane.error(System.lineSeparator() + GlobalUtils.getErrorMessageWithException(message, e));
     }
 
     private static void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
