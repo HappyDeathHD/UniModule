@@ -159,7 +159,7 @@ public class TemplateUploader {
         }
         final long templateId = templateIdMap.get(templateName);
         String topic = templateTopicMap.get(templateName + language.toUpperCase());
-        if(topic == null){
+        if (topic == null) {
             topic = file.getName();
         }
         ReportPane.normal("Начинаю загрузку " + file.getName() + " в " + templateName + "(" + templateId + ") c языком " + language);
@@ -188,13 +188,11 @@ public class TemplateUploader {
         try {
             final String language = FileUtils.getLanguage(fileName);
             if (language == null) {
-                ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:");
-                return null;
+                return language.toUpperCase();
             }
-            return language.toUpperCase();
-        } catch (Exception e) {
-            ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:", e);
+        } catch (Exception ignored) {
         }
+        ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:");
         return null;
     }
 

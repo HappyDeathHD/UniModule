@@ -1,5 +1,6 @@
 package ru.bpcbt.logger;
 
+import ru.bpcbt.Program;
 import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.Style;
 
@@ -36,6 +37,12 @@ public class ReportPane extends JTextPane {
 
     public static void error(String message) {
         insertString(message, Style.getError());
+    }
+
+    public static void debug(String message) {
+        if (Program.getMainFrame().getSettingsPanel().isDebug()) {
+            insertString(message, Style.getMark());
+        }
     }
 
     public static void error(String message, Exception e) {

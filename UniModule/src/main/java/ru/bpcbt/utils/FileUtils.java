@@ -137,7 +137,7 @@ public class FileUtils {
     public static void mkDir(File file) {
         if (!file.exists()) {
             if (!file.mkdir()) {
-                ReportPane.error("Не удалось создать директорию " + file.getPath());
+                ReportPane.warning("Не удалось создать директорию " + file.getPath());
             }
         }
     }
