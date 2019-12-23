@@ -76,7 +76,7 @@
                     <proguardVersion>5.2.1</proguardVersion>
                     <obfuscate>true</obfuscate>
                     <injar>${project.build.finalName}-jar-with-dependencies.jar</injar>
-                    <outjar>${project.build.finalName}-obf.jar</outjar>
+                    <outjar>UniModule.jar</outjar>
                     <outputDirectory>${project.build.directory}</outputDirectory>
                     <proguardInclude>${basedir}/UniModuleProGuard</proguardInclude>
                     <libs>
