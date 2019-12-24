@@ -1,0 +1,8 @@
+com.grack.nanojson.JsonReader$Type: com.grack.nanojson.JsonReader$Type[] values()
+com.grack.nanojson.JsonReader$Type: com.grack.nanojson.JsonReader$Type valueOf(java.lang.String)
+ru.bpcbt.Program
+ru.bpcbt.Program: void main(java.lang.String[])
+ru.bpcbt.misc.Delimiters: ru.bpcbt.misc.Delimiters[] values()
+ru.bpcbt.misc.Delimiters: ru.bpcbt.misc.Delimiters valueOf(java.lang.String)
+ru.bpcbt.settings.Settings: ru.bpcbt.settings.Settings[] values()
+ru.bpcbt.settings.Settings: ru.bpcbt.settings.Settings valueOf(java.lang.String)

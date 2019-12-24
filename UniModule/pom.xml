@@ -10,8 +10,8 @@
     <version>0.0.1</version>
 
     <modules>
-        <module>Updater</module>
-        <module>UniMain</module>
+        <module>updater</module>
+        <module>deskapp</module>
     </modules>
 
 </project>
