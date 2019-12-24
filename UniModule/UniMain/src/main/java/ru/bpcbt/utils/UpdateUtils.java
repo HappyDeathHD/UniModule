@@ -39,16 +39,12 @@ public class UpdateUtils {
     private static boolean isUpdateNeeded() throws IOException, JsonParserException {
         final String commitCheckUrl = "https://api.github.com/repos/HappyDeathHD/UniModule/commits?path=UniModule/UniMain/target/UniModule.jar&page=1&per_page=1";
         String rawJson = new Scanner(new URL(commitCheckUrl).openStream(), "UTF-8").useDelimiter("\\A").next();
-        System.out.println(rawJson);
 
         final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
         String message = obj.getObject("commit").getString("message");
         String sha = obj.getString("sha");
 
-        System.out.println(message);
-        System.out.println(sha);
         Map<Settings, String> properties = Program.getProperties();
-
         if (!properties.containsKey(Settings.LAST_SHA)) {
             properties.put(Settings.LAST_SHA, sha);
             FileUtils.setProperties(properties);
