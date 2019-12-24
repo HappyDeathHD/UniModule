@@ -8,6 +8,7 @@ import ru.bpcbt.settings.Settings;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -193,6 +194,14 @@ public class FileUtils {
             variables.put("locale", language);
         }
         return variables;
+    }
+
+    public static void deleteIfExists(String path) {
+        try {
+            Files.deleteIfExists(Paths.get(path));
+        } catch (IOException e) {
+            ReportPane.error("Не удалось удалить  " + path);
+        }
     }
 
     public static void refresh() {

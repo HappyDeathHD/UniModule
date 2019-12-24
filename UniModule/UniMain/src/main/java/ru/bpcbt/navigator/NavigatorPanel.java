@@ -68,7 +68,7 @@ public class NavigatorPanel extends JPanel {
                 if (evt.getClickCount() == 2) {
                     boolean confirmed = true;
                     if (isChanged) {
-                        confirmed = MiniFrame.confirmUnsavedChanges();
+                        confirmed = MiniFrame.askForConfirmation("Все внесенные изменения канут в Лету, пофиг?");
                     }
                     if (confirmed) {
                         int index = list.locationToIndex(evt.getPoint());
