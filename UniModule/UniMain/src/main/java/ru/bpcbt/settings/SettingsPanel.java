@@ -14,8 +14,6 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.Map;
 
-import static ru.bpcbt.settings.Settings.*;
-
 public class SettingsPanel extends JPanel {
     private JTextField inputDirTF;
     private JTextField modulesDirTF;
@@ -41,9 +39,9 @@ public class SettingsPanel extends JPanel {
         fonts = GraphicsEnvironment
                 .getLocalGraphicsEnvironment()
                 .getAvailableFontFamilyNames();
-        addOptionDir(INPUT_DIR, inputDirTF = new JTextField());
-        addOptionDir(MODULE_DIR, modulesDirTF = new JTextField());
-        addOptionDir(OUTPUT_DIR, outputDirTF = new JTextField());
+        addOptionDir(Settings.INPUT_DIR, inputDirTF = new JTextField());
+        addOptionDir(Settings.MODULE_DIR, modulesDirTF = new JTextField());
+        addOptionDir(Settings.OUTPUT_DIR, outputDirTF = new JTextField());
         addFontSelector();
         addLookAndFeelSelector();
         addApiBlock();
@@ -62,7 +60,7 @@ public class SettingsPanel extends JPanel {
         apiGridBag.insets = new Insets(3, 3, 3, 3);
         apiGridBag.weightx = 1;
 
-        final JLabel coreUrlL = new JLabel(CORE_URL.getDescription());
+        final JLabel coreUrlL = new JLabel(Settings.CORE_URL.getDescription());
         apiGridBag.gridwidth = 2;
         apiGridBag.gridy = 0;
         apiGridBag.gridx = 0;
@@ -72,7 +70,7 @@ public class SettingsPanel extends JPanel {
         apiGridBag.gridy = 1;
         apiPanel.add(coreUrlTF, apiGridBag);
 
-        final JLabel loginL = new JLabel(USERNAME.getDescription());
+        final JLabel loginL = new JLabel(Settings.USERNAME.getDescription());
         loginL.setPreferredSize(perfectLSize);
         apiGridBag.gridwidth = 1;
         apiGridBag.gridy = 2;
@@ -82,7 +80,7 @@ public class SettingsPanel extends JPanel {
         apiGridBag.gridy = 3;
         apiPanel.add(usernameTF, apiGridBag);
 
-        final JLabel passwordL = new JLabel(PASSWORD.getDescription());
+        final JLabel passwordL = new JLabel(Settings.PASSWORD.getDescription());
         passwordL.setPreferredSize(perfectLSize);
         apiGridBag.gridx = 1;
         apiGridBag.gridy = 2;
@@ -99,7 +97,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private void addFontSelector() {
-        final JLabel fontNameL = new JLabel(FONT_NAME.getDescription());
+        final JLabel fontNameL = new JLabel(Settings.FONT_NAME.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
         gridBag.gridwidth = 2;
@@ -116,7 +114,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private void addLookAndFeelSelector() {
-        final JLabel styleL = new JLabel(STYLE.getDescription());
+        final JLabel styleL = new JLabel(Settings.STYLE.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
         gridBag.gridwidth = 2;
@@ -157,14 +155,14 @@ public class SettingsPanel extends JPanel {
         saveB.addActionListener(e -> {
             try {
                 Map<Settings, String> properties = Program.getProperties();
-                properties.put(INPUT_DIR, inputDirTF.getText());
-                properties.put(MODULE_DIR, modulesDirTF.getText());
-                properties.put(OUTPUT_DIR, outputDirTF.getText());
-                properties.put(FONT_NAME, String.valueOf(fontNameCB.getSelectedIndex()));
-                properties.put(FONT_SIZE, String.valueOf(fontSizeS.getValue()));
-                properties.put(CORE_URL, coreUrlTF.getText());
-                properties.put(USERNAME, usernameTF.getText());
-                properties.put(STYLE, String.valueOf(styleCB.getSelectedIndex()));
+                properties.put(Settings.INPUT_DIR, inputDirTF.getText());
+                properties.put(Settings.MODULE_DIR, modulesDirTF.getText());
+                properties.put(Settings.OUTPUT_DIR, outputDirTF.getText());
+                properties.put(Settings.FONT_NAME, String.valueOf(fontNameCB.getSelectedIndex()));
+                properties.put(Settings.FONT_SIZE, String.valueOf(fontSizeS.getValue()));
+                properties.put(Settings.CORE_URL, coreUrlTF.getText());
+                properties.put(Settings.USERNAME, usernameTF.getText());
+                properties.put(Settings.STYLE, String.valueOf(styleCB.getSelectedIndex()));
                 Font font = new Font(fontNameCB.getSelectedItem().toString(), Font.PLAIN, (int) fontSizeS.getValue());
                 GlobalUtils.setNavigatorsFont(font);
                 FileUtils.setProperties(properties);
@@ -185,7 +183,7 @@ public class SettingsPanel extends JPanel {
     }
 
     public void addDebugFlag() {
-        debugFlag = new JCheckBox(DEBUG.getDescription());
+        debugFlag = new JCheckBox(Settings.DEBUG.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
         gridBag.gridwidth = 2;
@@ -204,42 +202,42 @@ public class SettingsPanel extends JPanel {
     public void loadConfigurations() {
         boolean allMandatoryParamsExist = true;
         final Map<Settings, String> properties = Program.getProperties();
-        if (properties.containsKey(INPUT_DIR)) {
-            inputDirTF.setText(properties.get(INPUT_DIR));
+        if (properties.containsKey(Settings.INPUT_DIR)) {
+            inputDirTF.setText(properties.get(Settings.INPUT_DIR));
         } else {
             allMandatoryParamsExist = false;
         }
-        if (properties.containsKey(MODULE_DIR)) {
-            modulesDirTF.setText(properties.get(MODULE_DIR));
+        if (properties.containsKey(Settings.MODULE_DIR)) {
+            modulesDirTF.setText(properties.get(Settings.MODULE_DIR));
         } else {
             allMandatoryParamsExist = false;
         }
-        if (properties.containsKey(OUTPUT_DIR)) {
-            outputDirTF.setText(properties.get(OUTPUT_DIR));
+        if (properties.containsKey(Settings.OUTPUT_DIR)) {
+            outputDirTF.setText(properties.get(Settings.OUTPUT_DIR));
         } else {
             allMandatoryParamsExist = false;
         }
-        if (properties.containsKey(FONT_NAME) && properties.containsKey(FONT_SIZE)) {
-            int selectedFont = Integer.parseInt(properties.get(FONT_NAME));
+        if (properties.containsKey(Settings.FONT_NAME) && properties.containsKey(Settings.FONT_SIZE)) {
+            int selectedFont = Integer.parseInt(properties.get(Settings.FONT_NAME));
             fontNameCB.setSelectedIndex(selectedFont);
-            int size = Integer.parseInt(properties.get(FONT_SIZE));
+            int size = Integer.parseInt(properties.get(Settings.FONT_SIZE));
             fontSizeS.setValue(size);
             Font font = new Font(fonts[selectedFont], Font.PLAIN, (int) fontSizeS.getValue());
             GlobalUtils.setNavigatorsFont(font);
         } else {
             fontSizeS.setValue(14);
         }
-        if (properties.containsKey(CORE_URL)) {
-            coreUrlTF.setText(properties.get(CORE_URL));
+        if (properties.containsKey(Settings.CORE_URL)) {
+            coreUrlTF.setText(properties.get(Settings.CORE_URL));
         } else {
-            properties.put(CORE_URL, "https://pay.test.aeroflot.ru/unimessage-core");
+            properties.put(Settings.CORE_URL, "https://pay.test.aeroflot.ru/unimessage-core");
             coreUrlTF.setText("https://pay.test.aeroflot.ru/unimessage-core");
         }
-        if (properties.containsKey(USERNAME)) {
-            usernameTF.setText(properties.get(USERNAME));
+        if (properties.containsKey(Settings.USERNAME)) {
+            usernameTF.setText(properties.get(Settings.USERNAME));
         }
-        if (properties.containsKey(STYLE)) {
-            int lafIndex = Integer.parseInt(properties.get(STYLE));
+        if (properties.containsKey(Settings.STYLE)) {
+            int lafIndex = Integer.parseInt(properties.get(Settings.STYLE));
             styleCB.setSelectedIndex(lafIndex);
         }
         if (allMandatoryParamsExist) {

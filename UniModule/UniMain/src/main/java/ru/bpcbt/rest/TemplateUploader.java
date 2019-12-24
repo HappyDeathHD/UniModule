@@ -7,9 +7,12 @@ import com.grack.nanojson.JsonParserException;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.logger.ReportPane;
-import ru.bpcbt.utils.*;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.logger.Narrator;
+import ru.bpcbt.utils.Const;
+import ru.bpcbt.utils.FileUtils;
+import ru.bpcbt.utils.GlobalUtils;
+import ru.bpcbt.utils.MiniFrame;
 
 import javax.swing.*;
 import java.io.*;
