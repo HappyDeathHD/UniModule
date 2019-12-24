@@ -16,7 +16,7 @@ public class Program {
 
     private static void downloadUniModule() {
         try {
-            final String url = "https://github.com/HappyDeathHD/UniModule/raw/master/UniModule/target/UniModule.jar";
+            final String url = "https://github.com/HappyDeathHD/UniModule/raw/master/UniModule/UniMain/target/UniModule.jar";
             InputStream in = new URL(url).openStream();
             Files.copy(in, Paths.get("UniModule.jar"), StandardCopyOption.REPLACE_EXISTING);
             Runtime.getRuntime().exec("java -jar UniModule.jar");

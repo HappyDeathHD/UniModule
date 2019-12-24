@@ -7,8 +7,8 @@ public class MiniFrame {
     private MiniFrame() {// Utils class
     }
 
-    public static boolean confirmUnsavedChanges() {
-        return JOptionPane.showConfirmDialog(null, "Все внесенные изменения канут в Лету, пофиг?") == 0;//0 — это ДА
+    public static boolean askForConfirmation(String message) {
+        return JOptionPane.showConfirmDialog(null, message) == 0;//0 — это ДА
     }
 
     public static void showMessage(String message) {
