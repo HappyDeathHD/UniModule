@@ -190,7 +190,7 @@ public class TemplateUploader {
     private static String getLanguage(String fileName) {
         try {
             final String language = FileUtils.getLanguage(fileName);
-            if (language == null) {
+            if (language != null) {
                 return language.toUpperCase();
             }
         } catch (Exception ignored) {
