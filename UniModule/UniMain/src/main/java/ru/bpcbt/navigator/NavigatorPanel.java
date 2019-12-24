@@ -3,10 +3,10 @@ package ru.bpcbt.navigator;
 import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.MiniFrame;
 import ru.bpcbt.misc.Delimiters;
-import ru.bpcbt.utils.Style;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.utils.FileUtils;
 import ru.bpcbt.logger.Narrator;
+import ru.bpcbt.utils.Style;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
