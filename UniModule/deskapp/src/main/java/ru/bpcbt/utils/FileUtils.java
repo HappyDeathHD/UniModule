@@ -53,14 +53,7 @@ public class FileUtils {
     }
 
     public static void setProperties(Map<Settings, String> properties) {
-        final Properties configFile = new Properties();
-        if (isFileExists(CONFIGURATION_FILE)) {
-            try (InputStream is = new FileInputStream(CONFIGURATION_FILE)) {
-                configFile.loadFromXML(is);
-            } catch (Exception e) {
-                Narrator.yell("Не смог прочитать конфиги", e);
-            }
-        }
+        final Properties configFile = loadConfigFile();
         properties.forEach((k, v) -> configFile.setProperty(k.name(), v));
         mkDir(new File(CONFIGURATION_DIR));
         try (OutputStream os = new FileOutputStream(CONFIGURATION_FILE)) {
@@ -71,14 +64,7 @@ public class FileUtils {
     }
 
     public static Map<Settings, String> getProperties() {
-        Properties configFile = new Properties();
-        if (isFileExists(CONFIGURATION_FILE)) {
-            try (InputStream is = new FileInputStream(CONFIGURATION_FILE)) {
-                configFile.loadFromXML(is);
-            } catch (Exception e) {
-                Narrator.yell("Не смог прочитать конфиги", e);
-            }
-        }
+        Properties configFile = loadConfigFile();
         return Arrays.stream(Settings.values()).filter(s -> configFile.containsKey(s.name()))
                 .collect(Collectors.toMap(s -> s, s -> configFile.getProperty(s.name())));
     }
@@ -209,5 +195,17 @@ public class FileUtils {
     public static void refresh() {
         cachedFiles.clear();
         fileProcessStatus.clear();
+    }
+
+    private static Properties loadConfigFile() {
+        final Properties configFile = new Properties();
+        if (isFileExists(CONFIGURATION_FILE)) {
+            try (InputStream is = new FileInputStream(CONFIGURATION_FILE)) {
+                configFile.loadFromXML(is);
+            } catch (Exception e) {
+                Narrator.yell("Не смог прочитать конфиги", e);
+            }
+        }
+        return configFile;
     }
 }

@@ -72,7 +72,7 @@ public class MainFrame extends JFrame {
         for (Delimiters delimiter : Delimiters.values()) {
             hints.append("<tr><td>").append(delimiter.getSymbol()).append("</td><td>").append(delimiter.getDescription()).append("</td></tr>");
         }
-        hints.append("</table><h1>Маппинг названий шаблонов/схем/заголовков писем</h1>")
+        hints.append("</table><h1>Маппинг названий шаблонов</h1>")
                 .append("В корневой папке со скелетами может быть файл ").append(Const.TEMPLATE_MAPPING_FILE).append(" со структурой:")
                 .append("<pre>{<br/> \"НАЗВАНИЕ_ПАПКИ\": {<br/>  \"name\":\"НАЗВАНИЕ_ОБЩЕЙ_СХЕМЫ\",<br/>")
                 .append("  \"topics\": {<br/>   \"ЯЗЫК(ru/en/...)\":\"ТЕМА_ПИСЬМА\"<br/>  }<br/> }<br/>}</pre></html>");
