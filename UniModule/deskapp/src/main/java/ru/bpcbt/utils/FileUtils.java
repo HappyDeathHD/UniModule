@@ -20,7 +20,8 @@ public class FileUtils {
     private static Map<File, String> cachedFiles = new HashMap<>();
     private static Map<File, Boolean> fileProcessStatus = new ConcurrentHashMap<>();
 
-    private static final String CONFIGURATION_FILE = "configurations.xml";
+    private static final String CONFIGURATION_DIR = System.getProperty("user.home") + File.separator + "UniModule";
+    private static final String CONFIGURATION_FILE = CONFIGURATION_DIR + File.separator + "configurations.xml";
 
     private static final String SEPARATOR = FileSystems.getDefault().getSeparator();
 
@@ -61,6 +62,7 @@ public class FileUtils {
             }
         }
         properties.forEach((k, v) -> configFile.setProperty(k.name(), v));
+        mkDir(new File(CONFIGURATION_DIR));
         try (OutputStream os = new FileOutputStream(CONFIGURATION_FILE)) {
             configFile.storeToXML(os, "Конфиги");
         } catch (Exception e) {
