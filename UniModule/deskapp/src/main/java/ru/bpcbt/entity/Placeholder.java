@@ -1,9 +1,9 @@
 package ru.bpcbt.entity;
 
 import javafx.util.Pair;
+import ru.bpcbt.Program;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
-import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.settings.Settings;
 
 import java.io.File;
@@ -31,10 +31,10 @@ import java.util.Objects;
  * </ul>
  */
 public class Placeholder {
-    private String rawPH;
+    private final String rawPH;
     private String body;
-    private Map<String, String> variables;
-    private Map<String, Placeholder> links;
+    private final Map<String, String> variables;
+    private final Map<String, Placeholder> links;
 
     public Placeholder(String placeholder) {
         rawPH = placeholder;
@@ -128,7 +128,7 @@ public class Placeholder {
 
     private File getFile(String pathStr) {
         final String[] pathPieces = pathStr.split(Delimiters.DELIMITER.getSymbol());
-        final Path fullPath = Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), pathPieces);
+        final Path fullPath = Paths.get(Program.getProperties().get(Settings.MODULE_DIR), pathPieces);
         return fullPath.toFile();
     }
 
@@ -177,14 +177,6 @@ public class Placeholder {
     }
 
     /*Getters & Setters*/
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
     public Map<String, String> getVariables() {
         return variables;
     }

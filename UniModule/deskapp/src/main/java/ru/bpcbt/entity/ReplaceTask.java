@@ -4,10 +4,10 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ReplaceTask implements Comparable<ReplaceTask> {
-    private String rawPlaceholder;
-    private String content;
-    private Map<String, String> parentVariables;
-    private int priority;
+    private final String rawPlaceholder;
+    private final String content;
+    private final Map<String, String> parentVariables;
+    private final int priority;
 
     public ReplaceTask(String rawPlaceholder, String content, Map<String, String> parentVariables) {
         this(rawPlaceholder, content, parentVariables, 0);

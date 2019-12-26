@@ -13,16 +13,17 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
     public static final int INPUTS_TAB = 0;
+    @SuppressWarnings("unused")
     public static final int MODULES_TAB = 1;
     public static final int OUTPUTS_TAB = 2;
     public static final int REPORT_TAB = 3;
     public static final int SETTINGS_TAB = 4;
 
-    private JTabbedPane tabbedPane;
-    private NavigatorPanel inputFilesPanel;
-    private NavigatorPanel modulesPanel;
-    private NavigatorPanel outputFilesPanel;
-    private SettingsPanel settingsPanel;
+    private final JTabbedPane tabbedPane;
+    private final NavigatorPanel inputFilesPanel;
+    private final NavigatorPanel modulesPanel;
+    private final NavigatorPanel outputFilesPanel;
+    private final SettingsPanel settingsPanel;
 
     MainFrame() {
         setTitle("UniModule 0.0.1");

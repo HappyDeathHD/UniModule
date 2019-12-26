@@ -57,15 +57,15 @@ public class ReplaceTasksExecutor {
         return new SwingWorker() {
             @Override
             protected Object doInBackground() {
-                int maxThreadsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
+                final int processorsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
+                final int maxThreadsCount = Math.min(processorsCount, MAX_WORKER_THREAD);
                 final long start = System.currentTimeMillis();
-                ReportPane.normal("Начало собрки: " + new Date(start) +
-                        System.lineSeparator() + "Количество ядер процессора: " + maxThreadsCount);
-                if (maxThreadsCount > MAX_WORKER_THREAD) {
-                    maxThreadsCount = MAX_WORKER_THREAD;
-                }
-                ReportPane.normal("Количество потоков: " + maxThreadsCount +
-                        System.lineSeparator() + "Количество файлов для сборки: " + mainJobsCount);
+                ReportPane.normal("┎────────────────────────────────────────────┒" + System.lineSeparator() +
+                        "┃Начало сборки: " + new Date(start) + "\t┃" + System.lineSeparator() +
+                        "┃Количество логических процессоров:\t" + processorsCount + "\t┃" + System.lineSeparator() +
+                        "┃Количество потоков:\t\t" + maxThreadsCount + "\t┃" + System.lineSeparator() +
+                        "┃Количество файлов для сборки:\t" + mainJobsCount + "\t┃" + System.lineSeparator() +
+                        "┖────────────────────────────────────────────┚");
                 workersCount.set(0);
                 while (mainJobsCount > mainJobsDone.get()) {
                     if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {
@@ -81,7 +81,7 @@ public class ReplaceTasksExecutor {
     }
 
     private static String cutThePath(File file) {
-        return file.getPath().replace(GlobalUtils.getProperties().get(Settings.INPUT_DIR), "").substring(1);
+        return file.getPath().replace(Program.getProperties().get(Settings.INPUT_DIR), "").substring(1);
     }
 
     private static boolean isLinksDone(Placeholder placeholder, int priority) {
@@ -147,9 +147,9 @@ public class ReplaceTasksExecutor {
 
     private static Set<Placeholder> getAllPlaceholders(String text) {
         final Set<Placeholder> placeholders = new HashSet<>();
-        final String sym = Delimiters.START_END.getSymbol();
+        final String symbol = Delimiters.START_END.getSymbol();
         boolean isOdd = false;
-        for (String pieceOfText : text.split(sym)) {
+        for (String pieceOfText : text.split(symbol)) {
             if (isOdd) {
                 placeholders.add(new Placeholder(pieceOfText));
             }

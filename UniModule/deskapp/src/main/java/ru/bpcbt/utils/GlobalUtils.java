@@ -4,47 +4,41 @@ import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.rest.TemplateUploader;
-import ru.bpcbt.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
 
+@SuppressWarnings("WeakerAccess")
 public class GlobalUtils {
 
     private GlobalUtils() { //Utils class
     }
 
-    public static MainFrame getMainFrame() {
-        return Program.getMainFrame();
-    }
-
     public static void refreshAllFiles() {
-        getMainFrame().getInputFilesPanel().refreshFiles();
-        getMainFrame().getModulesPanel().refreshFiles();
-        getMainFrame().getOutputFilesPanel().refreshFiles();
+        MainFrame mainFrame = Program.getMainFrame();
+        mainFrame.getInputFilesPanel().refreshFiles();
+        mainFrame.getModulesPanel().refreshFiles();
+        mainFrame.getOutputFilesPanel().refreshFiles();
         ReplaceTasksExecutor.refresh();
         TemplateUploader.refresh();
     }
 
-    public static Map<Settings, String> getProperties() {
-        return Program.getProperties();
-    }
-
     public static void setNavigatorsFont(Font font) {
-        getMainFrame().getInputFilesPanel().setFontToDisplay(font);
-        getMainFrame().getModulesPanel().setFontToDisplay(font);
-        getMainFrame().getOutputFilesPanel().setFontToDisplay(font);
+        MainFrame mainFrame = Program.getMainFrame();
+        mainFrame.getInputFilesPanel().setFontToDisplay(font);
+        mainFrame.getModulesPanel().setFontToDisplay(font);
+        mainFrame.getOutputFilesPanel().setFontToDisplay(font);
         ReportPane.setFontToReport(font);
     }
 
     public static void setEnabledToProcessButtons(boolean isEnabled) {
-        getMainFrame().getInputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
-        getMainFrame().getModulesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
-        getMainFrame().getOutputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        MainFrame mainFrame = Program.getMainFrame();
+        mainFrame.getInputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        mainFrame.getModulesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        mainFrame.getOutputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
     }
 
-    public static String getErrorMessageWithException(String message, Exception e){
+    public static String getErrorMessageWithException(String message, Exception e) {
         final StringBuilder builder = new StringBuilder(message);
         if (e != null) {
             builder.append(System.lineSeparator()).append(e.getClass().getCanonicalName());

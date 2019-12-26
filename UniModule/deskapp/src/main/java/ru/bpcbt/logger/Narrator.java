@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public class Narrator {
 
-    private static JLabel label;
+    private static final JLabel label;
 
     static {
         label = new JLabel("Добро пожаловать! При первом запуске нужно указать три папки в настройках");
@@ -46,11 +46,6 @@ public class Narrator {
 
     public static void error(String message) {
         label.setBackground(Style.RED);
-        label.setText(message);
-    }
-
-    public static void blue(String message) {
-        label.setBackground(Style.BLUE);
         label.setText(message);
     }
 }

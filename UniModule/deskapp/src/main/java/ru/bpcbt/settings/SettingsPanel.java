@@ -15,9 +15,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class SettingsPanel extends JPanel {
-    private JTextField inputDirTF;
-    private JTextField modulesDirTF;
-    private JTextField outputDirTF;
+    private final JTextField inputDirTF;
+    private final JTextField modulesDirTF;
+    private final JTextField outputDirTF;
     private JComboBox fontNameCB;
     private JComboBox styleCB;
     private JSpinner fontSizeS;
@@ -27,8 +27,8 @@ public class SettingsPanel extends JPanel {
 
     private final JPasswordField passwordPF = new JPasswordField();
 
-    private GridBagConstraints gridBag;
-    private String[] fonts;
+    private final GridBagConstraints gridBag;
+    private final String[] fonts;
 
     public SettingsPanel() {
         gridBag = new GridBagConstraints();
@@ -96,6 +96,7 @@ public class SettingsPanel extends JPanel {
         gridBag.gridwidth = 1;
     }
 
+    @SuppressWarnings("unchecked")
     private void addFontSelector() {
         final JLabel fontNameL = new JLabel(Settings.FONT_NAME.getDescription());
         gridBag.gridx = 0;
@@ -113,6 +114,7 @@ public class SettingsPanel extends JPanel {
         add(fontSizeS, gridBag);
     }
 
+    @SuppressWarnings("unchecked")
     private void addLookAndFeelSelector() {
         final JLabel styleL = new JLabel(Settings.STYLE.getDescription());
         gridBag.gridx = 0;
@@ -163,9 +165,12 @@ public class SettingsPanel extends JPanel {
                 properties.put(Settings.CORE_URL, coreUrlTF.getText());
                 properties.put(Settings.USERNAME, usernameTF.getText());
                 properties.put(Settings.STYLE, String.valueOf(styleCB.getSelectedIndex()));
-                Font font = new Font(fontNameCB.getSelectedItem().toString(), Font.PLAIN, (int) fontSizeS.getValue());
-                GlobalUtils.setNavigatorsFont(font);
                 FileUtils.setProperties(properties);
+
+                if (fontNameCB.getSelectedItem() != null) {
+                    Font font = new Font(fontNameCB.getSelectedItem().toString(), Font.PLAIN, (int) fontSizeS.getValue());
+                    GlobalUtils.setNavigatorsFont(font);
+                }
                 UIManager.setLookAndFeel(Style.getLafs()[styleCB.getSelectedIndex()].getClassName());
                 SwingUtilities.updateComponentTreeUI(Program.getMainFrame());
                 Narrator.success("Схоронил!");
@@ -182,7 +187,7 @@ public class SettingsPanel extends JPanel {
         gridBag.gridwidth = 1;
     }
 
-    public void addDebugFlag() {
+    private void addDebugFlag() {
         debugFlag = new JCheckBox(Settings.DEBUG.getDescription());
         gridBag.gridx = 0;
         gridBag.gridy++;
@@ -255,7 +260,7 @@ public class SettingsPanel extends JPanel {
         passwordPF.setText(password);
     }
 
-    public boolean isDebug(){
+    public boolean isDebug() {
         return debugFlag.isSelected();
     }
 }

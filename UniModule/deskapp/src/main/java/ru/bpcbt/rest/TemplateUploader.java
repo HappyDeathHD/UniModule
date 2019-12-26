@@ -11,7 +11,6 @@ import ru.bpcbt.settings.Settings;
 import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.utils.Const;
 import ru.bpcbt.utils.FileUtils;
-import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.MiniFrame;
 
 import javax.swing.*;
@@ -22,17 +21,18 @@ import java.util.*;
 
 public class TemplateUploader {
     private static UnimessageClient client;
-    private static Map<String, Long> templateIdMap = new HashMap<>();
-    private static Map<String, String> templateTopicMap = new HashMap<>();
-    private static Map<String, String> templateNameMap = new HashMap<>();
+    private static final Map<String, Long> templateIdMap = new HashMap<>();
+    private static final Map<String, String> templateTopicMap = new HashMap<>();
+    private static final Map<String, String> templateNameMap = new HashMap<>();
     private static int attemptsCount;
 
     private TemplateUploader() { // Utils class
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean checkAndPrepareConnectionSettings() {
         if (client == null) {
-            String coreUrl = GlobalUtils.getProperties().get(Settings.CORE_URL).trim();
+            String coreUrl = Program.getProperties().get(Settings.CORE_URL).trim();
             if (coreUrl.isEmpty()) {
                 Narrator.yell("Надо заполнить путь до api!");
                 Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
@@ -41,7 +41,7 @@ public class TemplateUploader {
             if (coreUrl.endsWith("/")) {
                 coreUrl = coreUrl.substring(0, coreUrl.length() - 1);
             }
-            final String login = GlobalUtils.getProperties().get(Settings.USERNAME).trim();
+            final String login = Program.getProperties().get(Settings.USERNAME).trim();
             String password = Program.getMainFrame().getSettingsPanel().getPassword().trim();
             if (login.isEmpty()) {
                 Narrator.yell("Нужно заполнить логин/пароль для подключения к api");
@@ -132,7 +132,7 @@ public class TemplateUploader {
     }
 
     private static void fillThemes() {
-        final String inputDir = GlobalUtils.getProperties().get(Settings.INPUT_DIR);
+        final String inputDir = Program.getProperties().get(Settings.INPUT_DIR);
         final File mappingFile = Paths.get(inputDir, Const.TEMPLATE_MAPPING_FILE).toFile();
         if (mappingFile.exists()) {
             try {

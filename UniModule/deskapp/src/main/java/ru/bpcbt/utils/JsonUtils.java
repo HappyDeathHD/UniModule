@@ -3,6 +3,7 @@ package ru.bpcbt.utils;
 import com.grack.nanojson.JsonObject;
 import com.grack.nanojson.JsonParser;
 import com.grack.nanojson.JsonParserException;
+import ru.bpcbt.Program;
 import ru.bpcbt.entity.ReplaceTask;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
@@ -13,9 +14,10 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("WeakerAccess")
 public class JsonUtils {
-    private static Map<File, Map<String, String>> cachedJson = new HashMap<>();
-    private static Map<File, Boolean> jsonProcessStatus = new ConcurrentHashMap<>();
+    private static final Map<File, Map<String, String>> cachedJson = new HashMap<>();
+    private static final Map<File, Boolean> jsonProcessStatus = new ConcurrentHashMap<>();
 
     private JsonUtils() { //Utils class
     }
@@ -23,6 +25,7 @@ public class JsonUtils {
     /**
      * @return мапу вида "@ключ=значение, @массив@массив@ключ2=значение2"
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     public static Map<String, String> parseModule(File file) {
         if (!jsonProcessStatus.containsKey(file)) {
             jsonProcessStatus.put(file, false);
@@ -96,7 +99,7 @@ public class JsonUtils {
         final List<ReplaceTask> replaceTasks = new ArrayList<>();
         for (Map.Entry<String, Object> jInputs : jsonObject.entrySet()) {
             for (Map.Entry<String, Object> jOutputs : ((JsonObject) jInputs.getValue()).entrySet()) {
-                File file = Paths.get(GlobalUtils.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile();
+                File file = Paths.get(Program.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile();
                 final HashMap<String, String> variables = FileUtils.getVariableMapWithLocale(file);
                 for (Map.Entry<String, Object> jVariables : ((JsonObject) jOutputs.getValue()).entrySet()) {
                     variables.put(jVariables.getKey(), String.valueOf(jVariables.getValue()));

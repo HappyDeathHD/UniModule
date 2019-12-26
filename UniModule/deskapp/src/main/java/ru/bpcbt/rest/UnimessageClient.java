@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 class UnimessageClient {
 
-    private String coreUrl;
+    private final String coreUrl;
     private String token;
 
     UnimessageClient(String coreUrl, String login, String password) {
@@ -30,12 +30,8 @@ class UnimessageClient {
         try {
             final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
             final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
+            makeConnectionPostJson(connection);
             connection.setRequestProperty("Authorization", "Bearer " + token);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json,text/plain");
-            connection.setRequestProperty("Method", "POST");
 
             final OutputStream os = connection.getOutputStream();
             final String params = JsonWriter.string()
@@ -58,42 +54,6 @@ class UnimessageClient {
             ReportPane.error("Файл " + file.getName() + " не загрузился:", e);
         }
         return -1;
-    }
-
-    private void setNewToken(String login, String password) {
-        try {
-            final URL authUrl = new URL(coreUrl + "/api/v1.0/authenticate");
-            final HttpURLConnection connection = (HttpURLConnection) authUrl.openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json,text/plain");
-            connection.setRequestProperty("Method", "POST");
-
-            final OutputStream os = connection.getOutputStream();
-            final String params = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
-            os.write(params.getBytes(StandardCharsets.UTF_8));
-            os.close();
-
-            final StringBuilder sb = new StringBuilder();
-            final int HttpResult = connection.getResponseCode();
-            if (HttpResult == HttpURLConnection.HTTP_OK) {
-                final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                reader.close();
-                ReportPane.fine("Получен новый токен");
-                final String rawResponse = sb.toString().substring(sb.toString().indexOf("\"token\":\"")).substring(9);
-                token =  rawResponse.substring(0, rawResponse.indexOf("\""));
-            } else {
-                ReportPane.error("Не удалось получить токен:" + System.lineSeparator() +
-                        connection.getResponseCode() + " " + connection.getResponseMessage());
-            }
-        } catch (Exception e) {
-            ReportPane.error("Не удалось получить токен:", e);
-        }
     }
 
     String getRawTemplates() {
@@ -122,5 +82,45 @@ class UnimessageClient {
             ReportPane.error("Не удалось загрузить список схем:", e);
         }
         return null;
+    }
+
+    private void setNewToken(String login, String password) {
+        try {
+            final URL authUrl = new URL(coreUrl + "/api/v1.0/authenticate");
+            final HttpURLConnection connection = (HttpURLConnection) authUrl.openConnection();
+            makeConnectionPostJson(connection);
+
+            final OutputStream os = connection.getOutputStream();
+            final String params = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
+            os.write(params.getBytes(StandardCharsets.UTF_8));
+            os.close();
+
+            final StringBuilder sb = new StringBuilder();
+            final int HttpResult = connection.getResponseCode();
+            if (HttpResult == HttpURLConnection.HTTP_OK) {
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                reader.close();
+                ReportPane.fine("Получен новый токен");
+                final String rawResponse = sb.toString().substring(sb.toString().indexOf("\"token\":\"")).substring(9);
+                token = rawResponse.substring(0, rawResponse.indexOf("\""));
+            } else {
+                ReportPane.error("Не удалось получить токен:" + System.lineSeparator() +
+                        connection.getResponseCode() + " " + connection.getResponseMessage());
+            }
+        } catch (Exception e) {
+            ReportPane.error("Не удалось получить токен:", e);
+        }
+    }
+
+    private void makeConnectionPostJson(HttpURLConnection connection) {
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Accept", "application/json,text/plain");
+        connection.setRequestProperty("Method", "POST");
     }
 }

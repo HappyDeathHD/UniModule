@@ -1,5 +1,6 @@
 package ru.bpcbt.utils;
 
+import ru.bpcbt.Program;
 import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
@@ -16,9 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("WeakerAccess")
 public class FileUtils {
-    private static Map<File, String> cachedFiles = new HashMap<>();
-    private static Map<File, Boolean> fileProcessStatus = new ConcurrentHashMap<>();
+    private static final Map<File, String> cachedFiles = new HashMap<>();
+    private static final Map<File, Boolean> fileProcessStatus = new ConcurrentHashMap<>();
 
     private static final String CONFIGURATION_DIR = System.getProperty("user.home") + File.separator + "UniModule";
     private static final String CONFIGURATION_FILE = CONFIGURATION_DIR + File.separator + "configurations.xml";
@@ -69,6 +71,7 @@ public class FileUtils {
                 .collect(Collectors.toMap(s -> s, s -> configFile.getProperty(s.name())));
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static List<File> getFilesByTypeRecursively(String workingDir) {
         final List<File> neededFiles = new ArrayList<>();
         if (isDirExists(workingDir)) {
@@ -84,6 +87,7 @@ public class FileUtils {
         return neededFiles;
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static String readFile(File file) {
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] data = new byte[(int) file.length()];
@@ -95,6 +99,7 @@ public class FileUtils {
         return "";
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public static String readAndCacheFileContent(File file) {
         if (cachedFiles.containsKey(file)) {
             return cachedFiles.get(file);
@@ -144,18 +149,14 @@ public class FileUtils {
         return file.getPath();
     }
 
-    public static String[] separatePath(String path) {
-        return path.split(Pattern.quote(SEPARATOR));
-    }
-
     public static String[] separatePlaceholders(String path) {
         return path.split(Pattern.quote(Delimiters.DELIMITER.getSymbol()));
     }
 
     public static void writeResultFile(String fileName, String newFileContent) {
-        final String outputDir = GlobalUtils.getProperties().get(Settings.OUTPUT_DIR);
+        final String outputDir = Program.getProperties().get(Settings.OUTPUT_DIR);
         final String[] separatedPath = FileUtils.separatePlaceholders(fileName);
-        if (GlobalUtils.getProperties().get(Settings.INPUT_DIR).equals(outputDir)) {
+        if (Program.getProperties().get(Settings.INPUT_DIR).equals(outputDir)) {
             separatedPath[0] = Const.CONFLICT_PREFIX + separatedPath[0];
         }
         final Path newPath = Paths.get(outputDir, separatedPath);

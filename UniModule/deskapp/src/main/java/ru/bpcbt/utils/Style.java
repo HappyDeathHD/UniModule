@@ -5,6 +5,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Style {
     public static final Color RED = new Color(217, 83, 79);
     public static final Color RED_B = new Color(255, 118, 112);
@@ -20,11 +21,11 @@ public class Style {
 
     private static final UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
 
-    private static SimpleAttributeSet error;
-    private static SimpleAttributeSet success;
-    private static SimpleAttributeSet warning;
-    private static SimpleAttributeSet fine;
-    private static SimpleAttributeSet mark;
+    private static final SimpleAttributeSet error;
+    private static final SimpleAttributeSet success;
+    private static final SimpleAttributeSet warning;
+    private static final SimpleAttributeSet fine;
+    private static final SimpleAttributeSet mark;
 
     static {
         error = new SimpleAttributeSet();
