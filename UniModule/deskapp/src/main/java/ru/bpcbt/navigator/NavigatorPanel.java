@@ -1,6 +1,6 @@
 package ru.bpcbt.navigator;
 
-import ru.bpcbt.utils.GlobalUtils;
+import ru.bpcbt.Program;
 import ru.bpcbt.utils.MiniFrame;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.settings.Settings;
@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 
 public class NavigatorPanel extends JPanel {
 
-    private Settings workingDirType;
-    private JTextPane display;
-    private JList<String> navigatorList;
+    private final Settings workingDirType;
+    private final JTextPane display;
+    private final JList<String> navigatorList;
     private List<File> fileList;
     private File currentFile;
     private boolean isChanged = false;
@@ -94,7 +94,7 @@ public class NavigatorPanel extends JPanel {
     }
 
     public void refreshFiles() {
-        final String workingDir = GlobalUtils.getProperties().get(workingDirType);
+        final String workingDir = Program.getProperties().get(workingDirType);
         fileList = FileUtils.getFilesByTypeRecursively(workingDir);
         final Vector<String> htmlFilesVector = fileList.stream().map(file -> FileUtils.makeTitleFromFile(file, workingDir))
                 .collect(Collectors.toCollection(Vector::new));
@@ -146,7 +146,7 @@ public class NavigatorPanel extends JPanel {
 
     void openCurrentDir() {
         try {
-            Desktop.getDesktop().open(new File(GlobalUtils.getProperties().get(workingDirType)));
+            Desktop.getDesktop().open(new File(Program.getProperties().get(workingDirType)));
         } catch (IOException e) {
             Narrator.error("Не удалось открыть проводник");
         }
@@ -160,10 +160,6 @@ public class NavigatorPanel extends JPanel {
 
     List<File> getFileList() {
         return fileList;
-    }
-
-    public String getText() {
-        return display.getText();
     }
 
     public ButtonsPanel getButtonsPanel() {

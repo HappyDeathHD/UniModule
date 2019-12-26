@@ -13,7 +13,7 @@ public enum Settings {
     DEBUG("Выводить в отчет отладочную информацию (Замедляет процесс сборки)"),
     LAST_SHA("Актуальный коммит");
 
-    private String description;
+    private final String description;
 
     Settings(String description) {
         this.description = description;

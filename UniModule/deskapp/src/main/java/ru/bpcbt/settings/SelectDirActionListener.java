@@ -10,11 +10,11 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Locale;
 
-public class SelectDirActionListener implements ActionListener {
+class SelectDirActionListener implements ActionListener {
 
-    private Component parent;
-    private JTextField selectedDirTF;
-    private Settings property;
+    private final Component parent;
+    private final JTextField selectedDirTF;
+    private final Settings property;
 
     SelectDirActionListener(Component parent, JTextField selectedDirTF, Settings property) {
         this.parent = parent;
