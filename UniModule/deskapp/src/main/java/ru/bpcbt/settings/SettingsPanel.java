@@ -235,8 +235,9 @@ public class SettingsPanel extends JPanel {
         if (properties.containsKey(Settings.CORE_URL)) {
             coreUrlTF.setText(properties.get(Settings.CORE_URL));
         } else {
-            properties.put(Settings.CORE_URL, "https://pay.test.aeroflot.ru/unimessage-core");
-            coreUrlTF.setText("https://pay.test.aeroflot.ru/unimessage-core");
+            String defaultCoreUrl = Program.getSysProperty("default.core.url");
+            properties.put(Settings.CORE_URL, defaultCoreUrl);
+            coreUrlTF.setText(defaultCoreUrl);
         }
         if (properties.containsKey(Settings.USERNAME)) {
             usernameTF.setText(properties.get(Settings.USERNAME));

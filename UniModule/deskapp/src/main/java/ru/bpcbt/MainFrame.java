@@ -26,7 +26,7 @@ public class MainFrame extends JFrame {
     private final SettingsPanel settingsPanel;
 
     MainFrame() {
-        setTitle("UniModule 0.0.1");
+        setTitle("UniModule v" + Program.getSysProperty("version") + " built " + Program.getSysProperty("build"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         tabbedPane = new JTabbedPane();
         setLayout(new BorderLayout());
@@ -50,6 +50,20 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    private JPanel getInfoPanel() {
+        JPanel hintsPanel = new JPanel();
+        final StringBuilder hints = new StringBuilder("<html><h1>Разделители</h1><table>");
+        for (Delimiters delimiter : Delimiters.values()) {
+            hints.append("<tr><td>").append(delimiter.getSymbol()).append("</td><td>").append(delimiter.getDescription()).append("</td></tr>");
+        }
+        hints.append("</table><h1>Маппинг названий шаблонов</h1>")
+                .append("В корневой папке со скелетами может быть файл ").append(Const.TEMPLATE_MAPPING_FILE).append(" со структурой:")
+                .append("<pre>{<br/> \"НАЗВАНИЕ_ПАПКИ\": {<br/>  \"name\":\"НАЗВАНИЕ_ОБЩЕЙ_СХЕМЫ\",<br/>")
+                .append("  \"topics\": {<br/>   \"ЯЗЫК(ru/en/...)\":\"ТЕМА_ПИСЬМА\"<br/>  }<br/> }<br/>}</pre></html>");
+        hintsPanel.add(new JLabel(hints.toString()));
+        return hintsPanel;
+    }
+
     /*Getters & Setters*/
     public void setPaneTab(int index) {
         tabbedPane.setSelectedIndex(index);
@@ -65,20 +79,6 @@ public class MainFrame extends JFrame {
 
     public NavigatorPanel getOutputFilesPanel() {
         return outputFilesPanel;
-    }
-
-    private JPanel getInfoPanel() {
-        JPanel hintsPanel = new JPanel();
-        final StringBuilder hints = new StringBuilder("<html><h1>Разделители</h1><table>");
-        for (Delimiters delimiter : Delimiters.values()) {
-            hints.append("<tr><td>").append(delimiter.getSymbol()).append("</td><td>").append(delimiter.getDescription()).append("</td></tr>");
-        }
-        hints.append("</table><h1>Маппинг названий шаблонов</h1>")
-                .append("В корневой папке со скелетами может быть файл ").append(Const.TEMPLATE_MAPPING_FILE).append(" со структурой:")
-                .append("<pre>{<br/> \"НАЗВАНИЕ_ПАПКИ\": {<br/>  \"name\":\"НАЗВАНИЕ_ОБЩЕЙ_СХЕМЫ\",<br/>")
-                .append("  \"topics\": {<br/>   \"ЯЗЫК(ru/en/...)\":\"ТЕМА_ПИСЬМА\"<br/>  }<br/> }<br/>}</pre></html>");
-        hintsPanel.add(new JLabel(hints.toString()));
-        return hintsPanel;
     }
 
     public SettingsPanel getSettingsPanel() {
