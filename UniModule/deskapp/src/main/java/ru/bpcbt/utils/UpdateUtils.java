@@ -45,9 +45,9 @@ public class UpdateUtils {
 
         final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
         String message = obj.getObject("commit").getString("message");
-        String sha = obj.getString("sha");
+        String penultSha = obj.getArray("parents").getObject(0).getString("sha");
 
-        return !sha.equals(Program.getSysProperty("git.commit.id"))
+        return !penultSha.equals(Program.getSysProperty("git.commit.id"))
                 && MiniFrame.askForConfirmation("Появилась новая версия с фиксом старых/добавлением новых багов:"
                 + System.lineSeparator() + message + System.lineSeparator() + "Обновляемся?");
     }
