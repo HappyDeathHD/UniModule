@@ -26,7 +26,7 @@ public class MainFrame extends JFrame {
     private final SettingsPanel settingsPanel;
 
     MainFrame() {
-        setTitle("UniModule v" + Program.getSysProperty("version") + " built " + Program.getSysProperty("build"));
+        setTitle("UniModule v" + Program.getSysProperty("version") + " built " + Program.getSysProperty("git.build.time"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         tabbedPane = new JTabbedPane();
         setLayout(new BorderLayout());

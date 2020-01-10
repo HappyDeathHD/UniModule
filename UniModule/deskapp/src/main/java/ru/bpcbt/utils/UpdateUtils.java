@@ -5,7 +5,6 @@ import com.grack.nanojson.JsonParser;
 import com.grack.nanojson.JsonParserException;
 import ru.bpcbt.Program;
 import ru.bpcbt.logger.Narrator;
-import ru.bpcbt.settings.Settings;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Map;
 import java.util.Scanner;
 
 public class UpdateUtils {
@@ -49,19 +47,8 @@ public class UpdateUtils {
         String message = obj.getObject("commit").getString("message");
         String sha = obj.getString("sha");
 
-        Map<Settings, String> properties = Program.getProperties();
-        if (!properties.containsKey(Settings.LAST_SHA)) {
-            properties.put(Settings.LAST_SHA, sha);
-            FileUtils.setProperties(properties);
-        }
-
-        if (!sha.equals(properties.get(Settings.LAST_SHA))
+        return !sha.equals(Program.getSysProperty("git.commit.id"))
                 && MiniFrame.askForConfirmation("Появилась новая версия с фиксом старых/добавлением новых багов:"
-                + System.lineSeparator() + message + System.lineSeparator() + "Обновляемся?")) {
-            properties.put(Settings.LAST_SHA, sha);
-            FileUtils.setProperties(properties);
-            return true;
-        }
-        return false;
+                + System.lineSeparator() + message + System.lineSeparator() + "Обновляемся?");
     }
 }
