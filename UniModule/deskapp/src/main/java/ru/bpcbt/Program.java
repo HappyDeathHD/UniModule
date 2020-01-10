@@ -9,12 +9,14 @@ import ru.bpcbt.utils.UpdateUtils;
 
 import javax.swing.*;
 import java.util.Map;
+import java.util.Properties;
 
 import static ru.bpcbt.settings.Settings.STYLE;
 
 public class Program {
     private static MainFrame mainFrame;
     private static Map<Settings, String> properties;
+    private static Properties sysProperties;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -45,5 +47,18 @@ public class Program {
 
     public static Map<Settings, String> getProperties() {
         return properties;
+    }
+
+    public static String getSysProperty(String key) {
+        if (sysProperties != null) {
+            return sysProperties.getProperty(key);
+        }
+        try {
+            sysProperties = new Properties();
+            sysProperties.load(Program.class.getClassLoader().getResourceAsStream(".properties"));
+            return sysProperties.getProperty(key);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 }

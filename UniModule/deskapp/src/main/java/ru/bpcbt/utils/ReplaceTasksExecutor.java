@@ -198,29 +198,26 @@ public class ReplaceTasksExecutor {
             protected Object doInBackground() {
                 try {
                     String newFileContent = task.getContent();
-                    final Set<Placeholder> allPlaceholders = getAllPlaceholders(newFileContent);
                     boolean jobDone = true;
-                    if (!allPlaceholders.isEmpty()) {
-                        for (Placeholder placeholder : allPlaceholders) {
-                            placeholder.mergeVariables(task.getParentVariables());
-                            if (isLinksDone(placeholder, task.getPriority())) {
-                                final String phValue = getContentForPlaceholder(placeholder, task.getPriority());
-                                if (phValue != null) {
-                                    newFileContent = newFileContent.replace(placeholder.wrapPH(), phValue);
-                                } else {
-                                    jobDone = false;
-                                }
+                    for (Placeholder placeholder : getAllPlaceholders(newFileContent)) {
+                        placeholder.mergeVariables(task.getParentVariables());
+                        if (isLinksDone(placeholder, task.getPriority())) {
+                            final String phValue = getContentForPlaceholder(placeholder, task.getPriority());
+                            if (phValue != null) {
+                                newFileContent = newFileContent.replace(placeholder.wrapPH(), phValue);
                             } else {
                                 jobDone = false;
                             }
+                        } else {
+                            jobDone = false;
                         }
                     }
-                    if (jobDone) {
-                        if (!isModule()) {
+                    if (jobDone) { // если плесхолдеров нет или для всех них готовы замены
+                        if (task.getPriority() == 0) { // Это была основная задача
                             FileUtils.writeResultFile(task.getRawPlaceholder(), newFileContent);
                             mainJobsDone.incrementAndGet();
                             ReportPane.success("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!");
-                        } else {
+                        } else { // Это был один из модулей (не основная задача)
                             final Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
                             placeholder.mergeVariables(task.getParentVariables());
                             foundReplacements.put(placeholder, newFileContent);
@@ -235,10 +232,6 @@ public class ReplaceTasksExecutor {
                     workersCount.getAndDecrement();
                 }
                 return null;
-            }
-
-            private boolean isModule() {
-                return task.getPriority() > 0;
             }
         };
     }

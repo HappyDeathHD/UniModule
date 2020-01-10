@@ -19,7 +19,18 @@
         </dependency>
     </dependencies>
 
+    <properties>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>dd-MM-yyyy HH:mm</maven.build.timestamp.format>
+    </properties>
+
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <!--jar-with-dependencies-->
             <plugin>
@@ -90,5 +101,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
