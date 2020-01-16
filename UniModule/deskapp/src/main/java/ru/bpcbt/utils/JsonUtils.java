@@ -100,7 +100,7 @@ public class JsonUtils {
         for (Map.Entry<String, Object> jInputs : jsonObject.entrySet()) {
             for (Map.Entry<String, Object> jOutputs : ((JsonObject) jInputs.getValue()).entrySet()) {
                 File file = Paths.get(Program.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile();
-                final HashMap<String, String> variables = FileUtils.getVariableMapWithLocale(file);
+                final HashMap<String, String> variables = FileUtils.getVariableMapWithLocale(jOutputs.getKey());
                 for (Map.Entry<String, Object> jVariables : ((JsonObject) jOutputs.getValue()).entrySet()) {
                     variables.put(jVariables.getKey(), String.valueOf(jVariables.getValue()));
                 }
