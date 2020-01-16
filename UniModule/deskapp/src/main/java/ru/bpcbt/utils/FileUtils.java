@@ -176,8 +176,8 @@ public class FileUtils {
         return null;
     }
 
-    public static HashMap<String, String> getVariableMapWithLocale(File file) {
-        String language = FileUtils.getLanguage(file.getName());
+    public static HashMap<String, String> getVariableMapWithLocale(String fileName) {
+        String language = FileUtils.getLanguage(fileName);
         HashMap<String, String> variables = new HashMap<>();
         if (language != null) {
             variables.put("locale", language);

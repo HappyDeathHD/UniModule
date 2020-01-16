@@ -24,8 +24,7 @@ public class Program {
                 properties = FileUtils.getProperties();
                 if (properties.containsKey(STYLE)) {
                     try {
-                        int lafIndex = Integer.parseInt(properties.get(STYLE));
-                        UIManager.setLookAndFeel(Style.getLafs()[lafIndex].getClassName());
+                        UIManager.setLookAndFeel(Style.getLafs()[Integer.parseInt(properties.get(STYLE))].getClassName());
                     } catch (Exception e) {
                         Narrator.yell("Ошибка при применении стиля", e);
                     }
