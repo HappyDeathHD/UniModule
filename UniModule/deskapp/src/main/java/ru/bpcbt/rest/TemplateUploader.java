@@ -162,11 +162,8 @@ public class TemplateUploader {
         }
         final long templateId = templateIdMap.get(templateName);
         String topic = templateTopicMap.get(templateName + language.toUpperCase());
-        if (topic == null) {
-            topic = file.getName();
-        }
         ReportPane.normal("Начинаю загрузку " + file.getName() + " в " + templateName + "(" + templateId + ") c языком " + language);
-        final int httpResult = client.uploadFileToTemplate(file, templateId, language, topic);
+        int httpResult = client.uploadFileToTemplate(file, templateId, language, topic);
         if (httpResult == HttpURLConnection.HTTP_OK) {
             ReportPane.success(file.getName() + " успешно загрузился");
             return true;

@@ -4,15 +4,16 @@ import com.grack.nanojson.JsonWriter;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.utils.FileUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 class UnimessageClient {
+
+    private final static String CRLF = "\r\n";
+    private final static String DOUBLE_LINE = "--";
 
     private final String coreUrl;
     private String token;
@@ -28,21 +29,12 @@ class UnimessageClient {
 
     int uploadFileToTemplate(File file, long templateId, String language, String topic) {
         try {
-            final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
-            final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
-            makeConnectionPostJson(connection);
-            connection.setRequestProperty("Authorization", "Bearer " + token);
-
-            final OutputStream os = connection.getOutputStream();
-            final String params = JsonWriter.string()
-                    .object()
-                    .value("body", FileUtils.readFile(file))
-                    .value("fileName", topic)
-                    .value("language", language)
-                    .end().done();
-            os.write(params.getBytes(StandardCharsets.UTF_8));
-            os.close();
-
+            HttpURLConnection connection;
+            if (topic == null) {
+                connection = uploadFile(file, templateId, language);
+            } else {
+                connection = uploadFile(file, templateId, language, topic);
+            }
             final int httpResult = connection.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK) {
                 return httpResult;
@@ -54,6 +46,48 @@ class UnimessageClient {
             ReportPane.error("Файл " + file.getName() + " не загрузился:", e);
         }
         return -1;
+    }
+
+    private HttpURLConnection uploadFile(File file, long templateId, String language) throws IOException {
+        final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language + "/upload");
+        final String boundary = Long.toHexString(System.currentTimeMillis());
+
+        final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
+        makeConnectionPostMultipart(connection, boundary);
+        connection.setRequestProperty("Authorization", "Bearer " + token);
+
+        try (final DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+             final PrintWriter writer = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8), true)) {
+            writer.append(DOUBLE_LINE).append(boundary).append(CRLF)
+                    .append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(file.getName()).append("\"").append(CRLF)
+                    .append("Content-Type: text/html").append(CRLF)
+                    .append("Content-Transfer-Encoding: binary").append(CRLF).flush();
+            writer.append(CRLF).flush();
+            Files.copy(file.toPath(), os);
+            os.flush();
+            writer.append(CRLF).flush();
+            writer.append(DOUBLE_LINE).append(boundary).append(DOUBLE_LINE).append(CRLF).flush();
+        }
+        return connection;
+    }
+
+    private HttpURLConnection uploadFile(File file, long templateId, String language, String topic) throws IOException {
+        final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
+
+        final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
+        makeConnectionPostJson(connection);
+        connection.setRequestProperty("Authorization", "Bearer " + token);
+
+        try (final OutputStream os = connection.getOutputStream()) {
+            final String params = JsonWriter.string()
+                    .object()
+                    .value("body", FileUtils.readFile(file))
+                    .value("fileName", topic)
+                    .value("language", language)
+                    .end().done();
+            os.write(params.getBytes(StandardCharsets.UTF_8));
+        }
+        return connection;
     }
 
     String getRawTemplates() {
@@ -121,6 +155,11 @@ class UnimessageClient {
         connection.setDoInput(true);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Accept", "application/json,text/plain");
-        connection.setRequestProperty("Method", "POST");
+    }
+
+    private void makeConnectionPostMultipart(HttpURLConnection connection, String boundary) {
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
     }
 }
