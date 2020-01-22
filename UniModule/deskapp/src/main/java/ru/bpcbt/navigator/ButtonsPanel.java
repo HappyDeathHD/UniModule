@@ -113,8 +113,7 @@ public class ButtonsPanel extends JPanel {
         uploadAllB.setEnabled(isEnabled);
     }
 
-    /*Getters & Setters*/
-    ColoredButton getSaveB() {
-        return saveB;
+    void setEnabledToSaveButton(boolean enabled) {
+        saveB.setEnabled(enabled);
     }
 }

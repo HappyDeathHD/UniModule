@@ -33,7 +33,7 @@ public class Program {
                 mainFrame = new MainFrame();
                 mainFrame.getSettingsPanel().loadConfigurations();
                 GlobalUtils.refreshAllFiles();
-                UpdateUtils.update();
+                UpdateUtils.checkForUpdate();
             } catch (Exception e) {
                 Narrator.yell("Ошибка:", e);
             }
