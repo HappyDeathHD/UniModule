@@ -1,6 +1,9 @@
 package ru.bpcbt.utils;
 
+import ru.bpcbt.misc.ColoredButton;
+
 import javax.swing.*;
+import java.awt.*;
 
 public class MiniFrame {
 
@@ -9,6 +12,28 @@ public class MiniFrame {
 
     public static boolean askForConfirmation(String message) {
         return JOptionPane.showConfirmDialog(null, message) == 0;//0 — это ДА
+    }
+
+    static void showUpdateMessage(String changelog) {
+        JLabel textArea = new JLabel("<html><body style='height:380px'>" +
+                "<h2>Появилась новая версия<br/>с фиксом старых/добавлением новых багов:</h2><br/>" +
+                "<div style='width:380px;margin:0 auto;'>" + changelog + "</div></body></html>");
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(500, 500));
+        scrollPane.setBorder(null);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JOptionPane op = new JOptionPane(scrollPane, JOptionPane.PLAIN_MESSAGE);
+        JDialog dialog = op.createDialog("Обновление!");
+        dialog.setAlwaysOnTop(false);
+        dialog.setModal(false);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+        ColoredButton confirmButton = new ColoredButton("Обновляемся!");
+        confirmButton.setBackground(Style.GREEN);
+        confirmButton.addActionListener(e -> UpdateUtils.update());
+        Object[] buttons = {confirmButton};
+        op.setOptions(buttons);
+        dialog.setVisible(true);
     }
 
     public static void showMessage(String message) {

@@ -9,8 +9,8 @@ import javax.swing.text.*;
 import java.awt.*;
 
 public class ReportPane extends JTextPane {
-    private static final ReportPane INSTANCE = new ReportPane();
-    private static final StyledDocument doc = INSTANCE.getStyledDocument();
+    private static final ReportPane INSTANCE = new ReportPane(); //ленивая инициализация не имеет смысла
+    private static final StyledDocument DOC = INSTANCE.getStyledDocument();
 
     private ReportPane() { //Singleton
     }
@@ -51,18 +51,18 @@ public class ReportPane extends JTextPane {
 
     private static void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
         try {
-            doc.insertString(doc.getLength(), message + System.lineSeparator(), simpleAttributeSet);
+            DOC.insertString(DOC.getLength(), message + System.lineSeparator(), simpleAttributeSet);
         } catch (BadLocationException e) {
             Narrator.error("Не удалось добавить текст в отчет!");
         }
     }
 
     public static void setFontToReport(Font font) {
-        INSTANCE.setFont(font);
-        INSTANCE.repaint();
+        getReportPane().setFont(font);
+        getReportPane().repaint();
     }
 
     public static void clearReport() {
-        INSTANCE.setText("");
+        getReportPane().setText("");
     }
 }

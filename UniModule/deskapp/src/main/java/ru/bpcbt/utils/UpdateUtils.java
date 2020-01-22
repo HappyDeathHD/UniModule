@@ -24,15 +24,18 @@ public class UpdateUtils {
     private UpdateUtils() { // Utils class
     }
 
-    public static void update() {
+    public static void checkForUpdate() {
         SwingUtilities.invokeLater(() -> {
             try {
                 FileUtils.deleteIfExists(UPDATER_NAME);
-                if (isUpdateNeeded()) {
-                    InputStream in = new URL(UPDATER_URL).openStream();
-                    Files.copy(in, Paths.get(UPDATER_NAME), StandardCopyOption.REPLACE_EXISTING);
-                    Runtime.getRuntime().exec("java -jar " + UPDATER_NAME);
-                    System.exit(10);
+                String rawJson = new Scanner(new URL(COMMIT_CHECK_URL).openStream(), "UTF-8").useDelimiter("\\A").next();
+
+                final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
+                String changelog = obj.getObject("commit").getString("message");
+                String penultSha = obj.getArray("parents").getObject(0).getString("sha");
+                if (!penultSha.equals(Program.getSysProperty("git.commit.id"))) {
+                    Narrator.warn("Версия приложения устарела!");
+                    MiniFrame.showUpdateMessage(changelog);
                 }
             } catch (IOException | JsonParserException e) {
                 Narrator.yell("Не удалось обновиться :( ", e);
@@ -40,15 +43,14 @@ public class UpdateUtils {
         });
     }
 
-    private static boolean isUpdateNeeded() throws IOException, JsonParserException {
-        String rawJson = new Scanner(new URL(COMMIT_CHECK_URL).openStream(), "UTF-8").useDelimiter("\\A").next();
-
-        final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
-        String message = obj.getObject("commit").getString("message");
-        String penultSha = obj.getArray("parents").getObject(0).getString("sha");
-
-        return !penultSha.equals(Program.getSysProperty("git.commit.id"))
-                && MiniFrame.askForConfirmation("Появилась новая версия с фиксом старых/добавлением новых багов:"
-                + System.lineSeparator() + message + System.lineSeparator() + "Обновляемся?");
+    static void update() {
+        try {
+            InputStream in = new URL(UPDATER_URL).openStream();
+            Files.copy(in, Paths.get(UPDATER_NAME), StandardCopyOption.REPLACE_EXISTING);
+            Runtime.getRuntime().exec("java -jar " + UPDATER_NAME);
+            System.exit(10);
+        } catch (IOException e) {
+            Narrator.yell("Не удалось обновиться :( ", e);
+        }
     }
 }

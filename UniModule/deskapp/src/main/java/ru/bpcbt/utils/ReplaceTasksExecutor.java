@@ -60,12 +60,12 @@ public class ReplaceTasksExecutor {
                 final int processorsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
                 final int maxThreadsCount = Math.min(processorsCount, MAX_WORKER_THREAD);
                 final long start = System.currentTimeMillis();
-                ReportPane.normal("┎────────────────────────────────────────────┒" + System.lineSeparator() +
-                        "┃Начало сборки: " + new Date(start) + "\t┃" + System.lineSeparator() +
-                        "┃Количество логических процессоров:\t" + processorsCount + "\t┃" + System.lineSeparator() +
-                        "┃Количество потоков:\t\t" + maxThreadsCount + "\t┃" + System.lineSeparator() +
-                        "┃Количество файлов для сборки:\t" + mainJobsCount + "\t┃" + System.lineSeparator() +
-                        "┖────────────────────────────────────────────┚");
+                ReportPane.normal("┎─────────────────────────────────────────────" + System.lineSeparator() +
+                        "┃Начало сборки: " + new Date(start) + System.lineSeparator() +
+                        "┃Количество логических процессоров:\t" + processorsCount + System.lineSeparator() +
+                        "┃Количество потоков:   \t\t" + maxThreadsCount + System.lineSeparator() +
+                        "┃Количество файлов для сборки:\t" + mainJobsCount + System.lineSeparator() +
+                        "┖─────────────────────────────────────────────");
                 workersCount.set(0);
                 while (mainJobsCount > mainJobsDone.get()) {
                     if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {

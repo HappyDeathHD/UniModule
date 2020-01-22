@@ -43,17 +43,17 @@ public class NavigatorPanel extends JPanel {
         display.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                isChanged = true;
+                changesDetected(true);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                isChanged = true;
+                changesDetected(true);
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                isChanged = true;
+                changesDetected(true);
             }
         });
         final JScrollPane scroll = new JScrollPane(display);
@@ -73,9 +73,8 @@ public class NavigatorPanel extends JPanel {
                     if (confirmed) {
                         int index = list.locationToIndex(evt.getPoint());
                         currentFile = fileList.get(index);
-                        buttonsPanel.getSaveB().setEnabled(true);
                         setColoredTextToDisplay(FileUtils.readFile(currentFile));
-                        isChanged = false;
+                        changesDetected(false);
                     }
                 }
             }
@@ -103,8 +102,8 @@ public class NavigatorPanel extends JPanel {
 
     private void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
         try {
-            //костыль, призванный убрать бесконечное дублирование CR+LF и CR. Уктуально для винды, не тестилось на других системах.
-            String crlfNormalizedMessage= message.replace(System.lineSeparator(),"\n");
+            //костыль, призванный убрать бесконечное дублирование CR+LF и CR. Актуально для винды, не тестилось на других системах.
+            String crlfNormalizedMessage = message.replace(System.lineSeparator(), "\n");
             display.getStyledDocument().insertString(display.getStyledDocument().getLength(),
                     crlfNormalizedMessage, simpleAttributeSet);
         } catch (BadLocationException e) {
@@ -137,7 +136,7 @@ public class NavigatorPanel extends JPanel {
 
     void saveCurrentFile() {
         if (FileUtils.createFile(currentFile.getPath(), display.getText())) {
-            isChanged = false;
+            changesDetected(false);
             Narrator.success("Файл \"" + currentFile.getName() + "\" успешно сохранен!");
         } else {
             Narrator.error("Не удалось сохранить файл \"" + currentFile.getName() + "\"");
@@ -158,6 +157,14 @@ public class NavigatorPanel extends JPanel {
         return selectedFiles;
     }
 
+    private void changesDetected(boolean flag) {
+        if (isChanged != flag) {
+            isChanged = flag;
+            buttonsPanel.setEnabledToSaveButton(flag);
+        }
+    }
+
+    /*Getters & Setters*/
     List<File> getFileList() {
         return fileList;
     }
