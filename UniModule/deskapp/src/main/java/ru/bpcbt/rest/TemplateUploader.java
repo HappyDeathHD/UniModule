@@ -143,8 +143,10 @@ public class TemplateUploader {
                     final String templateName = properties.get("name").toString();
                     templateNameMap.put(folderName, templateName);
                     final JsonObject topics = (JsonObject) properties.get("topics");
-                    for (Map.Entry<String, Object> topic : topics.entrySet()) {
-                        templateTopicMap.put(templateName + topic.getKey().toUpperCase(), topic.getValue().toString());
+                    if (topics != null) {
+                        for (Map.Entry<String, Object> topic : topics.entrySet()) {
+                            templateTopicMap.put(templateName + topic.getKey().toUpperCase(), topic.getValue().toString());
+                        }
                     }
                 }
             } catch (JsonParserException e) {
