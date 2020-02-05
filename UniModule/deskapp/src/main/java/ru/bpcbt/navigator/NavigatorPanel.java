@@ -70,15 +70,16 @@ public class NavigatorPanel extends JPanel {
         navigatorTree.setRootVisible(false);
         navigatorTree.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
-                final JTree tree = (JTree) evt.getSource();
-                if (evt.getClickCount() == 2 && ((DefaultMutableTreeNode) tree.getLastSelectedPathComponent()).isLeaf()) {
+                final DefaultMutableTreeNode node =
+                        (DefaultMutableTreeNode) ((JTree) evt.getSource()).getLastSelectedPathComponent();
+                if (node != null && evt.getClickCount() == 2 && node.isLeaf()) {
                     boolean confirmed = true;
                     if (isChanged) {
                         confirmed = MiniFrame.askForConfirmation("Все внесенные изменения канут в Лету, пофиг?");
                     }
                     if (confirmed) {
                         currentFile = Paths.get(workingDir,
-                                FileUtils.separatePlaceholders(tree.getLastSelectedPathComponent().toString())).toFile();
+                                FileUtils.separatePlaceholders(node.toString())).toFile();
                         setColoredTextToDisplay(FileUtils.readFile(currentFile));
                         changesDetected(false);
                         display.setEnabled(true);
