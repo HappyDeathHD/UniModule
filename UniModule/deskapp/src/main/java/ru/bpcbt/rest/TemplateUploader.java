@@ -67,7 +67,7 @@ public class TemplateUploader {
         client = null;
     }
 
-    public static SwingWorker uploadJob(List<File> files) {
+    public static SwingWorker uploadJob(Set<File> files) {
         ReportPane.clearReport();
         attemptsCount = 0;
         return new SwingWorker() {
@@ -81,6 +81,7 @@ public class TemplateUploader {
                 }
                 if (!checkAndPrepareConnectionSettings()) {
                     Narrator.error("Не удалось получить токен, проверь данные для подключения");
+                    Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
                     return null;
                 }
                 int errorsCount = 0;
@@ -194,7 +195,7 @@ public class TemplateUploader {
             }
         } catch (Exception ignored) {
         }
-        ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_ru.тип:");
+        ReportPane.error("Не удалось вытащить язык из файла " + fileName + ", название должно бьть в формате имя_язык.тип:");
         return null;
     }
 

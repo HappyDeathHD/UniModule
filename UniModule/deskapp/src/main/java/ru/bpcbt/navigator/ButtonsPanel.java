@@ -1,6 +1,8 @@
 package ru.bpcbt.navigator;
 
 import ru.bpcbt.Program;
+import ru.bpcbt.settings.Settings;
+import ru.bpcbt.utils.FileUtils;
 import ru.bpcbt.utils.ReplaceTasksExecutor;
 import ru.bpcbt.misc.ColoredButton;
 import ru.bpcbt.utils.MiniFrame;
@@ -68,10 +70,8 @@ public class ButtonsPanel extends JPanel {
             processAllB = new ColoredButton(getIconFromResource("/images/buildMultiple.png"),
                     "Сгенерировать все файлы с заменой плейсхолдеров для всех скелетов",
                     Style.GREEN, Style.GREEN_B, Style.RED);
-            processAllB.addActionListener(e -> {
-                NavigatorPanel inputPanel = Program.getMainFrame().getInputFilesPanel();
-                ReplaceTasksExecutor.process(inputPanel.getFileList());
-            });
+            processAllB.addActionListener(e -> ReplaceTasksExecutor.process(
+                    FileUtils.getFilesByTypeRecursively(Program.getProperties().get(Settings.INPUT_DIR))));
             add(processAllB);
             //отправить одного
             uploadSingleB = new ColoredButton(getIconFromResource("/images/uploadOne.png"),
@@ -92,10 +92,8 @@ public class ButtonsPanel extends JPanel {
             uploadAllB = new ColoredButton(getIconFromResource("/images/uploadMultiple.png"),
                     "Отправить всех с вкладки результатов на сервер",
                     Style.YELLOW, Style.YELLOW_B, Style.YELLOW);
-            uploadAllB.addActionListener(e -> {
-                NavigatorPanel outputPanel = Program.getMainFrame().getOutputFilesPanel();
-                TemplateUploader.uploadJob(outputPanel.getFileList()).execute();
-            });
+            uploadAllB.addActionListener(e -> TemplateUploader.uploadJob(
+                    FileUtils.getFilesByTypeRecursively(Program.getProperties().get(Settings.OUTPUT_DIR))).execute());
             add(uploadAllB);
         } catch (Exception e) {
             Narrator.yell("Что-то пошло не так при отрисовке кнопок: ", e);
