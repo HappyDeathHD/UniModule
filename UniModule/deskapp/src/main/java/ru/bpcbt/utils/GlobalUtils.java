@@ -25,9 +25,9 @@ public class GlobalUtils {
 
     public static void setNavigatorsFont(Font font) {
         MainFrame mainFrame = Program.getMainFrame();
-        mainFrame.getInputFilesPanel().setFontToDisplay(font);
-        mainFrame.getModulesPanel().setFontToDisplay(font);
-        mainFrame.getOutputFilesPanel().setFontToDisplay(font);
+        mainFrame.getInputFilesPanel().setFontToElements(font);
+        mainFrame.getModulesPanel().setFontToElements(font);
+        mainFrame.getOutputFilesPanel().setFontToElements(font);
         ReportPane.setFontToReport(font);
     }
 

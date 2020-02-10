@@ -36,7 +36,7 @@ public class ReplaceTasksExecutor {
     private ReplaceTasksExecutor() { // Utils class
     }
 
-    public static void process(List<File> files) {
+    public static void process(Set<File> files) {
         ReportPane.clearReport();
         GlobalUtils.setEnabledToProcessButtons(false);
         Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);

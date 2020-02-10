@@ -72,14 +72,14 @@ public class FileUtils {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static List<File> getFilesByTypeRecursively(String workingDir) {
-        final List<File> neededFiles = new ArrayList<>();
+    public static Set<File> getFilesByTypeRecursively(String workingDir) {
+        final Set<File> neededFiles = new HashSet<>();
         if (isDirExists(workingDir)) {
             File dir = new File(workingDir);
             for (File file : dir.listFiles()) {
                 if (file.isFile() && !Const.TEMPLATE_MAPPING_FILE.equals(file.getName())) {
                     neededFiles.add(file);
-                } else if (file.isDirectory() && !file.getName().startsWith(".")) {
+                } else if (file.isDirectory()) {
                     neededFiles.addAll(getFilesByTypeRecursively(file.getPath()));
                 }
             }

@@ -12,26 +12,26 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
 
 public class NavigatorPanel extends JPanel {
 
     private final Settings workingDirType;
     private final JTextPane display;
-    private final JList<String> navigatorList;
-    private List<File> fileList;
+    private final JTree navigatorTree;
     private File currentFile;
     private boolean isChanged = false;
-    private ButtonsPanel buttonsPanel;
+    private final ButtonsPanel buttonsPanel;
 
     public NavigatorPanel(Settings workingDirType) {
         this.workingDirType = workingDirType;
@@ -40,6 +40,7 @@ public class NavigatorPanel extends JPanel {
         final JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
         display = new JTextPane();
+        display.setEnabled(false);
         display.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -60,26 +61,33 @@ public class NavigatorPanel extends JPanel {
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         contentPanel.add(scroll);
         //сами файлы
-        navigatorList = new JList<>();
-        navigatorList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        navigatorList.addMouseListener(new MouseAdapter() {
+        final String workingDir = Program.getProperties().get(workingDirType);
+        if (FileUtils.isDirExists(workingDir)) {
+            navigatorTree = new JTree(addNodes(null, new File(workingDir), Program.getProperties().get(workingDirType)));
+        } else {
+            navigatorTree = new JTree();
+        }
+        navigatorTree.setRootVisible(false);
+        navigatorTree.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
-                JList list = (JList) evt.getSource();
-                if (evt.getClickCount() == 2) {
+                final DefaultMutableTreeNode node =
+                        (DefaultMutableTreeNode) ((JTree) evt.getSource()).getLastSelectedPathComponent();
+                if (node != null && evt.getClickCount() == 2 && node.isLeaf()) {
                     boolean confirmed = true;
                     if (isChanged) {
                         confirmed = MiniFrame.askForConfirmation("Все внесенные изменения канут в Лету, пофиг?");
                     }
                     if (confirmed) {
-                        int index = list.locationToIndex(evt.getPoint());
-                        currentFile = fileList.get(index);
+                        currentFile = Paths.get(workingDir,
+                                FileUtils.separatePlaceholders(node.toString())).toFile();
                         setColoredTextToDisplay(FileUtils.readFile(currentFile));
                         changesDetected(false);
+                        display.setEnabled(true);
                     }
                 }
             }
         });
-        final JScrollPane scrollPane = new JScrollPane(navigatorList);
+        final JScrollPane scrollPane = new JScrollPane(navigatorTree);
         //единение!
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 scrollPane, contentPanel);
@@ -94,16 +102,43 @@ public class NavigatorPanel extends JPanel {
 
     public void refreshFiles() {
         final String workingDir = Program.getProperties().get(workingDirType);
-        fileList = FileUtils.getFilesByTypeRecursively(workingDir);
-        final Vector<String> htmlFilesVector = fileList.stream().map(file -> FileUtils.makeTitleFromFile(file, workingDir))
-                .collect(Collectors.toCollection(Vector::new));
-        navigatorList.setListData(htmlFilesVector);
+        final DefaultMutableTreeNode rootNode = addNodes(null, new File(workingDir),
+                Program.getProperties().get(workingDirType));
+        final DefaultTreeModel model = (DefaultTreeModel) navigatorTree.getModel();
+        model.setRoot(rootNode);
+    }
+
+    private DefaultMutableTreeNode addNodes(DefaultMutableTreeNode topNode, File dir, String workingDir) {
+        final String curPath = dir.getPath();
+        final DefaultMutableTreeNode curDir = new DefaultMutableTreeNode(FileUtils.makeTitleFromFile(dir, workingDir));
+        final String[] filesInDir = dir.list();
+        List<String> sortedFiles = new ArrayList<>();
+        if (filesInDir != null && filesInDir.length != 0) {
+            if (topNode != null) {
+                topNode.add(curDir);
+            }
+            sortedFiles = Arrays.asList(filesInDir);
+            sortedFiles.sort(String.CASE_INSENSITIVE_ORDER);
+        }
+        final List<String> leafs = new ArrayList<>();
+        for (String fileName : sortedFiles) {
+            final File file = curPath.equals(".") ? new File(fileName) : Paths.get(curPath, fileName).toFile();
+            if (file.isDirectory()) {
+                addNodes(curDir, file, workingDir);
+            } else {
+                leafs.add(FileUtils.makeTitleFromFile(file, workingDir));
+            }
+        }
+        for (String leaf : leafs) {
+            curDir.add(new DefaultMutableTreeNode(leaf));
+        }
+        return curDir;
     }
 
     private void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
         try {
             //костыль, призванный убрать бесконечное дублирование CR+LF и CR. Актуально для винды, не тестилось на других системах.
-            String crlfNormalizedMessage = message.replace(System.lineSeparator(), "\n");
+            final String crlfNormalizedMessage = message.replace(System.lineSeparator(), "\n");
             display.getStyledDocument().insertString(display.getStyledDocument().getLength(),
                     crlfNormalizedMessage, simpleAttributeSet);
         } catch (BadLocationException e) {
@@ -129,8 +164,9 @@ public class NavigatorPanel extends JPanel {
         setColoredTextToDisplay(display.getText());
     }
 
-    public void setFontToDisplay(Font font) {
+    public void setFontToElements(Font font) {
         display.setFont(font);
+        navigatorTree.setFont(font);
         display.repaint();
     }
 
@@ -151,9 +187,21 @@ public class NavigatorPanel extends JPanel {
         }
     }
 
-    List<File> getSelectedFiles() {
-        final List<File> selectedFiles = new ArrayList<>();
-        Arrays.stream(navigatorList.getSelectedIndices()).forEach(index -> selectedFiles.add(fileList.get(index)));
+    Set<File> getSelectedFiles() {
+        final Set<File> selectedFiles = new HashSet<>();
+        final TreePath[] selectionPaths = navigatorTree.getSelectionPaths();
+        if (selectionPaths != null) {
+            for (TreePath treePath : selectionPaths) {
+                final DefaultMutableTreeNode lastComponent = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+                if (lastComponent.isLeaf()) {
+                    selectedFiles.add(Paths.get(Program.getProperties().get(workingDirType),
+                            FileUtils.separatePlaceholders(lastComponent.toString())).toFile());
+                } else {
+                    selectedFiles.addAll(FileUtils.getFilesByTypeRecursively(Paths.get(Program.getProperties().get(workingDirType),
+                            FileUtils.separatePlaceholders(lastComponent.toString())).toString()));
+                }
+            }
+        }
         return selectedFiles;
     }
 
@@ -165,10 +213,6 @@ public class NavigatorPanel extends JPanel {
     }
 
     /*Getters & Setters*/
-    List<File> getFileList() {
-        return fileList;
-    }
-
     public ButtonsPanel getButtonsPanel() {
         return buttonsPanel;
     }
