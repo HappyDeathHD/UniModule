@@ -164,8 +164,9 @@ public class NavigatorPanel extends JPanel {
         setColoredTextToDisplay(display.getText());
     }
 
-    public void setFontToDisplay(Font font) {
+    public void setFontToElements(Font font) {
         display.setFont(font);
+        navigatorTree.setFont(font);
         display.repaint();
     }
 

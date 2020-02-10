@@ -13,7 +13,9 @@ import ru.bpcbt.rest.TemplateUploader;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 public class ButtonsPanel extends JPanel {
 
@@ -56,13 +58,13 @@ public class ButtonsPanel extends JPanel {
                     "Сгенерировать файлы с заменой плейсхолдеров для выбранных скелетов",
                     Style.GREEN, Style.GREEN_B, Style.RED);
             processSingleB.addActionListener(e -> {
-                NavigatorPanel inputPanel = Program.getMainFrame().getInputFilesPanel();
-                if (inputPanel.getSelectedFiles().isEmpty()) {
+                Set<File> selectedFiles = Program.getMainFrame().getInputFilesPanel().getSelectedFiles();
+                if (selectedFiles.isEmpty()) {
                     MiniFrame.showMessage("Нужно выбрать что собирать." +
                             System.lineSeparator() +
                             "Для этого нужно выделить что-нибудь из вкладки со скелетами.");
                 } else {
-                    ReplaceTasksExecutor.process(inputPanel.getSelectedFiles());
+                    ReplaceTasksExecutor.process(selectedFiles);
                 }
             });
             add(processSingleB);
@@ -78,13 +80,13 @@ public class ButtonsPanel extends JPanel {
                     "Отправить выбранных во вкладке результатов на сервер",
                     Style.YELLOW, Style.YELLOW_B, Style.YELLOW);
             uploadSingleB.addActionListener(e -> {
-                NavigatorPanel outputPanel = Program.getMainFrame().getOutputFilesPanel();
-                if (outputPanel.getSelectedFiles().isEmpty()) {
+                Set<File> selectedFiles = Program.getMainFrame().getOutputFilesPanel().getSelectedFiles();
+                if (selectedFiles.isEmpty()) {
                     MiniFrame.showMessage("Нужно выбрать что отправлять." +
                             System.lineSeparator() +
                             "Для этого нужно выделить что-нибудь из вкладки с результатами.");
                 } else {
-                    TemplateUploader.uploadJob(outputPanel.getSelectedFiles()).execute();
+                    TemplateUploader.uploadJob(selectedFiles).execute();
                 }
             });
             add(uploadSingleB);
