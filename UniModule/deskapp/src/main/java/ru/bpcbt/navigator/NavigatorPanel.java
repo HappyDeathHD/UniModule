@@ -23,6 +23,7 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
 
     private final JTextPane display;
     private File currentFile;
+    private String workingDir;
     private boolean isChanged = false;
 
     public NavigatorPanel(Settings workingDirType) {
@@ -54,7 +55,6 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
         //единение!
         addSplittedScrollAndContent(contentPanel);
 
-        final String workingDir = Program.getProperties().get(workingDirType);
         navigatorTree.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 final DefaultMutableTreeNode node =
@@ -109,6 +109,12 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
     public void setFontToElements(Font font) {
         super.setFontToElements(font);
         display.setFont(font);
+    }
+
+    @Override
+    public void refreshFiles() {
+        super.refreshFiles();
+        workingDir = Program.getProperties().get(getWorkingDirType());
     }
 
     public void saveCurrentFile() {
