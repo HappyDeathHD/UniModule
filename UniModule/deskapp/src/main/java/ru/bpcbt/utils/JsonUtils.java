@@ -75,11 +75,6 @@ public class JsonUtils {
         return parseSkeleton(file, jsonContent);
     }
 
-    public static void refresh() {
-        cachedJson.clear();
-        jsonProcessStatus.clear();
-    }
-
     private static List<ReplaceTask> parseSkeleton(File file, String jsonContent) {
         try {
             final JsonObject obj = JsonParser.object().from(jsonContent);
@@ -88,6 +83,11 @@ public class JsonUtils {
             ReportPane.error("Ошибка в родительском json'e " + file.getPath() + " " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    public static void refresh() {
+        cachedJson.clear();
+        jsonProcessStatus.clear();
     }
 
     private static void fillMapFromModuleJson(Map<String, String> result, JsonObject jsonObject, String key) {

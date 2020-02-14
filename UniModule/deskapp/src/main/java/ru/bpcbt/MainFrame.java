@@ -64,6 +64,7 @@ public class MainFrame extends JFrame {
                 case RESERVE_TAB:
                     reserveFilesPanel.selectTab();
                     break;
+                default: //this should never happen
             }
         });
 
