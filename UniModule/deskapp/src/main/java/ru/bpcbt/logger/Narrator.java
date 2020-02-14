@@ -26,7 +26,7 @@ public class Narrator {
     }
 
     public static void yell(String message) {
-        JOptionPane.showMessageDialog(null, message, "Обнаружена новая фича!", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, "Важно!", JOptionPane.WARNING_MESSAGE);
     }
 
     public static void normal(String message) {

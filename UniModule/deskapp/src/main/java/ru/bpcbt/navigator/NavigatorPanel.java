@@ -13,29 +13,20 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.List;
 
-public class NavigatorPanel extends JPanel {
+public class NavigatorPanel extends BaseNavigatorTreePanel {
 
-    private final Settings workingDirType;
     private final JTextPane display;
-    private final JTree navigatorTree;
     private File currentFile;
     private boolean isChanged = false;
-    private final ButtonsPanel buttonsPanel;
 
     public NavigatorPanel(Settings workingDirType) {
-        this.workingDirType = workingDirType;
-        setLayout(new BorderLayout());
+        super(workingDirType);
         //контент файлов
         final JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
@@ -60,14 +51,10 @@ public class NavigatorPanel extends JPanel {
         final JScrollPane scroll = new JScrollPane(display);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         contentPanel.add(scroll);
-        //сами файлы
+        //единение!
+        addSplittedScrollAndContent(contentPanel);
+
         final String workingDir = Program.getProperties().get(workingDirType);
-        if (FileUtils.isDirExists(workingDir)) {
-            navigatorTree = new JTree(addNodes(null, new File(workingDir), Program.getProperties().get(workingDirType)));
-        } else {
-            navigatorTree = new JTree();
-        }
-        navigatorTree.setRootVisible(false);
         navigatorTree.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
                 final DefaultMutableTreeNode node =
@@ -87,52 +74,6 @@ public class NavigatorPanel extends JPanel {
                 }
             }
         });
-        final JScrollPane scrollPane = new JScrollPane(navigatorTree);
-        //единение!
-        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                scrollPane, contentPanel);
-        splitPane.setResizeWeight(0.1);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setContinuousLayout(true);
-
-        add(splitPane, BorderLayout.CENTER);
-        buttonsPanel = new ButtonsPanel(this);
-        add(buttonsPanel, BorderLayout.PAGE_END);
-    }
-
-    public void refreshFiles() {
-        final String workingDir = Program.getProperties().get(workingDirType);
-        final DefaultMutableTreeNode rootNode = addNodes(null, new File(workingDir),
-                Program.getProperties().get(workingDirType));
-        final DefaultTreeModel model = (DefaultTreeModel) navigatorTree.getModel();
-        model.setRoot(rootNode);
-    }
-
-    private DefaultMutableTreeNode addNodes(DefaultMutableTreeNode topNode, File dir, String workingDir) {
-        final String curPath = dir.getPath();
-        final DefaultMutableTreeNode curDir = new DefaultMutableTreeNode(FileUtils.makeTitleFromFile(dir, workingDir));
-        final String[] filesInDir = dir.list();
-        List<String> sortedFiles = new ArrayList<>();
-        if (filesInDir != null && filesInDir.length != 0) {
-            if (topNode != null) {
-                topNode.add(curDir);
-            }
-            sortedFiles = Arrays.asList(filesInDir);
-            sortedFiles.sort(String.CASE_INSENSITIVE_ORDER);
-        }
-        final List<String> leafs = new ArrayList<>();
-        for (String fileName : sortedFiles) {
-            final File file = curPath.equals(".") ? new File(fileName) : Paths.get(curPath, fileName).toFile();
-            if (file.isDirectory()) {
-                addNodes(curDir, file, workingDir);
-            } else {
-                leafs.add(FileUtils.makeTitleFromFile(file, workingDir));
-            }
-        }
-        for (String leaf : leafs) {
-            curDir.add(new DefaultMutableTreeNode(leaf));
-        }
-        return curDir;
     }
 
     private void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
@@ -160,17 +101,17 @@ public class NavigatorPanel extends JPanel {
         }
     }
 
-    void repaintTextToDisplay() {
+    public void repaintTextToDisplay() {
         setColoredTextToDisplay(display.getText());
     }
 
+    @Override
     public void setFontToElements(Font font) {
+        super.setFontToElements(font);
         display.setFont(font);
-        navigatorTree.setFont(font);
-        display.repaint();
     }
 
-    void saveCurrentFile() {
+    public void saveCurrentFile() {
         if (FileUtils.createFile(currentFile.getPath(), display.getText())) {
             changesDetected(false);
             Narrator.success("Файл \"" + currentFile.getName() + "\" успешно сохранен!");
@@ -179,41 +120,10 @@ public class NavigatorPanel extends JPanel {
         }
     }
 
-    void openCurrentDir() {
-        try {
-            Desktop.getDesktop().open(new File(Program.getProperties().get(workingDirType)));
-        } catch (IOException e) {
-            Narrator.error("Не удалось открыть проводник");
-        }
-    }
-
-    Set<File> getSelectedFiles() {
-        final Set<File> selectedFiles = new HashSet<>();
-        final TreePath[] selectionPaths = navigatorTree.getSelectionPaths();
-        if (selectionPaths != null) {
-            for (TreePath treePath : selectionPaths) {
-                final DefaultMutableTreeNode lastComponent = (DefaultMutableTreeNode) treePath.getLastPathComponent();
-                if (lastComponent.isLeaf()) {
-                    selectedFiles.add(Paths.get(Program.getProperties().get(workingDirType),
-                            FileUtils.separatePlaceholders(lastComponent.toString())).toFile());
-                } else {
-                    selectedFiles.addAll(FileUtils.getFilesByTypeRecursively(Paths.get(Program.getProperties().get(workingDirType),
-                            FileUtils.separatePlaceholders(lastComponent.toString())).toString()));
-                }
-            }
-        }
-        return selectedFiles;
-    }
-
     private void changesDetected(boolean flag) {
         if (isChanged != flag) {
             isChanged = flag;
             buttonsPanel.setEnabledToSaveButton(flag);
         }
-    }
-
-    /*Getters & Setters*/
-    public ButtonsPanel getButtonsPanel() {
-        return buttonsPanel;
     }
 }

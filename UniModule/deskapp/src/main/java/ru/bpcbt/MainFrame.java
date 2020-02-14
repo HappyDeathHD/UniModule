@@ -3,6 +3,7 @@ package ru.bpcbt;
 import ru.bpcbt.logger.ReportPanel;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.navigator.NavigatorPanel;
+import ru.bpcbt.navigator.ReservePanel;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.settings.SettingsPanel;
 import ru.bpcbt.utils.Const;
@@ -13,16 +14,19 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
     public static final int INPUTS_TAB = 0;
-    @SuppressWarnings("unused")
+    @SuppressWarnings("WeakerAccess")
     public static final int MODULES_TAB = 1;
     public static final int OUTPUTS_TAB = 2;
-    public static final int REPORT_TAB = 3;
-    public static final int SETTINGS_TAB = 4;
+    @SuppressWarnings("WeakerAccess")
+    public static final int RESERVE_TAB = 3;
+    public static final int REPORT_TAB = 4;
+    public static final int SETTINGS_TAB = 5;
 
     private final JTabbedPane tabbedPane;
     private final NavigatorPanel inputFilesPanel;
     private final NavigatorPanel modulesPanel;
     private final NavigatorPanel outputFilesPanel;
+    private final ReservePanel reserveFilesPanel;
     private final SettingsPanel settingsPanel;
 
     MainFrame() {
@@ -30,13 +34,14 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         tabbedPane = new JTabbedPane();
         setLayout(new BorderLayout());
-
         inputFilesPanel = new NavigatorPanel(Settings.INPUT_DIR);
         tabbedPane.addTab("Скелеты", inputFilesPanel);
         modulesPanel = new NavigatorPanel(Settings.MODULE_DIR);
         tabbedPane.addTab("Плоть", modulesPanel);
         outputFilesPanel = new NavigatorPanel(Settings.OUTPUT_DIR);
         tabbedPane.addTab("Результаты", outputFilesPanel);
+        reserveFilesPanel = new ReservePanel(Settings.RESERVE_DIR);
+        tabbedPane.addTab("Резервация", reserveFilesPanel);
         ReportPanel reportPanel = new ReportPanel();
         tabbedPane.addTab("Отчет", reportPanel);
         settingsPanel = new SettingsPanel();
@@ -44,7 +49,25 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Информация", getInfoPanel());
         add(tabbedPane, BorderLayout.CENTER);
         add(Narrator.getLabel(), BorderLayout.PAGE_END);
-        setMinimumSize(new Dimension(600, 600));
+
+        tabbedPane.addChangeListener(e -> {
+            switch (tabbedPane.getSelectedIndex()) {
+                case INPUTS_TAB:
+                    inputFilesPanel.selectTab();
+                    break;
+                case MODULES_TAB:
+                    modulesPanel.selectTab();
+                    break;
+                case OUTPUTS_TAB:
+                    outputFilesPanel.selectTab();
+                    break;
+                case RESERVE_TAB:
+                    reserveFilesPanel.selectTab();
+                    break;
+            }
+        });
+
+        setMinimumSize(new Dimension(625, 700));
         pack();
         setVisible(true);
         setLocationRelativeTo(null);
@@ -79,6 +102,10 @@ public class MainFrame extends JFrame {
 
     public NavigatorPanel getOutputFilesPanel() {
         return outputFilesPanel;
+    }
+
+    public ReservePanel getReserveFilesPanel() {
+        return reserveFilesPanel;
     }
 
     public SettingsPanel getSettingsPanel() {

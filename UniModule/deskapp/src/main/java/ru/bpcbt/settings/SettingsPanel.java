@@ -18,6 +18,7 @@ public class SettingsPanel extends JPanel {
     private final JTextField inputDirTF;
     private final JTextField modulesDirTF;
     private final JTextField outputDirTF;
+    private final JTextField reserveDirTF;
     private JComboBox fontNameCB;
     private JComboBox styleCB;
     private JSpinner fontSizeS;
@@ -42,6 +43,7 @@ public class SettingsPanel extends JPanel {
         addOptionDir(Settings.INPUT_DIR, inputDirTF = new JTextField());
         addOptionDir(Settings.MODULE_DIR, modulesDirTF = new JTextField());
         addOptionDir(Settings.OUTPUT_DIR, outputDirTF = new JTextField());
+        addOptionDir(Settings.RESERVE_DIR, reserveDirTF = new JTextField());
         addFontSelector();
         addLookAndFeelSelector();
         addApiBlock();
@@ -150,16 +152,14 @@ public class SettingsPanel extends JPanel {
     }
 
     private void addSaveButton() {
-        final ColoredButton saveB = new ColoredButton("Сохрани и Примени");
-        saveB.setBackground(Style.GREEN);
-        saveB.setHoverBackgroundColor(Style.GREEN_B);
-        saveB.setPressedBackgroundColor(Style.YELLOW);
+        final ColoredButton saveB = new ColoredButton("Сохрани и Примени", Style.GREEN);
         saveB.addActionListener(e -> {
             try {
                 Map<Settings, String> properties = Program.getProperties();
                 properties.put(Settings.INPUT_DIR, inputDirTF.getText());
                 properties.put(Settings.MODULE_DIR, modulesDirTF.getText());
                 properties.put(Settings.OUTPUT_DIR, outputDirTF.getText());
+                properties.put(Settings.RESERVE_DIR, reserveDirTF.getText());
                 properties.put(Settings.FONT_NAME, String.valueOf(fontNameCB.getSelectedIndex()));
                 properties.put(Settings.FONT_SIZE, String.valueOf(fontSizeS.getValue()));
                 properties.put(Settings.CORE_URL, coreUrlTF.getText());
@@ -196,10 +196,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private ColoredButton getCommonSelectFileButton() {
-        final ColoredButton button = new ColoredButton("🔍");
-        button.setBackground(Style.GREEN);
-        button.setHoverBackgroundColor(Style.GREEN_B);
-        button.setPressedBackgroundColor(Style.YELLOW);
+        final ColoredButton button = new ColoredButton("🔍", Style.GREEN);
         button.setToolTipText("Выбрать директорию");
         return button;
     }
@@ -221,6 +218,9 @@ public class SettingsPanel extends JPanel {
             outputDirTF.setText(properties.get(Settings.OUTPUT_DIR));
         } else {
             allMandatoryParamsExist = false;
+        }
+        if (properties.containsKey(Settings.RESERVE_DIR)) {
+            reserveDirTF.setText(properties.get(Settings.RESERVE_DIR));
         }
         if (properties.containsKey(Settings.FONT_NAME) && properties.containsKey(Settings.FONT_SIZE)) {
             int selectedFont = Integer.parseInt(properties.get(Settings.FONT_NAME));
@@ -248,6 +248,7 @@ public class SettingsPanel extends JPanel {
         }
         if (allMandatoryParamsExist) {
             Narrator.normal("С возвращением!");
+            Program.getMainFrame().getInputFilesPanel().refreshFiles();
         } else {
             Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
         }

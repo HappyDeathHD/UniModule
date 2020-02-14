@@ -75,6 +75,11 @@ public class JsonUtils {
         return parseSkeleton(file, jsonContent);
     }
 
+    public static void refresh() {
+        cachedJson.clear();
+        jsonProcessStatus.clear();
+    }
+
     private static List<ReplaceTask> parseSkeleton(File file, String jsonContent) {
         try {
             final JsonObject obj = JsonParser.object().from(jsonContent);
@@ -110,10 +115,5 @@ public class JsonUtils {
             }
         }
         return replaceTasks;
-    }
-
-    public static void refresh() {
-        cachedJson.clear();
-        jsonProcessStatus.clear();
     }
 }

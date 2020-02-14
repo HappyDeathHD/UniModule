@@ -3,12 +3,11 @@ package ru.bpcbt.utils;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.logger.ReportPane;
-import ru.bpcbt.rest.TemplateUploader;
+import ru.bpcbt.rest.TemplateWorker;
 
 import javax.swing.*;
 import java.awt.*;
 
-@SuppressWarnings("WeakerAccess")
 public class GlobalUtils {
 
     private GlobalUtils() { //Utils class
@@ -19,8 +18,9 @@ public class GlobalUtils {
         mainFrame.getInputFilesPanel().refreshFiles();
         mainFrame.getModulesPanel().refreshFiles();
         mainFrame.getOutputFilesPanel().refreshFiles();
+        mainFrame.getReserveFilesPanel().refreshFiles();
         ReplaceTasksExecutor.refresh();
-        TemplateUploader.refresh();
+        TemplateWorker.refresh();
     }
 
     public static void setNavigatorsFont(Font font) {
@@ -28,6 +28,7 @@ public class GlobalUtils {
         mainFrame.getInputFilesPanel().setFontToElements(font);
         mainFrame.getModulesPanel().setFontToElements(font);
         mainFrame.getOutputFilesPanel().setFontToElements(font);
+        mainFrame.getReserveFilesPanel().setFontToElements(font);
         ReportPane.setFontToReport(font);
     }
 
@@ -36,6 +37,7 @@ public class GlobalUtils {
         mainFrame.getInputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
         mainFrame.getModulesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
         mainFrame.getOutputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        mainFrame.getReserveFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
     }
 
     public static String getErrorMessageWithException(String message, Exception e) {

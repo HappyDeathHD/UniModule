@@ -32,10 +32,10 @@ public class Program {
                 GlobalUtils.makeSovietRussiaButtons();
                 mainFrame = new MainFrame();
                 mainFrame.getSettingsPanel().loadConfigurations();
-                GlobalUtils.refreshAllFiles();
                 UpdateUtils.checkForUpdate();
             } catch (Exception e) {
                 Narrator.yell("Ошибка:", e);
+                e.printStackTrace();
             }
         });
     }

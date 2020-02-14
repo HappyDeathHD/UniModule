@@ -97,17 +97,10 @@ class UnimessageClient {
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setRequestProperty("Method", "GET");
 
-            final StringBuilder sb = new StringBuilder();
             final int HttpResult = connection.getResponseCode();
             if (HttpResult == HttpURLConnection.HTTP_OK) {
-                final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-                reader.close();
-                ReportPane.fine("Список схем успешно загрузился");
-                return sb.toString();
+                ReportPane.debug("Список схем успешно загрузился");
+                return inputStreamToString(connection.getInputStream());
             } else {
                 ReportPane.error("Не удалось загрузить список схем:" + System.lineSeparator() +
                         connection.getResponseCode() + " " + connection.getResponseMessage());
@@ -118,6 +111,57 @@ class UnimessageClient {
         return null;
     }
 
+    String getRawTemplateMarkups(Long templateId) {
+        try {
+            final URL markupsUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups");
+            final HttpURLConnection connection = (HttpURLConnection) markupsUri.openConnection();
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("Method", "GET");
+
+            final int HttpResult = connection.getResponseCode();
+            if (HttpResult == HttpURLConnection.HTTP_OK) {
+                return inputStreamToString(connection.getInputStream());
+            } else {
+                ReportPane.error("Не удалось загрузить список версток:" + System.lineSeparator() +
+                        connection.getResponseCode() + " " + connection.getResponseMessage());
+            }
+        } catch (Exception e) {
+            ReportPane.error("Не удалось загрузить список версток:", e);
+        }
+        return null;
+    }
+
+    String getRawMarkup(Long templateId, String language) {
+        try {
+            final URL markupsUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
+            final HttpURLConnection connection = (HttpURLConnection) markupsUri.openConnection();
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setRequestProperty("Method", "GET");
+
+            final int HttpResult = connection.getResponseCode();
+            if (HttpResult == HttpURLConnection.HTTP_OK) {
+                return inputStreamToString(connection.getInputStream());
+            } else {
+                ReportPane.error("Не удалось загрузить версту " + templateId + " (" + language + "):" + System.lineSeparator() +
+                        connection.getResponseCode() + " " + connection.getResponseMessage());
+            }
+        } catch (Exception e) {
+            ReportPane.error("Не удалось загрузить версту " + templateId + " (" + language + "):", e);
+        }
+        return null;
+    }
+
+    private String inputStreamToString(InputStream inputStream) throws IOException {
+        final StringBuilder sb = new StringBuilder();
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        }
+        return sb.toString();
+    }
+
     private void setNewToken(String login, String password) {
         try {
             final URL authUrl = new URL(coreUrl + "/api/v1.0/authenticate");
@@ -125,7 +169,7 @@ class UnimessageClient {
             makeConnectionPostJson(connection);
 
             final OutputStream os = connection.getOutputStream();
-            final String params = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
+            final String params = "{\"username\":\"" + login.trim() + "\",\"password\":\"" + password.trim() + "\"}";
             os.write(params.getBytes(StandardCharsets.UTF_8));
             os.close();
 

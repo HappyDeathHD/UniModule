@@ -160,8 +160,12 @@ public class FileUtils {
             separatedPath[0] = Const.CONFLICT_PREFIX + separatedPath[0];
         }
         final Path newPath = Paths.get(outputDir, separatedPath);
-        mkDir(newPath.toFile().getParentFile());
-        createFile(newPath.toString(), newFileContent);
+        writeToPath(newPath, newFileContent);
+    }
+
+    public static void writeToPath(Path path, String content) {
+        mkDir(path.toFile().getParentFile());
+        createFile(path.toString(), content);
     }
 
     public static String getLanguage(String fileName) {

@@ -9,24 +9,26 @@ import ru.bpcbt.Program;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.logger.Narrator;
-import ru.bpcbt.utils.Const;
-import ru.bpcbt.utils.FileUtils;
-import ru.bpcbt.utils.MiniFrame;
+import ru.bpcbt.utils.*;
 
 import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class TemplateUploader {
+public class TemplateWorker {
+
+    private static final SimpleDateFormat OS_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd_HH-mm-ss");
+
     private static UnimessageClient client;
     private static final Map<String, Long> templateIdMap = new HashMap<>();
     private static final Map<String, String> templateTopicMap = new HashMap<>();
     private static final Map<String, String> templateNameMap = new HashMap<>();
     private static int attemptsCount;
 
-    private TemplateUploader() { // Utils class
+    private TemplateWorker() { // Utils class
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -35,20 +37,21 @@ public class TemplateUploader {
             String coreUrl = Program.getProperties().get(Settings.CORE_URL).trim();
             if (coreUrl.isEmpty()) {
                 Narrator.yell("Надо заполнить путь до api!");
+                Narrator.error("Надо заполнить путь до api!");
                 Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
                 return false;
             }
             if (coreUrl.endsWith("/")) {
                 coreUrl = coreUrl.substring(0, coreUrl.length() - 1);
             }
-            final String login = Program.getProperties().get(Settings.USERNAME).trim();
-            String password = Program.getMainFrame().getSettingsPanel().getPassword().trim();
-            if (login.isEmpty()) {
+            final String login = Program.getProperties().get(Settings.USERNAME);
+            String password = Program.getMainFrame().getSettingsPanel().getPassword();
+            if (login == null || login.isEmpty()) {
                 Narrator.yell("Нужно заполнить логин/пароль для подключения к api");
                 Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
                 return false;
             }
-            if (password.isEmpty()) {
+            if (password == null || password.isEmpty()) {
                 final String newPassword = MiniFrame.askPassword();
                 if (newPassword == null) {
                     Narrator.error("Без пароля ничего делать не буду!");
@@ -60,7 +63,12 @@ public class TemplateUploader {
             }
             client = new UnimessageClient(coreUrl, login, password);
         }
-        return client.isAuth();
+        if (client.isAuth()) {
+            return true;
+        } else {
+            Narrator.error("Не удалось получить токен, проверь данные для подключения");
+            return false;
+        }
     }
 
     public static void refresh() {
@@ -73,15 +81,17 @@ public class TemplateUploader {
         return new SwingWorker() {
             @Override
             protected Object doInBackground() {
+                GlobalUtils.setEnabledToProcessButtons(false);
                 Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
                 if (files.isEmpty()) {
                     ReportPane.warning("Нечего грузить! Проверь вкладку результатов!");
                     Narrator.warn("Нечего грузить!");
+                    GlobalUtils.setEnabledToProcessButtons(true);
                     return null;
                 }
                 if (!checkAndPrepareConnectionSettings()) {
-                    Narrator.error("Не удалось получить токен, проверь данные для подключения");
                     Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+                    GlobalUtils.setEnabledToProcessButtons(true);
                     return null;
                 }
                 int errorsCount = 0;
@@ -108,6 +118,76 @@ public class TemplateUploader {
                     ReportPane.error(errorMessage);
                     Narrator.error(errorMessage);
                 }
+                GlobalUtils.setEnabledToProcessButtons(true);
+                return null;
+            }
+        };
+    }
+
+    public static SwingWorker downloadJob(Collection<String> templates) {
+        ReportPane.clearReport();
+        attemptsCount = 0;
+        return new SwingWorker() {
+            @Override
+            protected Object doInBackground() {
+                GlobalUtils.setEnabledToProcessButtons(false);
+                Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
+                if (templates.isEmpty()) {
+                    ReportPane.warning("Нечего резервировать! Проверь вкладку резервации!");
+                    Narrator.warn("Нечего резервировать!");
+                    GlobalUtils.setEnabledToProcessButtons(true);
+                    return null;
+                }
+                if (!checkAndPrepareConnectionSettings()) {
+                    Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+                    GlobalUtils.setEnabledToProcessButtons(true);
+                    return null;
+                }
+                final String reserveDir = Program.getProperties().get(Settings.RESERVE_DIR);
+                long start = System.currentTimeMillis();
+                final Date startDate = new Date(start);
+                ReportPane.normal("Начало выгрузки: " + startDate);
+                try {
+                    for (String templateName : templates) {
+                        //список языков версток шаблона
+                        final List<String> languages = new ArrayList<>();
+                        final Long templateId = templateIdMap.get(templateName);
+                        final String rawTemplatesJson = client.getRawTemplateMarkups(templateId);
+                        JsonObject obj = JsonParser.object().from("{\"key\":" + rawTemplatesJson + "}");
+                        JsonArray templateArray = obj.getArray("key");
+                        for (Object templateObj : templateArray) {
+                            languages.add(((JsonObject) templateObj).get("language").toString().toUpperCase());
+                        }
+
+                        for (String language : languages) {
+                            final String rawMarkupsJson = client.getRawMarkup(templateId, language);
+                            // Либа nanojson не вывозит значения в несколько сотен тысяч символов.
+                            int markupStart = rawMarkupsJson.indexOf("\"body\":\"");
+                            int markupEnd = rawMarkupsJson.lastIndexOf("\",\"fileName\":");
+                            if (markupStart != -1 && markupEnd == -1) { //скорее всего верстка без имени
+                                markupEnd = rawMarkupsJson.lastIndexOf("\"}");
+                            }
+                            if (markupStart == -1 || markupEnd == -1) {
+                                ReportPane.error("Верстка шаблона " + templateName + " с языком " + language + " имеет неожиданный формат!");
+                                ReportPane.debug(rawMarkupsJson);
+                                continue;
+                            }
+
+                            final String markup = rawMarkupsJson.substring(markupStart + 8, markupEnd);
+                            FileUtils.writeToPath(
+                                    Paths.get(reserveDir, OS_DATE_FORMAT.format(startDate), templateName,
+                                            templateName + "_" + language.toLowerCase() + ".html"),
+                                    GistUtils.unescapeJavaString(markup));
+                            ReportPane.success("Верстка шаблона " + templateName + " с языком " + language + " успешно сохранена!");
+                        }
+                    }
+                    ReportPane.normal("Резервирование окончено!");
+                    Narrator.success("Резервирование окончено!");
+                    Program.getMainFrame().getReserveFilesPanel().refreshFiles();
+                } catch (JsonParserException e) {
+                    ReportPane.error("Ошибка в полученном json'e со схемами" + e.getMessage());
+                }
+                GlobalUtils.setEnabledToProcessButtons(true);
                 return null;
             }
         };
@@ -154,7 +234,7 @@ public class TemplateUploader {
                 ReportPane.error(Const.TEMPLATE_MAPPING_FILE + " содержит ошибку: " + e.getMessage());
             }
         } else {
-            ReportPane.warning(Const.TEMPLATE_MAPPING_FILE + " не найден.");
+            ReportPane.debug(Const.TEMPLATE_MAPPING_FILE + " не найден.");
         }
     }
 
@@ -201,5 +281,14 @@ public class TemplateUploader {
 
     private static String getTemplateName(File file) {
         return file.getParentFile().getName();
+    }
+
+    public static Map<String, Long> getTemplateIdMap() {
+        if (!checkAndPrepareConnectionSettings()) {
+            Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+            return null;
+        }
+        fillTemplates();
+        return templateIdMap;
     }
 }
