@@ -85,6 +85,11 @@ public class JsonUtils {
         }
     }
 
+    public static void refresh() {
+        cachedJson.clear();
+        jsonProcessStatus.clear();
+    }
+
     private static void fillMapFromModuleJson(Map<String, String> result, JsonObject jsonObject, String key) {
         for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
             if (entry.getValue().getClass() == JsonObject.class) {
@@ -110,10 +115,5 @@ public class JsonUtils {
             }
         }
         return replaceTasks;
-    }
-
-    public static void refresh() {
-        cachedJson.clear();
-        jsonProcessStatus.clear();
     }
 }

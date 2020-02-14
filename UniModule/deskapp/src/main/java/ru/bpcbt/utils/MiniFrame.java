@@ -28,8 +28,7 @@ public class MiniFrame {
         dialog.setModal(false);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        ColoredButton confirmButton = new ColoredButton("Обновляемся!");
-        confirmButton.setBackground(Style.GREEN);
+        ColoredButton confirmButton = new ColoredButton("Обновляемся!", Style.GREEN);
         confirmButton.addActionListener(e -> UpdateUtils.update());
         Object[] buttons = {confirmButton};
         op.setOptions(buttons);
