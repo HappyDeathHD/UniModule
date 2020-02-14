@@ -74,7 +74,7 @@ public class ButtonsPanel extends JPanel {
             add(processAllB);
             //отправить выбранных
             uploadSingleB = new HoverButton(getIconFromResource("/images/uploadOne.png"),
-                    "Отправить выбранных во вкладке результатов на сервер");
+                    "Отправить выбранных во вкладке результатов или резервации на сервер");
             uploadSingleB.addActionListener(e -> {
                 Set<File> selectedFiles;
                 if (Settings.RESERVE_DIR.equals(parent.getWorkingDirType())) {
