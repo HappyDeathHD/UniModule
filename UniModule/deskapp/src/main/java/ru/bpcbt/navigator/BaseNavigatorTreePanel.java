@@ -13,9 +13,11 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class BaseNavigatorTreePanel extends JPanel {
 
@@ -23,6 +25,7 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
     final JTree navigatorTree;
     final ButtonsPanel buttonsPanel;
 
+    String workingDir;
     JSplitPane splitPane;
 
     BaseNavigatorTreePanel(Settings workingDirType) {
@@ -30,6 +33,10 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
         setLayout(new BorderLayout());
         navigatorTree = new JTree(new DefaultMutableTreeNode());
         navigatorTree.setRootVisible(false);
+
+        CopyHandlerAndListener copyHandlerAndListener = new CopyHandlerAndListener(navigatorTree);
+        navigatorTree.setTransferHandler(copyHandlerAndListener);
+        navigatorTree.addKeyListener(copyHandlerAndListener);
 
         buttonsPanel = new ButtonsPanel(this);
         add(buttonsPanel, BorderLayout.PAGE_END);
@@ -47,21 +54,20 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
     }
 
     public void refreshFiles() {
-        final String workingDir = Program.getProperties().get(workingDirType);
+        workingDir = Program.getProperties().get(workingDirType);
         if (workingDir == null) {
             Narrator.yell("Необходимо выбрать директорию в настройках");
             Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
             return;
         }
-        final DefaultMutableTreeNode rootNode = addNodes(null, new File(workingDir),
-                Program.getProperties().get(workingDirType));
+        final DefaultMutableTreeNode rootNode = addNodes(null, new File(workingDir));
         final DefaultTreeModel model = (DefaultTreeModel) navigatorTree.getModel();
         model.setRoot(rootNode);
     }
 
-    private DefaultMutableTreeNode addNodes(DefaultMutableTreeNode topNode, File dir, String workingDir) {
+    private DefaultMutableTreeNode addNodes(DefaultMutableTreeNode topNode, File dir) {
         final String curPath = dir.getPath();
-        final DefaultMutableTreeNode curDir = new DefaultMutableTreeNode(FileUtils.makeTitleFromFile(dir, workingDir));
+        final DefaultMutableTreeNode curDir = new DefaultMutableTreeNode(dir.getName());
         final String[] filesInDir = dir.list();
         List<String> sortedFiles = new ArrayList<>();
         if (filesInDir != null && filesInDir.length != 0) {
@@ -75,9 +81,9 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
         for (String fileName : sortedFiles) {
             final File file = curPath.equals(".") ? new File(fileName) : Paths.get(curPath, fileName).toFile();
             if (file.isDirectory()) {
-                addNodes(curDir, file, workingDir);
+                addNodes(curDir, file);
             } else {
-                leafs.add(FileUtils.makeTitleFromFile(file, workingDir));
+                leafs.add(file.getName());
             }
         }
         for (String leaf : leafs) {
@@ -103,13 +109,13 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
         final TreePath[] selectionPaths = navigatorTree.getSelectionPaths();
         if (selectionPaths != null) {
             for (TreePath treePath : selectionPaths) {
+                final Path path = Paths.get(workingDir, Arrays.stream(treePath.getPath()).skip(1).map(Object::toString)
+                        .collect(Collectors.joining(File.separator)));
                 final DefaultMutableTreeNode lastComponent = (DefaultMutableTreeNode) treePath.getLastPathComponent();
                 if (lastComponent.isLeaf()) {
-                    selectedFiles.add(Paths.get(Program.getProperties().get(workingDirType),
-                            FileUtils.separatePlaceholders(lastComponent.toString())).toFile());
+                    selectedFiles.add(path.toFile());
                 } else {
-                    selectedFiles.addAll(FileUtils.getFilesByTypeRecursively(Paths.get(Program.getProperties().get(workingDirType),
-                            FileUtils.separatePlaceholders(lastComponent.toString())).toString()));
+                    selectedFiles.addAll(FileUtils.getFilesByTypeRecursively(path.toString()));
                 }
             }
         }
