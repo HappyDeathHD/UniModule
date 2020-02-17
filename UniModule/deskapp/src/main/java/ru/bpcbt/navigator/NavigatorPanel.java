@@ -1,6 +1,5 @@
 package ru.bpcbt.navigator;
 
-import ru.bpcbt.Program;
 import ru.bpcbt.utils.MiniFrame;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.settings.Settings;
@@ -18,12 +17,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class NavigatorPanel extends BaseNavigatorTreePanel {
 
     private final JTextPane display;
     private File currentFile;
-    private String workingDir;
     private boolean isChanged = false;
 
     public NavigatorPanel(Settings workingDirType) {
@@ -65,8 +65,8 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
                         confirmed = MiniFrame.askForConfirmation("Все внесенные изменения канут в Лету, пофиг?");
                     }
                     if (confirmed) {
-                        currentFile = Paths.get(workingDir,
-                                FileUtils.separatePlaceholders(node.toString())).toFile();
+                        currentFile = Paths.get(workingDir, Arrays.stream(node.getPath()).skip(1).map(Object::toString)
+                                .collect(Collectors.joining(File.separator))).toFile();
                         setColoredTextToDisplay(FileUtils.readFile(currentFile));
                         changesDetected(false);
                         display.setEnabled(true);
@@ -109,12 +109,6 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
     public void setFontToElements(Font font) {
         super.setFontToElements(font);
         display.setFont(font);
-    }
-
-    @Override
-    public void refreshFiles() {
-        super.refreshFiles();
-        workingDir = Program.getProperties().get(getWorkingDirType());
     }
 
     public void saveCurrentFile() {

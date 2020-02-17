@@ -8,7 +8,6 @@ import ru.bpcbt.settings.Settings;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,8 +23,6 @@ public class FileUtils {
 
     private static final String CONFIGURATION_DIR = System.getProperty("user.home") + File.separator + "UniModule";
     private static final String CONFIGURATION_FILE = CONFIGURATION_DIR + File.separator + "configurations.xml";
-
-    private static final String SEPARATOR = FileSystems.getDefault().getSeparator();
 
     private FileUtils() {
         // Utils class
@@ -136,17 +133,6 @@ public class FileUtils {
                 }
             }
         }
-    }
-
-    public static String makeTitleFromFile(File file, String dirPath) {
-        if (file.getPath().contains(dirPath)) {
-            final String desiredPath = file.getPath().replace(dirPath, "")
-                    .replace(SEPARATOR, Delimiters.DELIMITER.getSymbol());
-            return desiredPath.startsWith(Delimiters.DELIMITER.getSymbol())
-                    ? desiredPath.replaceFirst(Delimiters.DELIMITER.getSymbol(), "")
-                    : desiredPath;
-        }
-        return file.getPath();
     }
 
     public static String[] separatePlaceholders(String path) {
