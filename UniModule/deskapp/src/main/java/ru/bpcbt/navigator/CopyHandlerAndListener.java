@@ -31,7 +31,6 @@ class CopyHandlerAndListener extends TransferHandler implements KeyListener {
                             .collect(Collectors.joining(Delimiters.DELIMITER.getSymbol()))
                     + Delimiters.START_END.getSymbol();
             clip.setContents(new StringSelection(placeholder), null);
-
         }
     }
 

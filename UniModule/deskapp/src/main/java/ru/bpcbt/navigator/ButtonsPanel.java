@@ -99,8 +99,12 @@ public class ButtonsPanel extends JPanel {
                         MiniFrame.showMessage("Воу-воу ты же не хочешь отправить на сервер резервные копии за все время!?" +
                                 System.lineSeparator() + "Выбери данные за какую-нибудь дату и грузи их кнопкой левее!"));
             } else {
-                uploadAllB.addActionListener(e -> TemplateWorker.uploadJob(
-                        FileUtils.getFilesByTypeRecursively(Program.getProperties().get(Settings.OUTPUT_DIR))).execute());
+                uploadAllB.addActionListener(e -> {
+                    if (MiniFrame.askForConfirmation("Уверен, что хочешь отправить на сервер всё что есть?")) {
+                        TemplateWorker.uploadJob(FileUtils.getFilesByTypeRecursively(Program.getProperties().get(Settings.OUTPUT_DIR)))
+                                .execute();
+                    }
+                });
             }
             add(uploadAllB);
 
