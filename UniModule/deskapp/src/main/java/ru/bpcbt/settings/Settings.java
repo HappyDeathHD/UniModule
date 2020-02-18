@@ -1,6 +1,7 @@
 package ru.bpcbt.settings;
 
 public enum Settings {
+
     INPUT_DIR("Директория содержащая файлы с плейсхолдерами"),
     MODULE_DIR("Корневая директория с модулями"),
     OUTPUT_DIR("Директория для сохранения результатов подстановок"),

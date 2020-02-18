@@ -31,6 +31,7 @@ import java.util.Objects;
  * </ul>
  */
 public class Placeholder {
+
     private final String rawPH;
     private String body;
     private final Map<String, String> variables;
@@ -147,7 +148,8 @@ public class Placeholder {
     }
 
     public boolean isVariable() {
-        return rawPH.startsWith(Delimiters.VARIABLE_START_END.getSymbol()) && rawPH.endsWith(Delimiters.VARIABLE_START_END.getSymbol());
+        return rawPH.startsWith(Delimiters.VARIABLE_START_END.getSymbol())
+                && rawPH.endsWith(Delimiters.VARIABLE_START_END.getSymbol());
     }
 
     @Override
@@ -167,8 +169,7 @@ public class Placeholder {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Placeholder that = (Placeholder) o;
-        return Objects.equals(body, that.body) &&
-                Objects.equals(variables, that.variables);
+        return Objects.equals(body, that.body) && Objects.equals(variables, that.variables);
     }
 
     @Override

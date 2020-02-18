@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public class FileUtils {
+
+    public static final String CONFLICT_PREFIX = "UniModule_";
+    public static final String TEMPLATE_MAPPING_FILE = "template_mapping.json";
+
     private static final Map<File, String> cachedFiles = new HashMap<>();
     private static final Map<File, Boolean> fileProcessStatus = new ConcurrentHashMap<>();
 
@@ -74,7 +78,7 @@ public class FileUtils {
         if (isDirExists(workingDir)) {
             File dir = new File(workingDir);
             for (File file : dir.listFiles()) {
-                if (file.isFile() && !Const.TEMPLATE_MAPPING_FILE.equals(file.getName())) {
+                if (file.isFile() && !FileUtils.TEMPLATE_MAPPING_FILE.equals(file.getName())) {
                     neededFiles.add(file);
                 } else if (file.isDirectory()) {
                     neededFiles.addAll(getFilesByTypeRecursively(file.getPath()));
@@ -143,7 +147,7 @@ public class FileUtils {
         final String outputDir = Program.getProperties().get(Settings.OUTPUT_DIR);
         final String[] separatedPath = FileUtils.separatePlaceholders(fileName);
         if (Program.getProperties().get(Settings.INPUT_DIR).equals(outputDir)) {
-            separatedPath[0] = Const.CONFLICT_PREFIX + separatedPath[0];
+            separatedPath[0] = CONFLICT_PREFIX + separatedPath[0];
         }
         final Path newPath = Paths.get(outputDir, separatedPath);
         writeToPath(newPath, newFileContent);

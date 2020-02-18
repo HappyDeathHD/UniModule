@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class SettingsPanel extends JPanel {
+
     private final JTextField inputDirTF;
     private final JTextField modulesDirTF;
     private final JTextField outputDirTF;
