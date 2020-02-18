@@ -9,6 +9,7 @@ import javax.swing.text.*;
 import java.awt.*;
 
 public class ReportPane extends JTextPane {
+
     private static final ReportPane INSTANCE = new ReportPane(); //ленивая инициализация не имеет смысла
     private static final StyledDocument DOC = INSTANCE.getStyledDocument();
 

@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class TemplateWorker {
+public class UnimessageConductor {
 
     private static final SimpleDateFormat OS_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd_HH-mm-ss");
 
@@ -28,7 +28,7 @@ public class TemplateWorker {
     private static final Map<String, String> templateNameMap = new HashMap<>();
     private static int attemptsCount;
 
-    private TemplateWorker() { // Utils class
+    private UnimessageConductor() { // Utils class
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -214,7 +214,7 @@ public class TemplateWorker {
 
     private static void fillThemes() {
         final String inputDir = Program.getProperties().get(Settings.INPUT_DIR);
-        final File mappingFile = Paths.get(inputDir, Const.TEMPLATE_MAPPING_FILE).toFile();
+        final File mappingFile = Paths.get(inputDir, FileUtils.TEMPLATE_MAPPING_FILE).toFile();
         if (mappingFile.exists()) {
             try {
                 final JsonObject mainNode = JsonParser.object().from(FileUtils.readFile(mappingFile));
@@ -231,10 +231,10 @@ public class TemplateWorker {
                     }
                 }
             } catch (JsonParserException e) {
-                ReportPane.error(Const.TEMPLATE_MAPPING_FILE + " содержит ошибку: " + e.getMessage());
+                ReportPane.error(FileUtils.TEMPLATE_MAPPING_FILE + " содержит ошибку: " + e.getMessage());
             }
         } else {
-            ReportPane.debug(Const.TEMPLATE_MAPPING_FILE + " не найден.");
+            ReportPane.debug(FileUtils.TEMPLATE_MAPPING_FILE + " не найден.");
         }
     }
 

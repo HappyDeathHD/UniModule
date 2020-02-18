@@ -7,7 +7,7 @@ import ru.bpcbt.utils.FileUtils;
 import ru.bpcbt.utils.ReplaceTasksExecutor;
 import ru.bpcbt.utils.MiniFrame;
 import ru.bpcbt.logger.Narrator;
-import ru.bpcbt.rest.TemplateWorker;
+import ru.bpcbt.rest.UnimessageConductor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -58,9 +58,9 @@ public class ButtonsPanel extends JPanel {
             processSingleB.addActionListener(e -> {
                 Set<File> selectedFiles = Program.getMainFrame().getInputFilesPanel().getSelectedFiles();
                 if (selectedFiles.isEmpty()) {
-                    MiniFrame.showMessage("Нужно выбрать что собирать." +
-                            System.lineSeparator() +
-                            "Для этого нужно выделить что-нибудь из вкладки со скелетами.");
+                    MiniFrame.showMessage("Нужно выбрать что собирать."
+                            + System.lineSeparator()
+                            + "Для этого нужно выделить что-нибудь из вкладки со скелетами.");
                 } else {
                     ReplaceTasksExecutor.process(selectedFiles);
                 }
@@ -83,11 +83,11 @@ public class ButtonsPanel extends JPanel {
                     selectedFiles = Program.getMainFrame().getOutputFilesPanel().getSelectedFiles();
                 }
                 if (selectedFiles.isEmpty()) {
-                    MiniFrame.showMessage("Нужно выбрать что отправлять." +
-                            System.lineSeparator() +
-                            "Для этого нужно выделить что-нибудь из вкладки с результатами или резервации.");
+                    MiniFrame.showMessage("Нужно выбрать что отправлять."
+                            + System.lineSeparator()
+                            + "Для этого нужно выделить что-нибудь из вкладки с результатами или резервации.");
                 } else {
-                    TemplateWorker.uploadJob(selectedFiles).execute();
+                    UnimessageConductor.uploadJob(selectedFiles).execute();
                 }
             });
             add(uploadSingleB);
@@ -96,29 +96,29 @@ public class ButtonsPanel extends JPanel {
                     "Отправить всех с вкладки результатов.");
             if (Settings.RESERVE_DIR.equals(parent.getWorkingDirType())) {
                 uploadAllB.addActionListener(e ->
-                        MiniFrame.showMessage("Воу-воу ты же не хочешь отправить на сервер резервные копии за все время!?" +
-                                System.lineSeparator() + "Выбери данные за какую-нибудь дату и грузи их кнопкой левее!"));
+                        MiniFrame.showMessage("Воу-воу ты же не хочешь отправить на сервер резервные копии за все время!?"
+                                + System.lineSeparator()
+                                + "Выбери данные за какую-нибудь дату и грузи их кнопкой левее!"));
             } else {
                 uploadAllB.addActionListener(e -> {
                     if (MiniFrame.askForConfirmation("Уверен, что хочешь отправить на сервер всё что есть?")) {
-                        TemplateWorker.uploadJob(FileUtils.getFilesByTypeRecursively(Program.getProperties().get(Settings.OUTPUT_DIR)))
+                        UnimessageConductor.uploadJob(FileUtils.getFilesByTypeRecursively(Program.getProperties().get(Settings.OUTPUT_DIR)))
                                 .execute();
                     }
                 });
             }
             add(uploadAllB);
-
             //зарезервировать выбранных
             reserveSingleB = new HoverButton(getIconFromResource("/images/reserveOne.png"),
                     "Выгрузить выбранных во вкладке резервации с сервера");
             reserveSingleB.addActionListener(e -> {
                 List<String> selectedTemplates = Program.getMainFrame().getReserveFilesPanel().getSelectedTemplates();
                 if (selectedTemplates.isEmpty()) {
-                    MiniFrame.showMessage("Нужно выбрать что резервировать." +
-                            System.lineSeparator() +
-                            "Для этого нужно выделить что-нибудь из вкладки с резервацией.");
+                    MiniFrame.showMessage("Нужно выбрать что резервировать."
+                            + System.lineSeparator()
+                            + "Для этого нужно выделить что-нибудь из вкладки с резервацией.");
                 } else {
-                    TemplateWorker.downloadJob(selectedTemplates).execute();
+                    UnimessageConductor.downloadJob(selectedTemplates).execute();
                 }
             });
             add(reserveSingleB);
@@ -126,9 +126,9 @@ public class ButtonsPanel extends JPanel {
             reserveAllB = new HoverButton(getIconFromResource("/images/reserveAll.png"),
                     "Выгрузить всё с сервера");
             reserveAllB.addActionListener(e -> {
-                Map<String, Long> templateIdMap = TemplateWorker.getTemplateIdMap();
+                Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
                 if (templateIdMap != null) {
-                    TemplateWorker.downloadJob(templateIdMap.keySet()).execute();
+                    UnimessageConductor.downloadJob(templateIdMap.keySet()).execute();
                 }
             });
             add(reserveAllB);

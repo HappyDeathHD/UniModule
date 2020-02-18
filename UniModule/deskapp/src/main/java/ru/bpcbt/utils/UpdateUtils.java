@@ -29,7 +29,6 @@ public class UpdateUtils {
             try {
                 FileUtils.deleteIfExists(UPDATER_NAME);
                 String rawJson = new Scanner(new URL(COMMIT_CHECK_URL).openStream(), "UTF-8").useDelimiter("\\A").next();
-
                 final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
                 String changelog = obj.getObject("commit").getString("message");
                 String penultSha = obj.getArray("parents").getObject(0).getString("sha");

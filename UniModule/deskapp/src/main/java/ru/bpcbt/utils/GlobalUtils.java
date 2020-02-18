@@ -3,7 +3,7 @@ package ru.bpcbt.utils;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.logger.ReportPane;
-import ru.bpcbt.rest.TemplateWorker;
+import ru.bpcbt.rest.UnimessageConductor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +20,7 @@ public class GlobalUtils {
         mainFrame.getOutputFilesPanel().refreshFiles();
         mainFrame.getReserveFilesPanel().refreshFiles();
         ReplaceTasksExecutor.refresh();
-        TemplateWorker.refresh();
+        UnimessageConductor.refresh();
     }
 
     public static void setNavigatorsFont(Font font) {

@@ -26,9 +26,9 @@ class CopyHandlerAndListener extends TransferHandler implements KeyListener {
         JTree tree = (JTree) comp;
         TreePath path = tree.getSelectionPath();
         if (path != null) {
-            String placeholder = Delimiters.START_END.getSymbol() +
-                    Arrays.stream(path.getPath()).skip(1).map(Object::toString)
-                            .collect(Collectors.joining(Delimiters.DELIMITER.getSymbol()))
+            String placeholder = Delimiters.START_END.getSymbol()
+                    + Arrays.stream(path.getPath()).skip(1).map(Object::toString)
+                    .collect(Collectors.joining(Delimiters.DELIMITER.getSymbol()))
                     + Delimiters.START_END.getSymbol();
             clip.setContents(new StringSelection(placeholder), null);
         }
@@ -36,7 +36,7 @@ class CopyHandlerAndListener extends TransferHandler implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // KeyEvent.getModifiers() — каждому модификатору по биту
+        // KeyEvent.getModifiers() — в виде маски модификаторов из битов
         if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & MASK) != 0)) {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             navigatorTree.getTransferHandler().exportToClipboard(navigatorTree, clipboard, TransferHandler.COPY);

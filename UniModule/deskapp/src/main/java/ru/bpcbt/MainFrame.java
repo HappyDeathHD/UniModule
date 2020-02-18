@@ -6,13 +6,14 @@ import ru.bpcbt.navigator.NavigatorPanel;
 import ru.bpcbt.navigator.ReservePanel;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.settings.SettingsPanel;
-import ru.bpcbt.utils.Const;
 import ru.bpcbt.logger.Narrator;
+import ru.bpcbt.utils.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
+
     public static final int INPUTS_TAB = 0;
     @SuppressWarnings("WeakerAccess")
     public static final int MODULES_TAB = 1;
@@ -64,7 +65,7 @@ public class MainFrame extends JFrame {
                 case RESERVE_TAB:
                     reserveFilesPanel.selectTab();
                     break;
-                default: //this should never happen
+                default: // не достижимое состояние
             }
         });
 
@@ -81,7 +82,7 @@ public class MainFrame extends JFrame {
             hints.append("<tr><td>").append(delimiter.getSymbol()).append("</td><td>").append(delimiter.getDescription()).append("</td></tr>");
         }
         hints.append("</table><h1>Маппинг названий шаблонов</h1>")
-                .append("В корневой папке со скелетами может быть файл ").append(Const.TEMPLATE_MAPPING_FILE).append(" со структурой:")
+                .append("В корневой папке со скелетами может быть файл ").append(FileUtils.TEMPLATE_MAPPING_FILE).append(" со структурой:")
                 .append("<pre>{<br/> \"НАЗВАНИЕ_ПАПКИ\": {<br/>  \"name\":\"НАЗВАНИЕ_ОБЩЕЙ_СХЕМЫ\",<br/>")
                 .append("  \"topics\": {<br/>   \"ЯЗЫК(ru/en/...)\":\"ТЕМА_ПИСЬМА\"<br/>  }<br/> }<br/>}</pre></html>");
         hintsPanel.add(new JLabel(hints.toString()));

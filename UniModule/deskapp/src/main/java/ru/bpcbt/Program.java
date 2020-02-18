@@ -14,6 +14,7 @@ import java.util.Properties;
 import static ru.bpcbt.settings.Settings.STYLE;
 
 public class Program {
+
     private static MainFrame mainFrame;
     private static Map<Settings, String> properties;
     private static Properties sysProperties;

@@ -1,6 +1,6 @@
 package ru.bpcbt.navigator;
 
-import ru.bpcbt.rest.TemplateWorker;
+import ru.bpcbt.rest.UnimessageConductor;
 import ru.bpcbt.settings.Settings;
 
 import javax.swing.*;
@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Vector;
 
 public class ReservePanel extends BaseNavigatorTreePanel {
+
     private final JList<String> templates;
 
     public ReservePanel(Settings workingDirType) {
@@ -29,7 +30,7 @@ public class ReservePanel extends BaseNavigatorTreePanel {
     @Override
     public void selectTab() {
         super.selectTab();
-        Map<String, Long> templateIdMap = TemplateWorker.getTemplateIdMap();
+        Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
         if (templateIdMap != null && !templateIdMap.isEmpty()) {
             Vector<String> templateNames = new Vector<>(templateIdMap.keySet());
             templateNames.sort(String.CASE_INSENSITIVE_ORDER);

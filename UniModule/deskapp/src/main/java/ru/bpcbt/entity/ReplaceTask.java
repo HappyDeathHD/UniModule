@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ReplaceTask implements Comparable<ReplaceTask> {
+
     private final String rawPlaceholder;
     private final String content;
     private final Map<String, String> parentVariables;
@@ -25,9 +26,9 @@ public class ReplaceTask implements Comparable<ReplaceTask> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ReplaceTask replaceTask = (ReplaceTask) o;
-        return Objects.equals(rawPlaceholder, replaceTask.getRawPlaceholder()) &&
-                Objects.equals(content, replaceTask.getContent()) &&
-                Objects.equals(parentVariables, replaceTask.getParentVariables());
+        return Objects.equals(rawPlaceholder, replaceTask.getRawPlaceholder())
+                && Objects.equals(content, replaceTask.getContent())
+                && Objects.equals(parentVariables, replaceTask.getParentVariables());
     }
 
     @Override

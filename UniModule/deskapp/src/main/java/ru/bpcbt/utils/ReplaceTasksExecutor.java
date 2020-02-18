@@ -24,14 +24,14 @@ public class ReplaceTasksExecutor {
      * Одновременно могут работать 10 свинка-воркеров, но один из них менеджер среднего звена
      */
     private static final int MAX_WORKER_THREAD = 9;
-    private static final AtomicInteger workersCount = new AtomicInteger(0);
 
     private static final PriorityBlockingQueue<ReplaceTask> tasks = new PriorityBlockingQueue<>();
     private static final Map<Placeholder, String> foundReplacements = new ConcurrentHashMap<>();
     private static final Queue<Placeholder> notFoundReplacements = new ConcurrentLinkedQueue<>();
+    private static final AtomicInteger workersCount = new AtomicInteger(0);
+    private static final AtomicInteger mainJobsDone = new AtomicInteger(0);
 
     private static int mainJobsCount;
-    private static final AtomicInteger mainJobsDone = new AtomicInteger(0);
 
     private ReplaceTasksExecutor() { // Utils class
     }
@@ -42,7 +42,7 @@ public class ReplaceTasksExecutor {
         Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
         //не json
         final List<File> commonInputFiles = files.stream()
-                .filter(f -> !f.getPath().contains(Const.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
+                .filter(f -> !f.getPath().contains(FileUtils.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
                 .collect(Collectors.toList());
         commonInputFiles.stream().map(file -> new ReplaceTask(cutThePath(file), FileUtils.readFile(file), FileUtils.getVariableMapWithLocale(file.getName())))
                 .forEach(tasks::add);
@@ -60,12 +60,12 @@ public class ReplaceTasksExecutor {
                 final int processorsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
                 final int maxThreadsCount = Math.min(processorsCount, MAX_WORKER_THREAD);
                 final long start = System.currentTimeMillis();
-                ReportPane.normal("┎─────────────────────────────────────────────" + System.lineSeparator() +
-                        "┃Начало сборки: " + new Date(start) + System.lineSeparator() +
-                        "┃Количество логических процессоров:\t" + processorsCount + System.lineSeparator() +
-                        "┃Количество потоков:   \t\t" + maxThreadsCount + System.lineSeparator() +
-                        "┃Количество файлов для сборки:\t" + mainJobsCount + System.lineSeparator() +
-                        "┖─────────────────────────────────────────────");
+                ReportPane.normal("┎─────────────────────────────────────────────" + System.lineSeparator()
+                        + "┃Начало сборки: " + new Date(start) + System.lineSeparator()
+                        + "┃Количество логических процессоров:\t" + processorsCount + System.lineSeparator()
+                        + "┃Количество потоков:   \t\t" + maxThreadsCount + System.lineSeparator()
+                        + "┃Количество файлов для сборки:\t" + mainJobsCount + System.lineSeparator()
+                        + "┖─────────────────────────────────────────────");
                 workersCount.set(0);
                 while (mainJobsCount > mainJobsDone.get()) {
                     if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {
@@ -171,9 +171,9 @@ public class ReplaceTasksExecutor {
                 Narrator.success("Все готово без ошибок!");
             }
         } else {
-            ReportPane.error(System.lineSeparator() +
-                    "Есть не найденные модули (" + notFoundReplacements.size() + " шт) (" + foundReplacements.size() + " найдено):" +
-                    System.lineSeparator() + notFoundReplacements.stream().map(Placeholder::toString)
+            ReportPane.error(System.lineSeparator() + "Есть не найденные модули (" + notFoundReplacements.size()
+                    + " шт) (" + foundReplacements.size() + " найдено):"
+                    + System.lineSeparator() + notFoundReplacements.stream().map(Placeholder::toString)
                     .collect(Collectors.joining(System.lineSeparator())));
             Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
             Narrator.error("Все прошло не очень гладко!");

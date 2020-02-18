@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("WeakerAccess")
 public class JsonUtils {
+
     private static final Map<File, Map<String, String>> cachedJson = new HashMap<>();
     private static final Map<File, Boolean> jsonProcessStatus = new ConcurrentHashMap<>();
 
