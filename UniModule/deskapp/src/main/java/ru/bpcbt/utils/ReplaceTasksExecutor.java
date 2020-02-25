@@ -25,7 +25,7 @@ public class ReplaceTasksExecutor {
      */
     private static final int MAX_WORKER_THREAD = 9;
 
-    private static final PriorityBlockingQueue<ReplaceTask> tasks = new PriorityBlockingQueue<>();
+    private static final Queue<ReplaceTask> tasks = new PriorityBlockingQueue<>();
     private static final Map<Placeholder, String> foundReplacements = new ConcurrentHashMap<>();
     private static final Queue<Placeholder> notFoundReplacements = new ConcurrentLinkedQueue<>();
     private static final AtomicInteger workersCount = new AtomicInteger(0);

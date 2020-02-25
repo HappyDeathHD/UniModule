@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Плейсхолдер — ссылка до текста, которым он сам должен быть заменен.
@@ -31,6 +32,8 @@ import java.util.Objects;
  * </ul>
  */
 public class Placeholder {
+
+    private static final Pattern PATTERN_JSON = Pattern.compile("\\.json");
 
     private final String rawPH;
     private String body;
@@ -112,7 +115,7 @@ public class Placeholder {
      * @return пара путь/значение, вида docs@data.json/@var1@var2
      */
     public Pair<String, String> getJsonAndInnerPH() {
-        final String[] untilAndAfterJson = getWithReplaces().split(".json");
+        final String[] untilAndAfterJson = PATTERN_JSON.split(getWithReplaces());
         if (untilAndAfterJson.length != 2) {
             return null;
         }

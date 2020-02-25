@@ -25,7 +25,7 @@ public class ReplaceTask implements Comparable<ReplaceTask> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReplaceTask replaceTask = (ReplaceTask) o;
+        final ReplaceTask replaceTask = (ReplaceTask) o;
         return Objects.equals(rawPlaceholder, replaceTask.getRawPlaceholder())
                 && Objects.equals(content, replaceTask.getContent())
                 && Objects.equals(parentVariables, replaceTask.getParentVariables());
