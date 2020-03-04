@@ -38,7 +38,7 @@ public class UnimessageConductor {
             if (coreUrl.isEmpty()) {
                 Narrator.yell("Надо заполнить путь до api!");
                 Narrator.error("Надо заполнить путь до api!");
-                Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+                Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
                 return false;
             }
             if (coreUrl.endsWith("/")) {
@@ -48,7 +48,7 @@ public class UnimessageConductor {
             String password = Program.getMainFrame().getSettingsPanel().getPassword();
             if (login == null || login.isEmpty()) {
                 Narrator.yell("Нужно заполнить логин/пароль для подключения к api");
-                Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+                Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
                 return false;
             }
             if (password == null || password.isEmpty()) {
@@ -82,7 +82,7 @@ public class UnimessageConductor {
             @Override
             protected Object doInBackground() {
                 GlobalUtils.setEnabledToProcessButtons(false);
-                Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
+                Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 if (files.isEmpty()) {
                     ReportPane.warning("Нечего грузить! Проверь вкладку результатов!");
                     Narrator.warn("Нечего грузить!");
@@ -90,7 +90,7 @@ public class UnimessageConductor {
                     return null;
                 }
                 if (!checkAndPrepareConnectionSettings()) {
-                    Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+                    Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
                     GlobalUtils.setEnabledToProcessButtons(true);
                     return null;
                 }
@@ -131,7 +131,7 @@ public class UnimessageConductor {
             @Override
             protected Object doInBackground() {
                 GlobalUtils.setEnabledToProcessButtons(false);
-                Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
+                Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 if (templates.isEmpty()) {
                     ReportPane.warning("Нечего резервировать! Проверь вкладку резервации!");
                     Narrator.warn("Нечего резервировать!");
@@ -139,7 +139,7 @@ public class UnimessageConductor {
                     return null;
                 }
                 if (!checkAndPrepareConnectionSettings()) {
-                    Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+                    Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
                     GlobalUtils.setEnabledToProcessButtons(true);
                     return null;
                 }
@@ -285,7 +285,7 @@ public class UnimessageConductor {
 
     public static Map<String, Long> getTemplateIdMap() {
         if (!checkAndPrepareConnectionSettings()) {
-            Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+            Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
             return null;
         }
         fillTemplates();

@@ -1,13 +1,13 @@
 package ru.bpcbt;
 
 import ru.bpcbt.logger.ReportPanel;
-import ru.bpcbt.misc.Delimiters;
+import ru.bpcbt.misc.InfoPanel;
 import ru.bpcbt.navigator.NavigatorPanel;
 import ru.bpcbt.navigator.ReservePanel;
+import ru.bpcbt.navigator.SelectableTab;
 import ru.bpcbt.settings.Settings;
 import ru.bpcbt.settings.SettingsPanel;
 import ru.bpcbt.logger.Narrator;
-import ru.bpcbt.utils.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,17 +22,25 @@ public class MainFrame extends JFrame {
     public static final int RESERVE_TAB = 3;
     public static final int REPORT_TAB = 4;
     public static final int SETTINGS_TAB = 5;
+    @SuppressWarnings("WeakerAccess")
+    public static final int INFO_TAB = 6;
 
     private final JTabbedPane tabbedPane;
+
     private final NavigatorPanel inputFilesPanel;
     private final NavigatorPanel modulesPanel;
     private final NavigatorPanel outputFilesPanel;
     private final ReservePanel reserveFilesPanel;
+    private final ReportPanel reportPanel;
     private final SettingsPanel settingsPanel;
+    private final InfoPanel infoPanel;
 
     MainFrame() {
         setTitle("UniModule v" + Program.getSysProperty("version") + " built " + Program.getSysProperty("git.build.time"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //Один из логгеров. Инициализируем вне очереди
+        reportPanel = new ReportPanel();
+
         tabbedPane = new JTabbedPane();
         setLayout(new BorderLayout());
         inputFilesPanel = new NavigatorPanel(Settings.INPUT_DIR);
@@ -43,31 +51,15 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Результаты", outputFilesPanel);
         reserveFilesPanel = new ReservePanel(Settings.RESERVE_DIR);
         tabbedPane.addTab("Резервация", reserveFilesPanel);
-        ReportPanel reportPanel = new ReportPanel();
         tabbedPane.addTab("Отчет", reportPanel);
         settingsPanel = new SettingsPanel();
         tabbedPane.addTab("Настройки", settingsPanel);
-        tabbedPane.addTab("Информация", getInfoPanel());
+        infoPanel = new InfoPanel();
+        tabbedPane.addTab("Информация", infoPanel);
         add(tabbedPane, BorderLayout.CENTER);
         add(Narrator.getLabel(), BorderLayout.PAGE_END);
 
-        tabbedPane.addChangeListener(e -> {
-            switch (tabbedPane.getSelectedIndex()) {
-                case INPUTS_TAB:
-                    inputFilesPanel.selectTab();
-                    break;
-                case MODULES_TAB:
-                    modulesPanel.selectTab();
-                    break;
-                case OUTPUTS_TAB:
-                    outputFilesPanel.selectTab();
-                    break;
-                case RESERVE_TAB:
-                    reserveFilesPanel.selectTab();
-                    break;
-                default: // не достижимое состояние
-            }
-        });
+        tabbedPane.addChangeListener(e -> getPaneTab(tabbedPane.getSelectedIndex()).selectTab());
 
         setMinimumSize(new Dimension(625, 700));
         pack();
@@ -75,25 +67,32 @@ public class MainFrame extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private JPanel getInfoPanel() {
-        JPanel hintsPanel = new JPanel();
-        final StringBuilder hints = new StringBuilder("<html><h1>Разделители</h1><table>");
-        for (Delimiters delimiter : Delimiters.values()) {
-            hints.append("<tr><td>").append(delimiter.getSymbol()).append("</td><td>").append(delimiter.getDescription()).append("</td></tr>");
-        }
-        hints.append("</table><h1>Маппинг названий шаблонов</h1>")
-                .append("В корневой папке со скелетами может быть файл ").append(FileUtils.TEMPLATE_MAPPING_FILE).append(" со структурой:")
-                .append("<pre>{<br/> \"НАЗВАНИЕ_ПАПКИ\": {<br/>  \"name\":\"НАЗВАНИЕ_ОБЩЕЙ_СХЕМЫ\",<br/>")
-                .append("  \"topics\": {<br/>   \"ЯЗЫК(ru/en/...)\":\"ТЕМА_ПИСЬМА\"<br/>  }<br/> }<br/>}</pre></html>");
-        hintsPanel.add(new JLabel(hints.toString()));
-        return hintsPanel;
-    }
-
-    /*Getters & Setters*/
-    public void setPaneTab(int index) {
+    public void selectPaneTab(int index) {
         tabbedPane.setSelectedIndex(index);
     }
 
+    private SelectableTab getPaneTab(int index) {
+        switch (index) {
+            case INPUTS_TAB:
+                return inputFilesPanel;
+            case MODULES_TAB:
+                return modulesPanel;
+            case OUTPUTS_TAB:
+                return outputFilesPanel;
+            case RESERVE_TAB:
+                return reserveFilesPanel;
+            case REPORT_TAB:
+                return reportPanel;
+            case SETTINGS_TAB:
+                return settingsPanel;
+            case INFO_TAB:
+                return infoPanel;
+            default: // не достижимое состояние
+                return settingsPanel;
+        }
+    }
+
+    /*Getters & Setters*/
     public NavigatorPanel getInputFilesPanel() {
         return inputFilesPanel;
     }

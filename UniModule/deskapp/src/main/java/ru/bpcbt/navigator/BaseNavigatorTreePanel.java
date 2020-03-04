@@ -7,7 +7,8 @@ import ru.bpcbt.settings.Settings;
 import ru.bpcbt.utils.FileUtils;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -16,14 +17,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class BaseNavigatorTreePanel extends JPanel {
+public abstract class BaseNavigatorTreePanel extends JPanel implements SelectableTab {
 
     private final Settings workingDirType;
     final JTree navigatorTree;
     final ButtonsPanel buttonsPanel;
+    private DefaultTreeModel model;
 
     String workingDir;
     JSplitPane splitPane;
@@ -31,8 +32,23 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
     BaseNavigatorTreePanel(Settings workingDirType) {
         this.workingDirType = workingDirType;
         setLayout(new BorderLayout());
-        navigatorTree = new JTree(new DefaultMutableTreeNode());
+
+        navigatorTree = new JTree(model);
         navigatorTree.setRootVisible(false);
+        navigatorTree.setShowsRootHandles(true);
+        navigatorTree.addTreeWillExpandListener(new TreeWillExpandListener() {
+            @Override
+            public void treeWillExpand(TreeExpansionEvent event) {
+                TreePath path = event.getPath();
+                LazyTreeNode node = (LazyTreeNode) path.getLastPathComponent();
+                node.loadChildren(model, Paths.get(workingDir, Arrays.stream(path.getPath()).skip(1).map(Object::toString)
+                        .collect(Collectors.joining(File.separator))).toFile());
+            }
+
+            @Override
+            public void treeWillCollapse(TreeExpansionEvent event) {
+            }
+        });
 
         CopyHandlerAndListener copyHandlerAndListener = new CopyHandlerAndListener(navigatorTree);
         navigatorTree.setTransferHandler(copyHandlerAndListener);
@@ -46,7 +62,7 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
         final JScrollPane scrollPane = new JScrollPane(navigatorTree);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 scrollPane, contentPanel);
-        splitPane.setResizeWeight(0.1);
+        splitPane.setResizeWeight(0.5);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
 
@@ -57,39 +73,13 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
         workingDir = Program.getProperties().get(workingDirType);
         if (workingDir == null) {
             Narrator.yell("Необходимо выбрать директорию в настройках");
-            Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
-            return;
+            Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
         }
-        final DefaultMutableTreeNode rootNode = addNodes(null, new File(workingDir));
-        final DefaultTreeModel model = (DefaultTreeModel) navigatorTree.getModel();
-        model.setRoot(rootNode);
-    }
-
-    private DefaultMutableTreeNode addNodes(DefaultMutableTreeNode topNode, File dir) {
-        final String curPath = dir.getPath();
-        final DefaultMutableTreeNode curDir = new DefaultMutableTreeNode(dir.getName());
-        final String[] filesInDir = dir.list();
-        List<String> sortedFiles = new ArrayList<>();
-        if (filesInDir != null && filesInDir.length != 0) {
-            if (topNode != null) {
-                topNode.add(curDir);
-            }
-            sortedFiles = Arrays.asList(filesInDir);
-            sortedFiles.sort(String.CASE_INSENSITIVE_ORDER);
-        }
-        final List<String> leafs = new ArrayList<>();
-        for (String fileName : sortedFiles) {
-            final File file = curPath.equals(".") ? new File(fileName) : Paths.get(curPath, fileName).toFile();
-            if (file.isDirectory()) {
-                addNodes(curDir, file);
-            } else {
-                leafs.add(file.getName());
-            }
-        }
-        for (String leaf : leafs) {
-            curDir.add(new DefaultMutableTreeNode(leaf));
-        }
-        return curDir;
+        File workingFile = new File(workingDir);
+        final LazyTreeNode root = new LazyTreeNode(workingFile);
+        model = new DefaultTreeModel(root);
+        navigatorTree.setModel(model);
+        root.loadChildren(model, workingFile);
     }
 
     void setFontToElements(Font font) {
@@ -111,7 +101,7 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
             for (TreePath treePath : selectionPaths) {
                 final Path path = Paths.get(workingDir, Arrays.stream(treePath.getPath()).skip(1).map(Object::toString)
                         .collect(Collectors.joining(File.separator)));
-                final DefaultMutableTreeNode lastComponent = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+                final LazyTreeNode lastComponent = (LazyTreeNode) treePath.getLastPathComponent();
                 if (lastComponent.isLeaf()) {
                     selectedFiles.add(path.toFile());
                 } else {
@@ -122,8 +112,9 @@ public abstract class BaseNavigatorTreePanel extends JPanel {
         return selectedFiles;
     }
 
+    @Override
     public void selectTab() {
-        if (((DefaultMutableTreeNode) navigatorTree.getModel().getRoot()).getDepth() == 0) {
+        if (navigatorTree.getModel() == null) {
             refreshFiles();
         }
     }

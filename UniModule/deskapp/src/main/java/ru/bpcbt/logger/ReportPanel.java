@@ -1,10 +1,12 @@
 package ru.bpcbt.logger;
 
+import ru.bpcbt.navigator.SelectableTab;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
 
-public class ReportPanel extends JPanel {
+public class ReportPanel extends JPanel implements SelectableTab {
 
     public ReportPanel() {
         setLayout(new BorderLayout());
@@ -13,5 +15,9 @@ public class ReportPanel extends JPanel {
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         add(scroll, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void selectTab() {
     }
 }
