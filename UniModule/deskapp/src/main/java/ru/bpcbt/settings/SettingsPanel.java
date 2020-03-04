@@ -3,6 +3,7 @@ package ru.bpcbt.settings;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.misc.ColoredButton;
+import ru.bpcbt.navigator.SelectableTab;
 import ru.bpcbt.utils.GlobalUtils;
 import ru.bpcbt.utils.Style;
 import ru.bpcbt.utils.FileUtils;
@@ -14,7 +15,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.Map;
 
-public class SettingsPanel extends JPanel {
+public class SettingsPanel extends JPanel implements SelectableTab {
 
     private final JTextField inputDirTF;
     private final JTextField modulesDirTF;
@@ -176,7 +177,7 @@ public class SettingsPanel extends JPanel {
                 SwingUtilities.updateComponentTreeUI(Program.getMainFrame());
                 Narrator.success("Схоронил!");
                 GlobalUtils.refreshAllFiles();
-                Program.getMainFrame().setPaneTab(MainFrame.INPUTS_TAB);
+                Program.getMainFrame().selectPaneTab(MainFrame.INPUTS_TAB);
             } catch (Exception ex) {
                 Narrator.yell("Не удалось сохранить настройки", ex);
             }
@@ -203,22 +204,15 @@ public class SettingsPanel extends JPanel {
     }
 
     public void loadConfigurations() {
-        boolean allMandatoryParamsExist = true;
         final Map<Settings, String> properties = Program.getProperties();
         if (properties.containsKey(Settings.INPUT_DIR)) {
             inputDirTF.setText(properties.get(Settings.INPUT_DIR));
-        } else {
-            allMandatoryParamsExist = false;
         }
         if (properties.containsKey(Settings.MODULE_DIR)) {
             modulesDirTF.setText(properties.get(Settings.MODULE_DIR));
-        } else {
-            allMandatoryParamsExist = false;
         }
         if (properties.containsKey(Settings.OUTPUT_DIR)) {
             outputDirTF.setText(properties.get(Settings.OUTPUT_DIR));
-        } else {
-            allMandatoryParamsExist = false;
         }
         if (properties.containsKey(Settings.RESERVE_DIR)) {
             reserveDirTF.setText(properties.get(Settings.RESERVE_DIR));
@@ -247,11 +241,11 @@ public class SettingsPanel extends JPanel {
             int lafIndex = Integer.parseInt(properties.get(Settings.STYLE));
             styleCB.setSelectedIndex(lafIndex);
         }
-        if (allMandatoryParamsExist) {
-            Narrator.normal("С возвращением!");
-            Program.getMainFrame().getInputFilesPanel().refreshFiles();
+        if (properties.isEmpty()) {
+            Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
         } else {
-            Program.getMainFrame().setPaneTab(MainFrame.SETTINGS_TAB);
+            Narrator.normal("С возвращением!");
+            Program.getMainFrame().getInputFilesPanel().selectTab();
         }
     }
 
@@ -265,5 +259,9 @@ public class SettingsPanel extends JPanel {
 
     public boolean isDebug() {
         return debugFlag.isSelected();
+    }
+
+    @Override
+    public void selectTab() {
     }
 }

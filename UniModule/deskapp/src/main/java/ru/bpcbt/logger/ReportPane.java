@@ -41,12 +41,18 @@ public class ReportPane extends JTextPane {
     }
 
     public static void error(String message, Exception e) {
-        ReportPane.error(System.lineSeparator() + GlobalUtils.getErrorMessageWithException(message, e));
+        error(System.lineSeparator() + GlobalUtils.getErrorMessageWithException(message, e));
     }
 
     public static void debug(String message) {
         if (Program.getMainFrame().getSettingsPanel().isDebug()) {
             insertString(message, Style.getMark());
+        }
+    }
+
+    public static void debug(String message, Exception e) {
+        if (Program.getMainFrame().getSettingsPanel().isDebug()) {
+            debug(System.lineSeparator() + GlobalUtils.getErrorMessageWithException(message, e));
         }
     }
 

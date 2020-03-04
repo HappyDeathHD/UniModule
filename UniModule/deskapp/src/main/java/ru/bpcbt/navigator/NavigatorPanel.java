@@ -11,7 +11,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -57,8 +56,8 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
 
         navigatorTree.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
-                final DefaultMutableTreeNode node =
-                        (DefaultMutableTreeNode) ((JTree) evt.getSource()).getLastSelectedPathComponent();
+                final LazyTreeNode node =
+                        (LazyTreeNode) ((JTree) evt.getSource()).getLastSelectedPathComponent();
                 if (node != null && evt.getClickCount() == 2 && node.isLeaf()) {
                     boolean confirmed = true;
                     if (isChanged) {

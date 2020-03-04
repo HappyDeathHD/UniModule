@@ -11,6 +11,8 @@ import java.util.Vector;
 
 public class ReservePanel extends BaseNavigatorTreePanel {
 
+    private final static String LOADING = "Загрузка...";
+
     private final JList<String> templates;
 
     public ReservePanel(Settings workingDirType) {
@@ -29,13 +31,12 @@ public class ReservePanel extends BaseNavigatorTreePanel {
 
     @Override
     public void selectTab() {
-        super.selectTab();
-        Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
-        if (templateIdMap != null && !templateIdMap.isEmpty()) {
-            Vector<String> templateNames = new Vector<>(templateIdMap.keySet());
-            templateNames.sort(String.CASE_INSENSITIVE_ORDER);
-            templates.setListData(templateNames);
-            splitPane.setDividerLocation(0.7);
+        if (navigatorTree.getModel() == null) {
+            super.refreshFiles();
+        }
+        if (templates.getModel().getSize() == 0
+                || (templates.getModel().getSize() == 1 && LOADING.equals(templates.getModel().getElementAt(0)))) {
+            fillTemplatesInBackground();
         }
     }
 
@@ -51,6 +52,25 @@ public class ReservePanel extends BaseNavigatorTreePanel {
 
     @Override
     public void repaintTextToDisplay() {
+    }
+
+    @Override
+    public void refreshFiles() {
+        super.refreshFiles();
+        fillTemplatesInBackground();
+    }
+
+    private void fillTemplatesInBackground() {
+        templates.setListData(new String[]{LOADING});
+        SwingUtilities.invokeLater(() -> {
+            Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
+            if (templateIdMap != null && !templateIdMap.isEmpty()) {
+                Vector<String> templateNames = new Vector<>(templateIdMap.keySet());
+                templateNames.sort(String.CASE_INSENSITIVE_ORDER);
+                templates.setListData(templateNames);
+                splitPane.setDividerLocation(0.7);
+            }
+        });
     }
 
     List<String> getSelectedTemplates() {

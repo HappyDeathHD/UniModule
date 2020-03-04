@@ -39,7 +39,7 @@ public class ReplaceTasksExecutor {
     public static void process(Set<File> files) {
         ReportPane.clearReport();
         GlobalUtils.setEnabledToProcessButtons(false);
-        Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
+        Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
         //не json
         final List<File> commonInputFiles = files.stream()
                 .filter(f -> !f.getPath().contains(FileUtils.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
@@ -163,11 +163,11 @@ public class ReplaceTasksExecutor {
         if (notFoundReplacements.isEmpty()) {
             if (foundReplacements.isEmpty()) {
                 ReportPane.warning(System.lineSeparator() + "Не было ни одного плейсхолдера!");
-                Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
+                Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 Narrator.warn("Не было ни одного плейсхолдера!");
             } else {
                 ReportPane.success(System.lineSeparator() + "Все необходимые модули были найдены (" + foundReplacements.size() + " шт.)");
-                Program.getMainFrame().setPaneTab(MainFrame.OUTPUTS_TAB);
+                Program.getMainFrame().selectPaneTab(MainFrame.OUTPUTS_TAB);
                 Narrator.success("Все готово без ошибок!");
             }
         } else {
@@ -175,7 +175,7 @@ public class ReplaceTasksExecutor {
                     + " шт) (" + foundReplacements.size() + " найдено):"
                     + System.lineSeparator() + notFoundReplacements.stream().map(Placeholder::toString)
                     .collect(Collectors.joining(System.lineSeparator())));
-            Program.getMainFrame().setPaneTab(MainFrame.REPORT_TAB);
+            Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
             Narrator.error("Все прошло не очень гладко!");
         }
         refresh();
