@@ -32,7 +32,7 @@ public class ReportPane extends JTextPane {
         insertString(message, null);
     }
 
-    public static void warning(String message) {
+    public static void warn(String message) {
         insertString(message, Style.getWarning());
     }
 

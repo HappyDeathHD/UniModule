@@ -12,8 +12,9 @@ import java.nio.file.Files;
 
 class UnimessageClient {
 
-    private final static String CRLF = "\r\n";
-    private final static String DOUBLE_LINE = "--";
+    private static final String API_TEMPLATES = "/api/v1.0/templates/";
+    private static final String CRLF = "\r\n";
+    private static final String DOUBLE_LINE = "--";
 
     private final String coreUrl;
     private String token;
@@ -49,12 +50,12 @@ class UnimessageClient {
     }
 
     private HttpURLConnection uploadFile(File file, long templateId, String language) throws IOException {
-        final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language + "/upload");
+        final URL uploadUri = new URL(coreUrl + API_TEMPLATES + templateId + "/markups/" + language + "/upload");
         final String boundary = Long.toHexString(System.currentTimeMillis());
 
         final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
         makeConnectionPostMultipart(connection, boundary);
-        connection.setRequestProperty("Authorization", "Bearer " + token);
+        setAuthorizationToConnection(connection);
 
         try (final DataOutputStream os = new DataOutputStream(connection.getOutputStream());
              final PrintWriter writer = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8), true)) {
@@ -72,11 +73,11 @@ class UnimessageClient {
     }
 
     private HttpURLConnection uploadFile(File file, long templateId, String language, String topic) throws IOException {
-        final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
+        final URL uploadUri = new URL(coreUrl + API_TEMPLATES + templateId + "/markups/" + language);
 
         final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
         makeConnectionPostJson(connection);
-        connection.setRequestProperty("Authorization", "Bearer " + token);
+        setAuthorizationToConnection(connection);
 
         try (final OutputStream os = connection.getOutputStream()) {
             final String params = JsonWriter.string()
@@ -94,7 +95,7 @@ class UnimessageClient {
         try {
             final URL uploadUri = new URL(coreUrl + "/api/v1.0/templates/headers");
             final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
-            connection.setRequestProperty("Authorization", "Bearer " + token);
+            setAuthorizationToConnection(connection);
             connection.setRequestProperty("Method", "GET");
 
             final int HttpResult = connection.getResponseCode();
@@ -113,9 +114,9 @@ class UnimessageClient {
 
     String getRawTemplateMarkups(Long templateId) {
         try {
-            final URL markupsUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups");
+            final URL markupsUri = new URL(coreUrl + API_TEMPLATES + templateId + "/markups");
             final HttpURLConnection connection = (HttpURLConnection) markupsUri.openConnection();
-            connection.setRequestProperty("Authorization", "Bearer " + token);
+            setAuthorizationToConnection(connection);
             connection.setRequestProperty("Method", "GET");
 
             final int HttpResult = connection.getResponseCode();
@@ -133,9 +134,9 @@ class UnimessageClient {
 
     String getRawMarkup(Long templateId, String language) {
         try {
-            final URL markupsUri = new URL(coreUrl + "/api/v1.0/templates/" + templateId + "/markups/" + language);
+            final URL markupsUri = new URL(coreUrl + API_TEMPLATES + templateId + "/markups/" + language);
             final HttpURLConnection connection = (HttpURLConnection) markupsUri.openConnection();
-            connection.setRequestProperty("Authorization", "Bearer " + token);
+            setAuthorizationToConnection(connection);
             connection.setRequestProperty("Method", "GET");
 
             final int HttpResult = connection.getResponseCode();
@@ -184,7 +185,7 @@ class UnimessageClient {
                 reader.close();
                 ReportPane.fine("Получен новый токен");
                 final String rawResponse = sb.toString().substring(sb.toString().indexOf("\"token\":\"")).substring(9);
-                token = rawResponse.substring(0, rawResponse.indexOf("\""));
+                token = rawResponse.substring(0, rawResponse.indexOf('\"'));
             } else {
                 ReportPane.error("Не удалось получить токен:" + System.lineSeparator() +
                         connection.getResponseCode() + " " + connection.getResponseMessage());
@@ -205,5 +206,9 @@ class UnimessageClient {
         connection.setDoOutput(true);
         connection.setDoInput(true);
         connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+    }
+
+    private void setAuthorizationToConnection(HttpURLConnection connection) {
+        connection.setRequestProperty("Authorization", "Bearer " + token);
     }
 }

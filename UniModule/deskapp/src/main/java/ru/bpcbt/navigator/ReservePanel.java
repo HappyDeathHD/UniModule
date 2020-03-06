@@ -11,13 +11,13 @@ import java.util.Vector;
 
 public class ReservePanel extends BaseNavigatorTreePanel {
 
-    private final static String LOADING = "Загрузка...";
+    private static final String LOADING = "Загрузка...";
 
     private final JList<String> templates;
 
     public ReservePanel(Settings workingDirType) {
         super(workingDirType);
-        //схемы с сервера
+        // Схемы с сервера
         final JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
         templates = new JList<>();
@@ -25,7 +25,7 @@ public class ReservePanel extends BaseNavigatorTreePanel {
         final JScrollPane scroll = new JScrollPane(templates);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         contentPanel.add(scroll);
-        //единение!
+        // Единение!
         addSplittedScrollAndContent(contentPanel);
     }
 
@@ -47,11 +47,11 @@ public class ReservePanel extends BaseNavigatorTreePanel {
     }
 
     @Override
-    public void saveCurrentFile() {
+    public void saveCurrentFile() { // No implementation necessary
     }
 
     @Override
-    public void repaintTextToDisplay() {
+    public void repaintTextToDisplay() { // No implementation necessary
     }
 
     @Override

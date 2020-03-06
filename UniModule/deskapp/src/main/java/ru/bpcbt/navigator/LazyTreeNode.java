@@ -80,7 +80,7 @@ class LazyTreeNode extends DefaultMutableTreeNode {
 
     private void setChildren(List<LazyTreeNode> children) {
         removeAllChildren();
-        setAllowsChildren(children.size() > 0);
+        setAllowsChildren(!children.isEmpty());
         for (MutableTreeNode node : children) {
             add(node);
         }

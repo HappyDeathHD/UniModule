@@ -46,7 +46,7 @@ public abstract class BaseNavigatorTreePanel extends JPanel implements Selectabl
             }
 
             @Override
-            public void treeWillCollapse(TreeExpansionEvent event) {
+            public void treeWillCollapse(TreeExpansionEvent event) { // No implementation necessary
             }
         });
 
@@ -117,6 +117,10 @@ public abstract class BaseNavigatorTreePanel extends JPanel implements Selectabl
         if (navigatorTree.getModel() == null) {
             refreshFiles();
         }
+    }
+
+    public void forceUpdateLater() {
+        navigatorTree.setModel(null);
     }
 
     public abstract void saveCurrentFile();

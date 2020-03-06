@@ -37,8 +37,8 @@ public class MainFrame extends JFrame {
 
     MainFrame() {
         setTitle("UniModule v" + Program.getSysProperty("version") + " built " + Program.getSysProperty("git.build.time"));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //Один из логгеров. Инициализируем вне очереди
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        // Один из логгеров. Инициализируем вне очереди
         reportPanel = new ReportPanel();
 
         tabbedPane = new JTabbedPane();
@@ -87,7 +87,7 @@ public class MainFrame extends JFrame {
                 return settingsPanel;
             case INFO_TAB:
                 return infoPanel;
-            default: // не достижимое состояние
+            default: // Не достижимое состояние
                 return settingsPanel;
         }
     }

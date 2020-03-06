@@ -33,7 +33,7 @@ public class InfoPanel extends JPanel implements SelectableTab {
     }
 
     @Override
-    public void selectTab() {
+    public void selectTab() {// No implementation necessary
     }
 
     private ColoredButton createButtonWithLink(String title, String url) {
@@ -44,7 +44,7 @@ public class InfoPanel extends JPanel implements SelectableTab {
                 Desktop.getDesktop().browse(URI.create(url));
             } catch (IOException ex) {
                 ex.printStackTrace();
-                ReportPane.debug("Не смог открыть ссылку", ex);
+                ReportPane.error("Не смог открыть ссылку", ex);
             }
         });
         Dimension size = new Dimension(200, 30);

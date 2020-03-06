@@ -7,11 +7,11 @@ import java.awt.*;
 
 public class MiniFrame {
 
-    private MiniFrame() {// Utils class
+    private MiniFrame() { // Utils class
     }
 
     public static boolean askForConfirmation(String message) {
-        return JOptionPane.showConfirmDialog(null, message) == 0;//0 — это ДА
+        return JOptionPane.showConfirmDialog(null, message) == 0; // 0 — это ДА
     }
 
     static void showUpdateMessage(String changelog) {
@@ -21,12 +21,12 @@ public class MiniFrame {
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(500, 500));
         scrollPane.setBorder(null);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JOptionPane op = new JOptionPane(scrollPane, JOptionPane.PLAIN_MESSAGE);
         JDialog dialog = op.createDialog("Обновление!");
         dialog.setAlwaysOnTop(false);
         dialog.setModal(false);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         ColoredButton confirmButton = new ColoredButton("Обновляемся!", Style.GREEN);
         confirmButton.addActionListener(e -> UpdateUtils.update());

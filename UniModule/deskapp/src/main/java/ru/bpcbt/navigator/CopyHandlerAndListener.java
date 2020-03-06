@@ -22,6 +22,7 @@ class CopyHandlerAndListener extends TransferHandler implements KeyListener {
         this.navigatorTree = navigatorTree;
     }
 
+    @Override
     public void exportToClipboard(JComponent comp, Clipboard clip, int action) {
         JTree tree = (JTree) comp;
         TreePath path = tree.getSelectionPath();
@@ -44,10 +45,10 @@ class CopyHandlerAndListener extends TransferHandler implements KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(KeyEvent e) { // No implementation necessary
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
+    public void keyReleased(KeyEvent e) { // No implementation necessary
     }
 }

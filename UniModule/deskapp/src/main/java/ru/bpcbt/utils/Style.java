@@ -47,7 +47,7 @@ public class Style {
         StyleConstants.setBackground(mark, BLUE_B);
     }
 
-    private Style() {// Utils class
+    private Style() { // Utils class
     }
 
     public static UIManager.LookAndFeelInfo[] getLafs() {

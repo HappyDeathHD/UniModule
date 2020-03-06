@@ -14,7 +14,7 @@ public class Narrator {
         label.setOpaque(true);
     }
 
-    private Narrator() {//Utils class
+    private Narrator() { //Utils class
     }
 
     public static JLabel getLabel() {

@@ -25,21 +25,25 @@ public class UpdateUtils {
     }
 
     public static void checkForUpdate() {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                FileUtils.deleteIfExists(UPDATER_NAME);
-                String rawJson = new Scanner(new URL(COMMIT_CHECK_URL).openStream(), "UTF-8").useDelimiter("\\A").next();
-                final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
-                String changelog = obj.getObject("commit").getString("message");
-                String penultSha = obj.getArray("parents").getObject(0).getString("sha");
-                if (!penultSha.equals(Program.getSysProperty("git.commit.id"))) {
-                    Narrator.warn("Версия приложения устарела!");
-                    MiniFrame.showUpdateMessage(changelog);
+        new SwingWorker() {
+            @Override
+            protected Object doInBackground() {
+                try (Scanner scanner = new Scanner(new URL(COMMIT_CHECK_URL).openStream(), "UTF-8")) {
+                    FileUtils.deleteIfExists(UPDATER_NAME);
+                    String rawJson = scanner.useDelimiter("\\A").next();
+                    final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
+                    String changelog = obj.getObject("commit").getString("message");
+                    String penultSha = obj.getArray("parents").getObject(0).getString("sha");
+                    if (!penultSha.equals(Program.getSysProperty("git.commit.id"))) {
+                        Narrator.warn("Версия приложения устарела!");
+                        MiniFrame.showUpdateMessage(changelog);
+                    }
+                } catch (IOException | JsonParserException e) {
+                    Narrator.yell("Не удалось обновиться :( ", e);
                 }
-            } catch (IOException | JsonParserException e) {
-                Narrator.yell("Не удалось обновиться :( ", e);
+                return null;
             }
-        });
+        }.execute();
     }
 
     static void update() {
