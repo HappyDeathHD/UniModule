@@ -38,6 +38,17 @@ public class GlobalUtils {
         mainFrame.getModulesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
         mainFrame.getOutputFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
         mainFrame.getReserveFilesPanel().getButtonsPanel().setEnabledToProcessButtons(isEnabled);
+        mainFrame.getReportPanel().setEnabledToStopButton(!isEnabled);
+    }
+
+    public static void emergencyBrake() {
+        if (ReplaceTasksExecutor.stop()) {
+            ReportPane.error("Сборка была прервана!");
+        } else if (UnimessageConductor.stop()) {
+            ReportPane.error("Взаимодействие с сервером было прервано!");
+        } else {
+            ReportPane.error("Ничего не было прервано!");
+        }
     }
 
     public static String getErrorMessageWithException(String message, Exception e) {

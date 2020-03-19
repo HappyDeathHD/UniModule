@@ -1,5 +1,6 @@
 package ru.bpcbt.utils;
 
+import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.misc.ColoredButton;
 
 import javax.swing.*;
@@ -14,7 +15,8 @@ public class MiniFrame {
         return JOptionPane.showConfirmDialog(null, message) == 0; // 0 — это ДА
     }
 
-    static void showUpdateMessage(String changelog) {
+    static void showUpdateMessage(String changelog, boolean isForce) {
+        Narrator.warn("Версия приложения устарела!");
         JLabel textArea = new JLabel("<html><body style='height:380px'>"
                 + "<h2>Появилась новая версия<br/>с фиксом старых/добавлением новых багов:</h2><br/>"
                 + "<div style='width:380px;margin:0 auto;'>" + changelog + "</div></body></html>");
@@ -25,8 +27,12 @@ public class MiniFrame {
         JOptionPane op = new JOptionPane(scrollPane, JOptionPane.PLAIN_MESSAGE);
         JDialog dialog = op.createDialog("Обновление!");
         dialog.setAlwaysOnTop(false);
-        dialog.setModal(false);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setModal(isForce);
+        if (isForce) {
+            dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        } else {
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        }
 
         ColoredButton confirmButton = new ColoredButton("Обновляемся!", Style.GREEN);
         confirmButton.addActionListener(e -> UpdateUtils.update());

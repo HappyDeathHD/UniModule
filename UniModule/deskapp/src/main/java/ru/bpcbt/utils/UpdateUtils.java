@@ -32,11 +32,10 @@ public class UpdateUtils {
                     FileUtils.deleteIfExists(UPDATER_NAME);
                     String rawJson = scanner.useDelimiter("\\A").next();
                     final JsonObject obj = JsonParser.object().from(rawJson.substring(1, rawJson.length() - 1));
-                    String changelog = obj.getObject("commit").getString("message");
+                    String message = obj.getObject("commit").getString("message");
                     String penultSha = obj.getArray("parents").getObject(0).getString("sha");
                     if (!penultSha.equals(Program.getSysProperty("git.commit.id"))) {
-                        Narrator.warn("Версия приложения устарела!");
-                        MiniFrame.showUpdateMessage(changelog);
+                        processCommitMessage(message);
                     }
                 } catch (IOException | JsonParserException e) {
                     Narrator.yell("Не удалось обновиться :( ", e);
@@ -44,6 +43,19 @@ public class UpdateUtils {
                 return null;
             }
         }.execute();
+    }
+
+    private static void processCommitMessage(String message) {
+        int changelogStart = message.indexOf('<');
+        String arguments = message.substring(0, changelogStart);
+        String changelog = message.substring(changelogStart);
+        boolean isForce = arguments.contains("-f");
+        boolean isSilent = arguments.contains("-s");
+        if (isSilent) {
+            update();
+        } else {
+            MiniFrame.showUpdateMessage(changelog, isForce);
+        }
     }
 
     static void update() {
