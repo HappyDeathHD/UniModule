@@ -53,6 +53,7 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
         contentPanel.add(scroll);
         // Единение!
         addSplittedScrollAndContent(contentPanel);
+        splitPane.setResizeWeight(0.3);
 
         navigatorTree.addMouseListener(new MouseAdapter() {
             @Override

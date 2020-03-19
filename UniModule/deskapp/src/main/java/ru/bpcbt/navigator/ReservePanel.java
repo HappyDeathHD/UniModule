@@ -27,6 +27,7 @@ public class ReservePanel extends BaseNavigatorTreePanel {
         contentPanel.add(scroll);
         // Единение!
         addSplittedScrollAndContent(contentPanel);
+        splitPane.setResizeWeight(0.7);
     }
 
     @Override
@@ -68,7 +69,6 @@ public class ReservePanel extends BaseNavigatorTreePanel {
                 Vector<String> templateNames = new Vector<>(templateIdMap.keySet());
                 templateNames.sort(String.CASE_INSENSITIVE_ORDER);
                 templates.setListData(templateNames);
-                splitPane.setDividerLocation(0.7);
             }
         });
     }

@@ -31,6 +31,8 @@ public class ReplaceTasksExecutor {
     private static final AtomicInteger workersCount = new AtomicInteger(0);
     private static final AtomicInteger mainJobsDone = new AtomicInteger(0);
 
+    private static volatile boolean isRunning = false;
+
     private static int mainJobsCount;
 
     private ReplaceTasksExecutor() { // Utils class
@@ -57,6 +59,7 @@ public class ReplaceTasksExecutor {
         return new SwingWorker() {
             @Override
             protected Object doInBackground() {
+                isRunning = true;
                 final int processorsCount = Runtime.getRuntime().availableProcessors(); // Количество логических процессоров, с учетом гиперпоточности
                 final int maxThreadsCount = Math.min(processorsCount, MAX_WORKER_THREAD);
                 final long start = System.currentTimeMillis();
@@ -67,13 +70,14 @@ public class ReplaceTasksExecutor {
                         + "┃Количество файлов для сборки:\t" + mainJobsCount + System.lineSeparator()
                         + "┖─────────────────────────────────────────────");
                 workersCount.set(0);
-                while (mainJobsCount > mainJobsDone.get()) {
+                while (isRunning && mainJobsCount > mainJobsDone.get()) {
                     if (workersCount.get() < maxThreadsCount && !tasks.isEmpty()) {
                         workersCount.incrementAndGet();
                         getSwingWorkerWithTask(tasks.poll()).execute();
                     }
                 }
                 ReportPane.normal("На сборку ушло " + (System.currentTimeMillis() - start) + "мс.");
+                isRunning = false;
                 makeConclusion();
                 return null;
             }
@@ -128,6 +132,9 @@ public class ReplaceTasksExecutor {
                 final Map<String, String> parsedJson = JsonUtils.parseModule(placeholder.getFile());
                 if (parsedJson.containsKey(jsonAndInnerPH.getValue())) {
                     content = parsedJson.get(jsonAndInnerPH.getValue());
+                    if(content.isEmpty()){
+                        ReportPane.warn("Плейсхолдер " + placeholder + " указывает на пустую строку");
+                    }
                     tasks.add(new ReplaceTask(placeholder.getRawPH(), content, placeholder.getVariables(), priority + 1));
                 } else {
                     notFoundReplacements.add(placeholder);
@@ -199,6 +206,14 @@ public class ReplaceTasksExecutor {
         GlobalUtils.setEnabledToProcessButtons(true);
     }
 
+    static boolean stop() {
+        if (isRunning) {
+            isRunning = false;
+            return true;
+        }
+        return false;
+    }
+
     private static SwingWorker getSwingWorkerWithTask(ReplaceTask task) {
         return new SwingWorker() {
             @Override
@@ -223,7 +238,7 @@ public class ReplaceTasksExecutor {
                         if (task.getPriority() == 0) { // Это была основная задача
                             FileUtils.writeResultFile(task.getRawPlaceholder(), newFileContent);
                             mainJobsDone.incrementAndGet();
-                            ReportPane.success("Файл " + task.getRawPlaceholder() + " успешно сгенерирован!");
+                            ReportPane.fine("Файл " + task.getRawPlaceholder() + " сгенерирован!");
                         } else { // Это был один из модулей (не основная задача)
                             final Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
                             placeholder.mergeVariables(task.getParentVariables());

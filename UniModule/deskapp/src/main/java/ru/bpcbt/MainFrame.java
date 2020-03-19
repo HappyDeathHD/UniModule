@@ -112,4 +112,8 @@ public class MainFrame extends JFrame {
     public SettingsPanel getSettingsPanel() {
         return settingsPanel;
     }
+
+    public ReportPanel getReportPanel() {
+        return reportPanel;
+    }
 }

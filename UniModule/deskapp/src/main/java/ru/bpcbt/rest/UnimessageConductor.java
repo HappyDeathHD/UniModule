@@ -26,6 +26,8 @@ public class UnimessageConductor {
     private static final Map<String, String> templateNameMap = new HashMap<>();
     private static int attemptsCount;
 
+    private static boolean isRunning = false;
+
     private UnimessageConductor() { // Utils class
     }
 
@@ -80,6 +82,7 @@ public class UnimessageConductor {
             @Override
             protected Object doInBackground() {
                 GlobalUtils.setEnabledToProcessButtons(false);
+                isRunning = true;
                 Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 if (files.isEmpty()) {
                     ReportPane.warn("Нечего грузить!");
@@ -95,17 +98,19 @@ public class UnimessageConductor {
                 int errorsCount = 0;
                 fillTemplates();
                 for (File file : files) {
-                    String templateName = getTemplateName(file);
-                    if (templateNameMap.containsKey(templateName)) {
-                        templateName = templateNameMap.get(templateName);
-                    }
-                    if (templateIdMap.containsKey(templateName)) {
-                        if (!upload(templateName, file)) {
+                    if (isRunning) {
+                        String templateName = getTemplateName(file);
+                        if (templateNameMap.containsKey(templateName)) {
+                            templateName = templateNameMap.get(templateName);
+                        }
+                        if (templateIdMap.containsKey(templateName)) {
+                            if (!upload(templateName, file)) {
+                                errorsCount++;
+                            }
+                        } else {
+                            ReportPane.error("Схема " + templateName + " (" + file.getName() + ")" + " не найдена");
                             errorsCount++;
                         }
-                    } else {
-                        ReportPane.error("Схема " + templateName + " (" + file.getName() + ")" + " не найдена");
-                        errorsCount++;
                     }
                 }
                 if (errorsCount == 0) {
@@ -117,6 +122,7 @@ public class UnimessageConductor {
                     Narrator.error(errorMessage);
                 }
                 GlobalUtils.setEnabledToProcessButtons(true);
+                isRunning = false;
                 return null;
             }
         };
@@ -129,6 +135,7 @@ public class UnimessageConductor {
             @Override
             protected Object doInBackground() {
                 GlobalUtils.setEnabledToProcessButtons(false);
+                isRunning = true;
                 Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 if (templates.isEmpty()) {
                     ReportPane.warn("Нечего резервировать! Проверь вкладку резервации!");
@@ -147,6 +154,7 @@ public class UnimessageConductor {
                 long start = System.currentTimeMillis();
                 final Date startDate = new Date(start);
                 ReportPane.normal("Начало выгрузки: " + startDate);
+                Narrator.normal("Резервирую верстки с сервера...");
                 try {
                     for (String templateName : templates) {
                         // Список языков версток шаблона
@@ -160,30 +168,32 @@ public class UnimessageConductor {
                         }
 
                         for (String language : languages) {
-                            final String rawMarkupsJson = client.getRawMarkup(templateId, language);
-                            if (rawMarkupsJson == null) {
-                                errorCount++;
-                                continue;
-                            }
-                            // Либа nanojson не вывозит значения в несколько сотен тысяч символов.
-                            int markupStart = rawMarkupsJson.indexOf("\"body\":\"");
-                            int markupEnd = rawMarkupsJson.lastIndexOf("\",\"fileName\":");
-                            if (markupStart != -1 && markupEnd == -1) { // Скорее всего верстка без имени
-                                markupEnd = rawMarkupsJson.lastIndexOf("\"}");
-                            }
-                            if (markupStart == -1 || markupEnd == -1) {
-                                ReportPane.error("Верстка шаблона " + templateName + " с языком " + language + " имеет неожиданный формат!");
-                                ReportPane.debug(rawMarkupsJson);
-                                errorCount++;
-                                continue;
-                            }
+                            if (isRunning) {
+                                final String rawMarkupsJson = client.getRawMarkup(templateId, language);
+                                if (rawMarkupsJson == null) {
+                                    errorCount++;
+                                    continue;
+                                }
+                                // Либа nanojson не вывозит значения в несколько сотен тысяч символов.
+                                int markupStart = rawMarkupsJson.indexOf("\"body\":\"");
+                                int markupEnd = rawMarkupsJson.lastIndexOf("\",\"fileName\":");
+                                if (markupStart != -1 && markupEnd == -1) { // Скорее всего верстка без имени
+                                    markupEnd = rawMarkupsJson.lastIndexOf("\"}");
+                                }
+                                if (markupStart == -1 || markupEnd == -1) {
+                                    ReportPane.error("Верстка шаблона " + templateName + " с языком " + language + " имеет неожиданный формат!");
+                                    ReportPane.debug(rawMarkupsJson);
+                                    errorCount++;
+                                    continue;
+                                }
 
-                            final String markup = rawMarkupsJson.substring(markupStart + 8, markupEnd);
-                            FileUtils.writeToPath(
-                                    Paths.get(reserveDir, osDateFormat.format(startDate), templateName,
-                                            templateName + "_" + language.toLowerCase() + ".html"),
-                                    GistUtils.unescapeJavaString(markup));
-                            ReportPane.success("Верстка шаблона " + templateName + " с языком " + language + " успешно сохранена!");
+                                final String markup = rawMarkupsJson.substring(markupStart + 8, markupEnd);
+                                FileUtils.writeToPath(
+                                        Paths.get(reserveDir, osDateFormat.format(startDate), templateName,
+                                                templateName + "_" + language.toLowerCase() + ".html"),
+                                        GistUtils.unescapeJavaString(markup));
+                                ReportPane.success("Верстка шаблона " + templateName + " с языком " + language + " успешно сохранена!");
+                            }
                         }
                     }
                     if (errorCount == 0) {
@@ -200,9 +210,18 @@ public class UnimessageConductor {
                     ReportPane.error("Ошибка в полученном json'e со схемами" + e.getMessage());
                 }
                 GlobalUtils.setEnabledToProcessButtons(true);
+                isRunning = false;
                 return null;
             }
         };
+    }
+
+    public static boolean stop() {
+        if (isRunning) {
+            isRunning = false;
+            return true;
+        }
+        return false;
     }
 
     private static void fillTemplates() {

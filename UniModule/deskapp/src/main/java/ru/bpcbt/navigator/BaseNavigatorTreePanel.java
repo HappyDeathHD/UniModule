@@ -62,7 +62,6 @@ public abstract class BaseNavigatorTreePanel extends JPanel implements Selectabl
         final JScrollPane scrollPane = new JScrollPane(navigatorTree);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                 scrollPane, contentPanel);
-        splitPane.setResizeWeight(0.5);
         splitPane.setOneTouchExpandable(true);
         splitPane.setContinuousLayout(true);
 

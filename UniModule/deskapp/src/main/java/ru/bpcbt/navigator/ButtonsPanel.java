@@ -43,7 +43,7 @@ public class ButtonsPanel extends JPanel {
             addReserveSelectedButton();
             addReserveAllButton();
         } catch (Exception e) {
-            Narrator.yell("Что-то пошло не так при отрисовке кнопок: ", e);
+            Narrator.yell("Что-то пошло не так при отрисовке кнопок:", e);
         }
     }
 
