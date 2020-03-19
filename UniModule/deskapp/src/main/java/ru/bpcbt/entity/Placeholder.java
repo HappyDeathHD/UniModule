@@ -57,7 +57,7 @@ public class Placeholder {
         String linkDelimiter = Delimiters.LINK_START_END.getSymbol();
         if (placeholder.endsWith(varDelimiter) && placeholder.contains("=")) {
             String subPH = placeholder.substring(0, placeholder.length() - varDelimiter.length());
-            if (subPH.endsWith(linkDelimiter)) { //это ссылка
+            if (subPH.endsWith(linkDelimiter)) { // Это ссылка
                 subPH = placeholder.substring(0, subPH.length() - linkDelimiter.length());
                 final int startValue = subPH.lastIndexOf(linkDelimiter);
                 final String linkValue = subPH.substring(startValue + linkDelimiter.length());
@@ -65,7 +65,7 @@ public class Placeholder {
                 final String keyValue = subPH.substring(startKey + varDelimiter.length()).split("=")[0];
                 links.put(keyValue, new Placeholder(linkValue));
                 setVariables(subPH.substring(0, startKey));
-            } else { //это обычная переменная
+            } else { // Это обычная переменная
                 final int start = subPH.lastIndexOf(varDelimiter);
                 final String rawVariable = subPH.substring(start + varDelimiter.length());
                 final String[] split = rawVariable.split("=");

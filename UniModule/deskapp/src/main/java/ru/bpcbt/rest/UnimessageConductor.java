@@ -20,8 +20,6 @@ import java.util.*;
 
 public class UnimessageConductor {
 
-    private static final SimpleDateFormat OS_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd_HH-mm-ss");
-
     private static UnimessageClient client;
     private static final Map<String, Long> templateIdMap = new HashMap<>();
     private static final Map<String, String> templateTopicMap = new HashMap<>();
@@ -84,7 +82,7 @@ public class UnimessageConductor {
                 GlobalUtils.setEnabledToProcessButtons(false);
                 Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 if (files.isEmpty()) {
-                    ReportPane.warning("Нечего грузить! Проверь вкладку результатов!");
+                    ReportPane.warn("Нечего грузить!");
                     Narrator.warn("Нечего грузить!");
                     GlobalUtils.setEnabledToProcessButtons(true);
                     return null;
@@ -133,7 +131,7 @@ public class UnimessageConductor {
                 GlobalUtils.setEnabledToProcessButtons(false);
                 Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 if (templates.isEmpty()) {
-                    ReportPane.warning("Нечего резервировать! Проверь вкладку резервации!");
+                    ReportPane.warn("Нечего резервировать! Проверь вкладку резервации!");
                     Narrator.warn("Нечего резервировать!");
                     GlobalUtils.setEnabledToProcessButtons(true);
                     return null;
@@ -144,12 +142,14 @@ public class UnimessageConductor {
                     return null;
                 }
                 final String reserveDir = Program.getProperties().get(Settings.RESERVE_DIR);
+                final SimpleDateFormat osDateFormat = new SimpleDateFormat("yyyy.MM.dd_HH-mm-ss");
+                int errorCount = 0;
                 long start = System.currentTimeMillis();
                 final Date startDate = new Date(start);
                 ReportPane.normal("Начало выгрузки: " + startDate);
                 try {
                     for (String templateName : templates) {
-                        //список языков версток шаблона
+                        // Список языков версток шаблона
                         final List<String> languages = new ArrayList<>();
                         final Long templateId = templateIdMap.get(templateName);
                         final String rawTemplatesJson = client.getRawTemplateMarkups(templateId);
@@ -161,28 +161,40 @@ public class UnimessageConductor {
 
                         for (String language : languages) {
                             final String rawMarkupsJson = client.getRawMarkup(templateId, language);
+                            if (rawMarkupsJson == null) {
+                                errorCount++;
+                                continue;
+                            }
                             // Либа nanojson не вывозит значения в несколько сотен тысяч символов.
                             int markupStart = rawMarkupsJson.indexOf("\"body\":\"");
                             int markupEnd = rawMarkupsJson.lastIndexOf("\",\"fileName\":");
-                            if (markupStart != -1 && markupEnd == -1) { //скорее всего верстка без имени
+                            if (markupStart != -1 && markupEnd == -1) { // Скорее всего верстка без имени
                                 markupEnd = rawMarkupsJson.lastIndexOf("\"}");
                             }
                             if (markupStart == -1 || markupEnd == -1) {
                                 ReportPane.error("Верстка шаблона " + templateName + " с языком " + language + " имеет неожиданный формат!");
                                 ReportPane.debug(rawMarkupsJson);
+                                errorCount++;
                                 continue;
                             }
 
                             final String markup = rawMarkupsJson.substring(markupStart + 8, markupEnd);
                             FileUtils.writeToPath(
-                                    Paths.get(reserveDir, OS_DATE_FORMAT.format(startDate), templateName,
+                                    Paths.get(reserveDir, osDateFormat.format(startDate), templateName,
                                             templateName + "_" + language.toLowerCase() + ".html"),
                                     GistUtils.unescapeJavaString(markup));
                             ReportPane.success("Верстка шаблона " + templateName + " с языком " + language + " успешно сохранена!");
                         }
                     }
-                    ReportPane.normal("Резервирование окончено!");
-                    Narrator.success("Резервирование окончено!");
+                    if (errorCount == 0) {
+                        String conclusionSuccess = "Резервирование окончено!";
+                        ReportPane.success(conclusionSuccess);
+                        Narrator.success(conclusionSuccess);
+                    } else {
+                        String conclusionWithErrors = "Резервирование окончено c ошибками! (" + errorCount + " шт.)";
+                        ReportPane.warn(conclusionWithErrors);
+                        Narrator.warn(conclusionWithErrors);
+                    }
                     Program.getMainFrame().getReserveFilesPanel().refreshFiles();
                 } catch (JsonParserException e) {
                     ReportPane.error("Ошибка в полученном json'e со схемами" + e.getMessage());
@@ -252,7 +264,7 @@ public class UnimessageConductor {
             return true;
         } else if (httpResult == HttpURLConnection.HTTP_FORBIDDEN || httpResult == HttpURLConnection.HTTP_UNAUTHORIZED) {
             if (++attemptsCount <= 1) {
-                ReportPane.warning("Похоже что-то с токеном, попробую обновить");
+                ReportPane.warn("Похоже что-то с токеном, попробую обновить");
                 if (!checkAndPrepareConnectionSettings()) {
                     return false;
                 } else {

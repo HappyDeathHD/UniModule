@@ -10,15 +10,15 @@ import java.awt.*;
 
 public class GlobalUtils {
 
-    private GlobalUtils() { //Utils class
+    private GlobalUtils() { // Utils class
     }
 
     public static void refreshAllFiles() {
         MainFrame mainFrame = Program.getMainFrame();
-        mainFrame.getInputFilesPanel().refreshFiles();
-        mainFrame.getModulesPanel().refreshFiles();
-        mainFrame.getOutputFilesPanel().refreshFiles();
-        mainFrame.getReserveFilesPanel().refreshFiles();
+        mainFrame.getInputFilesPanel().forceUpdateLater();
+        mainFrame.getModulesPanel().forceUpdateLater();
+        mainFrame.getOutputFilesPanel().forceUpdateLater();
+        mainFrame.getReserveFilesPanel().forceUpdateLater();
         ReplaceTasksExecutor.refresh();
         UnimessageConductor.refresh();
     }

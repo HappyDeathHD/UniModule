@@ -28,8 +28,7 @@ public class FileUtils {
     private static final String CONFIGURATION_DIR = System.getProperty("user.home") + File.separator + "UniModule";
     private static final String CONFIGURATION_FILE = CONFIGURATION_DIR + File.separator + "configurations.xml";
 
-    private FileUtils() {
-        // Utils class
+    private FileUtils() { // Utils class
     }
 
     public static boolean isFileExists(String pathToFile) {
@@ -112,7 +111,7 @@ public class FileUtils {
             fileProcessStatus.put(file, true);
             return content;
         } else {
-            while (!fileProcessStatus.get(file)) {
+            while (Boolean.FALSE.equals(fileProcessStatus.get(file))) { // Кто-то уже работает над этим. Ждем
             }
             return cachedFiles.get(file);
         }
@@ -170,7 +169,7 @@ public class FileUtils {
         return null;
     }
 
-    public static HashMap<String, String> getVariableMapWithLocale(String fileName) {
+    public static Map<String, String> getVariableMapWithLocale(String fileName) {
         String language = FileUtils.getLanguage(fileName);
         HashMap<String, String> variables = new HashMap<>();
         if (language != null) {

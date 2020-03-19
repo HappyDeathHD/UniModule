@@ -20,7 +20,7 @@ public class JsonUtils {
     private static final Map<File, Map<String, String>> cachedJson = new HashMap<>();
     private static final Map<File, Boolean> jsonProcessStatus = new ConcurrentHashMap<>();
 
-    private JsonUtils() { //Utils class
+    private JsonUtils() { // Utils class
     }
 
     /**
@@ -43,7 +43,7 @@ public class JsonUtils {
             jsonProcessStatus.put(file, true);
             return result;
         } else {
-            while (!jsonProcessStatus.get(file)) {
+            while (Boolean.FALSE.equals(jsonProcessStatus.get(file))) { // Кто-то уже работает над этим. Ждем
             }
             return cachedJson.get(file);
         }
@@ -106,7 +106,7 @@ public class JsonUtils {
         for (Map.Entry<String, Object> jInputs : jsonObject.entrySet()) {
             for (Map.Entry<String, Object> jOutputs : ((JsonObject) jInputs.getValue()).entrySet()) {
                 File file = Paths.get(Program.getProperties().get(Settings.MODULE_DIR), FileUtils.separatePlaceholders(jInputs.getKey())).toFile();
-                final HashMap<String, String> variables = FileUtils.getVariableMapWithLocale(jOutputs.getKey());
+                final Map<String, String> variables = FileUtils.getVariableMapWithLocale(jOutputs.getKey());
                 for (Map.Entry<String, Object> jVariables : ((JsonObject) jOutputs.getValue()).entrySet()) {
                     variables.put(jVariables.getKey(), String.valueOf(jVariables.getValue()));
                 }

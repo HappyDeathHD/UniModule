@@ -42,10 +42,16 @@ public class SettingsPanel extends JPanel implements SelectableTab {
         fonts = GraphicsEnvironment
                 .getLocalGraphicsEnvironment()
                 .getAvailableFontFamilyNames();
-        addOptionDir(Settings.INPUT_DIR, inputDirTF = new JTextField());
-        addOptionDir(Settings.MODULE_DIR, modulesDirTF = new JTextField());
-        addOptionDir(Settings.OUTPUT_DIR, outputDirTF = new JTextField());
-        addOptionDir(Settings.RESERVE_DIR, reserveDirTF = new JTextField());
+
+        inputDirTF = new JTextField();
+        addOptionDir(Settings.INPUT_DIR, inputDirTF);
+        modulesDirTF = new JTextField();
+        addOptionDir(Settings.MODULE_DIR, modulesDirTF);
+        outputDirTF = new JTextField();
+        addOptionDir(Settings.OUTPUT_DIR, outputDirTF);
+        reserveDirTF = new JTextField();
+        addOptionDir(Settings.RESERVE_DIR, reserveDirTF);
+
         addFontSelector();
         addLookAndFeelSelector();
         addApiBlock();
@@ -262,6 +268,6 @@ public class SettingsPanel extends JPanel implements SelectableTab {
     }
 
     @Override
-    public void selectTab() {
+    public void selectTab() { // No implementation necessary
     }
 }

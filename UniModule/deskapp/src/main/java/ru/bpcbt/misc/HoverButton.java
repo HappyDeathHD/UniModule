@@ -29,6 +29,7 @@ public class HoverButton extends JButton implements MouseListener {
         repaint();
     }
 
+    @Override
     public void paintComponent(java.awt.Graphics g) {
         java.awt.Graphics2D g2 = (java.awt.Graphics2D) g;
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, currentTransparency));
@@ -69,14 +70,14 @@ public class HoverButton extends JButton implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent e) { // No implementation necessary
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e) { // No implementation necessary
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseReleased(MouseEvent e) { // No implementation necessary
     }
 }

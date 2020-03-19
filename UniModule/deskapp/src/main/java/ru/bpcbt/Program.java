@@ -23,13 +23,7 @@ public class Program {
         SwingUtilities.invokeLater(() -> {
             try {
                 properties = FileUtils.getProperties();
-                if (properties.containsKey(STYLE)) {
-                    try {
-                        UIManager.setLookAndFeel(Style.getLafs()[Integer.parseInt(properties.get(STYLE))].getClassName());
-                    } catch (Exception e) {
-                        Narrator.yell("Ошибка при применении стиля", e);
-                    }
-                }
+                setLookAndFeel();
                 GlobalUtils.makeSovietRussiaButtons();
                 mainFrame = new MainFrame();
                 mainFrame.getSettingsPanel().loadConfigurations();
@@ -60,5 +54,15 @@ public class Program {
         } catch (Exception ignored) {
         }
         return null;
+    }
+
+    private static void setLookAndFeel() {
+        if (properties.containsKey(STYLE)) {
+            try {
+                UIManager.setLookAndFeel(Style.getLafs()[Integer.parseInt(properties.get(STYLE))].getClassName());
+            } catch (Exception e) {
+                Narrator.yell("Ошибка при применении стиля", e);
+            }
+        }
     }
 }

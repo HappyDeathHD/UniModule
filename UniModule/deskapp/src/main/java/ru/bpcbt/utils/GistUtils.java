@@ -87,7 +87,7 @@ public class GistUtils {
                         sb.append(Character.toChars(code));
                         i += 5;
                         continue;
-                    default: //this should never happen
+                    default: // This should never happen
                 }
                 i++;
             }

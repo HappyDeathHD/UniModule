@@ -40,13 +40,13 @@ public class ReplaceTasksExecutor {
         ReportPane.clearReport();
         GlobalUtils.setEnabledToProcessButtons(false);
         Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
-        //не json
+        // не json
         final List<File> commonInputFiles = files.stream()
                 .filter(f -> !f.getPath().contains(FileUtils.CONFLICT_PREFIX) && !f.getPath().contains(".json"))
                 .collect(Collectors.toList());
         commonInputFiles.stream().map(file -> new ReplaceTask(cutThePath(file), FileUtils.readFile(file), FileUtils.getVariableMapWithLocale(file.getName())))
                 .forEach(tasks::add);
-        //json
+        // json
         files.stream().filter(f -> f.getPath().contains(".json")).forEach(file -> tasks.addAll(JsonUtils.parseSkeleton(file)));
         mainJobsCount = ReplaceTasksExecutor.tasks.size();
         Narrator.normal("Сейчас мы соберем " + mainJobsCount + " файл(-ов)");
@@ -57,7 +57,7 @@ public class ReplaceTasksExecutor {
         return new SwingWorker() {
             @Override
             protected Object doInBackground() {
-                final int processorsCount = Runtime.getRuntime().availableProcessors(); //кол-во ядер (x2 при поддержке гиперпоточности)
+                final int processorsCount = Runtime.getRuntime().availableProcessors(); // Количество логических процессоров, с учетом гиперпоточности
                 final int maxThreadsCount = Math.min(processorsCount, MAX_WORKER_THREAD);
                 final long start = System.currentTimeMillis();
                 ReportPane.normal("┎─────────────────────────────────────────────" + System.lineSeparator()
@@ -101,19 +101,26 @@ public class ReplaceTasksExecutor {
     }
 
     private static String getContentForPlaceholder(Placeholder placeholder, int priority) {
+        // Для плейсхолдера-переменной подставляем значение
         if (placeholder.isVariable()) {
             final String variable = placeholder.getVariableWithReplaces();
-            if (variable.startsWith(Delimiters.START_END.getSymbol())) { // не все переменные были определены
+            if (variable.startsWith(Delimiters.START_END.getSymbol())) {
                 notFoundReplacements.add(placeholder);
-                ReportPane.warning("Не все переменные плейсхолдера " + placeholder + " были определены");
+                ReportPane.warn("Не все переменные плейсхолдера " + placeholder + " были определены");
             }
             return variable;
         }
+        // Для плейсхолдеров, указывающих на файл отдаем уже найденную замену
         if (foundReplacements.containsKey(placeholder)) {
             return foundReplacements.get(placeholder);
         } else if (notFoundReplacements.contains(placeholder)) {
             return placeholder.wrapPH();
         }
+        // Если замена еще не найдена, то ищем
+        return getPlaceholderContentFromFile(placeholder, priority);
+    }
+
+    private static String getPlaceholderContentFromFile(Placeholder placeholder, int priority) {
         if (FileUtils.isFileExists(placeholder.getFile())) {
             String content;
             if (placeholder.isJson()) {
@@ -162,7 +169,7 @@ public class ReplaceTasksExecutor {
         Program.getMainFrame().getOutputFilesPanel().refreshFiles();
         if (notFoundReplacements.isEmpty()) {
             if (foundReplacements.isEmpty()) {
-                ReportPane.warning(System.lineSeparator() + "Не было ни одного плейсхолдера!");
+                ReportPane.warn(System.lineSeparator() + "Не было ни одного плейсхолдера!");
                 Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 Narrator.warn("Не было ни одного плейсхолдера!");
             } else {
@@ -212,7 +219,7 @@ public class ReplaceTasksExecutor {
                             jobDone = false;
                         }
                     }
-                    if (jobDone) { // если плесхолдеров нет или для всех них готовы замены
+                    if (jobDone) { // Если плесхолдеров нет или для всех них готовы замены
                         if (task.getPriority() == 0) { // Это была основная задача
                             FileUtils.writeResultFile(task.getRawPlaceholder(), newFileContent);
                             mainJobsDone.incrementAndGet();
@@ -221,9 +228,9 @@ public class ReplaceTasksExecutor {
                             final Placeholder placeholder = new Placeholder(task.getRawPlaceholder());
                             placeholder.mergeVariables(task.getParentVariables());
                             foundReplacements.put(placeholder, newFileContent);
-                            ReportPane.debug("Плейсхолдер " + placeholder + " успешно собран"); //узкое место
+                            ReportPane.debug("Плейсхолдер " + placeholder + " успешно собран"); // Узкое место
                         }
-                    } else {
+                    } else { // Если задачу нельзя завершить (не все дочерние задачи выполнены), то откладываем ее на потом
                         tasks.add(new ReplaceTask(task.getRawPlaceholder(), newFileContent, task.getParentVariables(), task.getPriority()));
                     }
                 } catch (Exception e) {

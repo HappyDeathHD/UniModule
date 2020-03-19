@@ -18,6 +18,6 @@ public class ReportPanel extends JPanel implements SelectableTab {
     }
 
     @Override
-    public void selectTab() {
+    public void selectTab() { // No implementation necessary
     }
 }

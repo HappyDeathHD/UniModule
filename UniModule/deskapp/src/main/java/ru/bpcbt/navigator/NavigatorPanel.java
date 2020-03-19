@@ -51,10 +51,11 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
         final JScrollPane scroll = new JScrollPane(display);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         contentPanel.add(scroll);
-        //единение!
+        // Единение!
         addSplittedScrollAndContent(contentPanel);
 
         navigatorTree.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent evt) {
                 final LazyTreeNode node =
                         (LazyTreeNode) ((JTree) evt.getSource()).getLastSelectedPathComponent();
@@ -77,7 +78,7 @@ public class NavigatorPanel extends BaseNavigatorTreePanel {
 
     private void insertString(String message, SimpleAttributeSet simpleAttributeSet) {
         try {
-            //костыль, призванный убрать бесконечное дублирование CR+LF и CR. Актуально для винды, не тестилось на других системах.
+            // Костыль, призванный убрать бесконечное дублирование CR+LF и CR. Актуально для винды
             final String crlfNormalizedMessage = message.replace(System.lineSeparator(), "\n");
             display.getStyledDocument().insertString(display.getStyledDocument().getLength(),
                     crlfNormalizedMessage, simpleAttributeSet);
