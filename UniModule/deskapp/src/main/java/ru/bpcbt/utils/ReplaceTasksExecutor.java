@@ -219,6 +219,7 @@ public class ReplaceTasksExecutor {
             @Override
             protected Object doInBackground() {
                 try {
+                    ReportPane.debug("Начал работу над " + task.getRawPlaceholder());
                     String newFileContent = task.getContent();
                     boolean jobDone = true;
                     for (Placeholder placeholder : getAllPlaceholders(newFileContent)) {

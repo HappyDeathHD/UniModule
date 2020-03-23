@@ -1,5 +1,6 @@
 package ru.bpcbt.utils;
 
+import ru.bpcbt.Program;
 import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.misc.ColoredButton;
 
@@ -17,6 +18,7 @@ public class MiniFrame {
 
     static void showUpdateMessage(String changelog, boolean isForce) {
         Narrator.warn("Версия приложения устарела!");
+        Program.getMainFrame().setTitle(Program.getMainFrame().getTitle() + " [Устаревшая версия]");
         JLabel textArea = new JLabel("<html><body style='height:380px'>"
                 + "<h2>Появилась новая версия<br/>с фиксом старых/добавлением новых багов:</h2><br/>"
                 + "<div style='width:380px;margin:0 auto;'>" + changelog + "</div></body></html>");
@@ -24,6 +26,7 @@ public class MiniFrame {
         scrollPane.setPreferredSize(new Dimension(500, 500));
         scrollPane.setBorder(null);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(8);
         JOptionPane op = new JOptionPane(scrollPane, JOptionPane.PLAIN_MESSAGE);
         JDialog dialog = op.createDialog("Обновление!");
         dialog.setAlwaysOnTop(false);
