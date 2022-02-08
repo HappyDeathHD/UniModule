@@ -56,6 +56,16 @@ public class Program {
         return null;
     }
 
+    public static Properties getUpdateProperties() {
+        try {
+            Properties properties = new Properties();
+            properties.load(Program.class.getClassLoader().getResourceAsStream("update.properties"));
+            return properties;
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
     private static void setLookAndFeel() {
         if (properties.containsKey(STYLE)) {
             try {

@@ -73,6 +73,7 @@ public abstract class BaseNavigatorTreePanel extends JPanel implements Selectabl
         if (workingDir == null) {
             Narrator.yell("Необходимо выбрать директорию в настройках");
             Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
+            return;
         }
         File workingFile = new File(workingDir);
         final LazyTreeNode root = new LazyTreeNode(workingFile);

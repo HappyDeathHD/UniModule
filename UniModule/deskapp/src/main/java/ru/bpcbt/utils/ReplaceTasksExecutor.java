@@ -1,6 +1,5 @@
 package ru.bpcbt.utils;
 
-import javafx.util.Pair;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.entity.ReplaceTask;
@@ -8,6 +7,7 @@ import ru.bpcbt.logger.Narrator;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.misc.Delimiters;
 import ru.bpcbt.entity.Placeholder;
+import ru.bpcbt.misc.Pair;
 import ru.bpcbt.settings.Settings;
 
 import javax.swing.*;
