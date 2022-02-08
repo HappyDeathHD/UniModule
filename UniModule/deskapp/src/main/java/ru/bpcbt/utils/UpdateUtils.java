@@ -13,13 +13,25 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class UpdateUtils {
 
-    private static final String UPDATER_URL = "https://github.com/HappyDeathHD/UniModule/raw/master/UniModule/updater/target/Updater.jar";
     private static final String UPDATER_NAME = "Updater.jar";
-    private static final String COMMIT_CHECK_URL = "https://api.github.com/repos/HappyDeathHD/UniModule/commits?path=UniModule/deskapp/target/UniModule.jar&page=1&per_page=1";
+    private static final String COMMIT_CHECK_URL;
+    private static final String UPDATER_URL;
+
+    static {
+        Properties properties = Program.getUpdateProperties();
+        if (properties != null) {
+            COMMIT_CHECK_URL = properties.getProperty("update.commit.check");
+            UPDATER_URL = properties.getProperty("update.url");
+        } else {
+            COMMIT_CHECK_URL = null;
+            UPDATER_URL = null;
+        }
+    }
 
     private UpdateUtils() { // Utils class
     }
