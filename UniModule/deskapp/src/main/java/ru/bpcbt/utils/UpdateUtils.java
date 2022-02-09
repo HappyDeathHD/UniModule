@@ -37,6 +37,9 @@ public class UpdateUtils {
     }
 
     public static void checkForUpdate() {
+        if (COMMIT_CHECK_URL == null || UPDATER_URL == null){
+            return;
+        }
         new SwingWorker() {
             @Override
             protected Object doInBackground() {
@@ -71,6 +74,9 @@ public class UpdateUtils {
     }
 
     static void update() {
+        if (COMMIT_CHECK_URL == null || UPDATER_URL == null){
+            return;
+        }
         try {
             InputStream in = new URL(UPDATER_URL).openStream();
             Files.copy(in, Paths.get(UPDATER_NAME), StandardCopyOption.REPLACE_EXISTING);

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>UniModule</artifactId>
         <groupId>bpcbt</groupId>
-        <version>0.1.2</version>
+        <version>0.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -93,7 +93,7 @@
                     <dependency>
                         <groupId>net.sf.proguard</groupId>
                         <artifactId>proguard-base</artifactId>
-                        <version>5.2.1</version>
+                        <version>6.2.2</version>
                         <scope>runtime</scope>
                     </dependency>
                 </dependencies>
@@ -106,7 +106,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <proguardVersion>5.2.1</proguardVersion>
+                    <proguardVersion>6.2.2</proguardVersion>
                     <obfuscate>true</obfuscate>
                     <injar>${project.build.finalName}-jar-with-dependencies.jar</injar>
                     <outjar>UniModule.jar</outjar>
