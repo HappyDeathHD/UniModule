@@ -270,10 +270,21 @@ public class UnimessageConductor {
     }
 
     private static boolean upload(String templateName, File file) {
-        final String language = getLanguage(file.getName());
-        if (language == null) {
-            return false;
+        if (file.getName().contains(".groovy")) {
+            return uploadGroovy(templateName, file);
         }
+        if (file.getName().equals("config.json")) {
+           return uploadConfig(templateName, file);
+        }
+        final String language = getLanguage(file.getName());
+        if (language != null) {
+            return uploadMakeup(templateName, file, language);
+        }
+        ReportPane.warn(file.getName() + " имеет неопознанный тип");
+        return false;
+    }
+
+    private static boolean uploadMakeup(String templateName, File file, String language) {
         final long templateId = templateIdMap.get(templateName);
         String topic = templateTopicMap.get(templateName + language.toUpperCase());
         ReportPane.normal("Начинаю загрузку " + file.getName() + " в " + templateName + "(" + templateId + ") c языком " + language);
@@ -281,14 +292,41 @@ public class UnimessageConductor {
         if (httpResult == HttpURLConnection.HTTP_OK) {
             ReportPane.success(file.getName() + " успешно загрузился");
             return true;
-        } else if (httpResult == HttpURLConnection.HTTP_FORBIDDEN || httpResult == HttpURLConnection.HTTP_UNAUTHORIZED) {
+        } else if (isNeedRetry(httpResult)) {
+            return uploadMakeup(templateName, file, language);
+        }
+        return false;
+    }
+
+    private static boolean uploadGroovy(String templateName, File file) {
+        final long templateId = templateIdMap.get(templateName);
+        int httpResult = client.uploadScript(file, templateId);
+        if (httpResult == HttpURLConnection.HTTP_OK) {
+            ReportPane.success("Скрипт " + templateName + " успешно загрузился");
+            return true;
+        } else if (isNeedRetry(httpResult)) {
+            return uploadGroovy(templateName, file);
+        }
+        return true;
+    }
+
+    private static boolean uploadConfig(String templateName, File file) {
+        final long templateId = templateIdMap.get(templateName);
+        int httpResult = client.uploadConfig(file, templateId);
+        if (httpResult == HttpURLConnection.HTTP_OK) {
+            ReportPane.success("Конфиг " + templateName + " успешно загрузился");
+            return true;
+        } else if (isNeedRetry(httpResult)) {
+            return uploadConfig(templateName, file);
+        }
+        return true;
+    }
+
+    private static boolean isNeedRetry(int httpResult) {
+        if (httpResult == HttpURLConnection.HTTP_FORBIDDEN || httpResult == HttpURLConnection.HTTP_UNAUTHORIZED) {
             if (++attemptsCount <= 1) {
                 ReportPane.warn("Похоже что-то с токеном, попробую обновить");
-                if (!checkAndPrepareConnectionSettings()) {
-                    return false;
-                } else {
-                    return upload(templateName, file);
-                }
+                return checkAndPrepareConnectionSettings();
             } else {
                 ReportPane.error("Идея с обновлением токена не помогла");
                 return false;

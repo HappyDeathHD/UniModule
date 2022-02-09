@@ -1,5 +1,6 @@
 package ru.bpcbt.navigator;
 
+import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.misc.HoverButton;
 import ru.bpcbt.settings.Settings;
@@ -24,7 +25,6 @@ public class ButtonsPanel extends JPanel {
     private HoverButton processSelectedB;
     private HoverButton processAllB;
     private HoverButton uploadSelectedB;
-    private HoverButton uploadAllB;
     private HoverButton reserveSelectedB;
     private HoverButton reserveAllB;
 
@@ -39,7 +39,6 @@ public class ButtonsPanel extends JPanel {
             addProcessSelectedButton();
             addProcessAllButton();
             addUploadSelectedButton(parent);
-            addUploadAllButton(parent);
             addReserveSelectedButton();
             addReserveAllButton();
         } catch (Exception e) {
@@ -51,7 +50,6 @@ public class ButtonsPanel extends JPanel {
         processSelectedB.setEnabled(isEnabled);
         processAllB.setEnabled(isEnabled);
         uploadSelectedB.setEnabled(isEnabled);
-        uploadAllB.setEnabled(isEnabled);
         reserveSelectedB.setEnabled(isEnabled);
         reserveAllB.setEnabled(isEnabled);
     }
@@ -137,31 +135,15 @@ public class ButtonsPanel extends JPanel {
         add(uploadSelectedB);
     }
 
-    private void addUploadAllButton(BaseNavigatorTreePanel parent) throws IOException {
-        uploadAllB = new HoverButton(getIconFromResource("/images/uploadMultiple.png"),
-                "Отправить всех с вкладки результатов.");
-        if (Settings.RESERVE_DIR.equals(parent.getWorkingDirType())) {
-            uploadAllB.addActionListener(e ->
-                    MiniFrame.showMessage("Воу-воу ты же не хочешь отправить на сервер резервные копии за все время!?"
-                            + System.lineSeparator()
-                            + "Выбери данные за какую-нибудь дату и грузи их кнопкой левее!"));
-        } else {
-            uploadAllB.addActionListener(e -> {
-                if (MiniFrame.askForConfirmation("Уверен, что хочешь отправить на сервер всё что есть?")) {
-                    UnimessageConductor.uploadJob(FileUtils.getFilesByTypeRecursively(Program.getProperties().get(Settings.OUTPUT_DIR)))
-                            .execute();
-                }
-            });
-        }
-        add(uploadAllB);
-    }
-
     private void addReserveSelectedButton() throws IOException {
         reserveSelectedB = new HoverButton(getIconFromResource("/images/reserveOne.png"),
                 "Выгрузить выбранных во вкладке резервации с сервера");
         reserveSelectedB.addActionListener(e -> {
             List<String> selectedTemplates = Program.getMainFrame().getReserveFilesPanel().getSelectedTemplates();
-            if (selectedTemplates.isEmpty()) {
+            if (Program.getProperties().get(Settings.RESERVE_DIR).isEmpty()) {
+                Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
+                MiniFrame.showMessage("Нужно выбрать место хранения выгрузки.");
+            } else if (selectedTemplates.isEmpty()) {
                 MiniFrame.showMessage("Нужно выбрать что резервировать."
                         + System.lineSeparator()
                         + "Для этого нужно выделить что-нибудь из вкладки с резервацией.");
@@ -176,9 +158,14 @@ public class ButtonsPanel extends JPanel {
         reserveAllB = new HoverButton(getIconFromResource("/images/reserveAll.png"),
                 "Выгрузить всё с сервера");
         reserveAllB.addActionListener(e -> {
-            Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
-            if (templateIdMap != null) {
-                UnimessageConductor.downloadJob(templateIdMap.keySet()).execute();
+            if (Program.getProperties().get(Settings.RESERVE_DIR).isEmpty()) {
+                Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
+                MiniFrame.showMessage("Нужно выбрать место хранения выгрузки.");
+            } else {
+                Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
+                if (templateIdMap != null) {
+                    UnimessageConductor.downloadJob(templateIdMap.keySet()).execute();
+                }
             }
         });
         add(reserveAllB);

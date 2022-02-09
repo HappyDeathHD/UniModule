@@ -28,6 +28,61 @@ class UnimessageClient {
         return token != null;
     }
 
+    int uploadScript(File file, long templateId) {
+        try {
+            final URL uploadUri = new URL(coreUrl + API_TEMPLATES + templateId + "/script");
+
+            final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
+            makeConnectionPostJson(connection);
+            connection.setRequestMethod("PUT");
+            setAuthorizationToConnection(connection);
+
+            try (final OutputStream os = connection.getOutputStream()) {
+                final String params = JsonWriter.string()
+                        .object()
+                        .value("script", FileUtils.readFile(file))
+                        .end().done();
+                os.write(params.getBytes(StandardCharsets.UTF_8));
+            }
+            final int httpResult = connection.getResponseCode();
+            if (httpResult == HttpURLConnection.HTTP_OK) {
+                return httpResult;
+            } else {
+                ReportPane.error("Скрипт " + templateId + " не загрузился:" + System.lineSeparator() +
+                        connection.getResponseCode() + " " + connection.getResponseMessage());
+            }
+        } catch (Exception e) {
+            ReportPane.error("Ошибка загрузки скрипта " + templateId, e);
+        }
+        return -1;
+    }
+
+    int uploadConfig(File file, long templateId) {
+        try {
+            final URL uploadUri = new URL(coreUrl + API_TEMPLATES + templateId + "/configuration");
+
+            final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
+            makeConnectionPostJson(connection);
+            connection.setRequestMethod("PUT");
+            setAuthorizationToConnection(connection);
+
+            try (final OutputStream os = connection.getOutputStream()) {
+                final String params = "{\"templateConfiguration\":" + FileUtils.readFile(file) + "}";
+                os.write(params.getBytes(StandardCharsets.UTF_8));
+            }
+            final int httpResult = connection.getResponseCode();
+            if (httpResult == HttpURLConnection.HTTP_OK) {
+                return httpResult;
+            } else {
+                ReportPane.error("Конфиг " + templateId + " не загрузился:" + System.lineSeparator() +
+                        connection.getResponseCode() + " " + connection.getResponseMessage());
+            }
+        } catch (Exception e) {
+            ReportPane.error("Ошибка загрузки конфига " + templateId, e);
+        }
+        return -1;
+    }
+
     int uploadFileToTemplate(File file, long templateId, String language, String topic) {
         try {
             HttpURLConnection connection;
@@ -184,7 +239,7 @@ class UnimessageClient {
                 }
                 reader.close();
                 ReportPane.fine("Получен новый токен");
-                final String rawResponse = sb.toString().substring(sb.toString().indexOf("\"token\":\"")).substring(9);
+                final String rawResponse = sb.substring(sb.toString().indexOf("\"token\":\"")).substring(9);
                 token = rawResponse.substring(0, rawResponse.indexOf('\"'));
             } else {
                 ReportPane.error("Не удалось получить токен:" + System.lineSeparator() +
