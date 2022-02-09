@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
         outputFilesPanel = new NavigatorPanel(Settings.OUTPUT_DIR);
         tabbedPane.addTab("Результаты", outputFilesPanel);
         reserveFilesPanel = new ReservePanel(Settings.RESERVE_DIR);
-        tabbedPane.addTab("Резервация", reserveFilesPanel);
+        tabbedPane.addTab("Бэкап", reserveFilesPanel);
         tabbedPane.addTab("Отчет", reportPanel);
         settingsPanel = new SettingsPanel();
         tabbedPane.addTab("Настройки", settingsPanel);

@@ -116,7 +116,7 @@ public class ButtonsPanel extends JPanel {
 
     private void addUploadSelectedButton(BaseNavigatorTreePanel parent) throws IOException {
         uploadSelectedB = new HoverButton(getIconFromResource("/images/uploadOne.png"),
-                "Отправить выбранных во вкладке результатов или резервации на сервер");
+                "Отправить шаблоны, выбранные на вкладке результатов или бэкапов, на сервер");
         uploadSelectedB.addActionListener(e -> {
             Set<File> selectedFiles;
             if (Settings.RESERVE_DIR.equals(parent.getWorkingDirType())) {
@@ -127,7 +127,7 @@ public class ButtonsPanel extends JPanel {
             if (selectedFiles.isEmpty()) {
                 MiniFrame.showMessage("Нужно выбрать что отправлять."
                         + System.lineSeparator()
-                        + "Для этого нужно выделить что-нибудь из вкладки с результатами или резервации.");
+                        + "Для этого нужно выделить что-нибудь из вкладки с результатами или бэкапами.");
             } else {
                 UnimessageConductor.uploadJob(selectedFiles).execute();
             }
@@ -137,16 +137,16 @@ public class ButtonsPanel extends JPanel {
 
     private void addReserveSelectedButton() throws IOException {
         reserveSelectedB = new HoverButton(getIconFromResource("/images/reserveOne.png"),
-                "Выгрузить выбранных во вкладке резервации с сервера");
+                "Выгрузить шаблоны, выбранные на вкладке бэкапов с сервера");
         reserveSelectedB.addActionListener(e -> {
             List<String> selectedTemplates = Program.getMainFrame().getReserveFilesPanel().getSelectedTemplates();
             if (Program.getProperties().get(Settings.RESERVE_DIR).isEmpty()) {
                 Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
                 MiniFrame.showMessage("Нужно выбрать место хранения выгрузки.");
             } else if (selectedTemplates.isEmpty()) {
-                MiniFrame.showMessage("Нужно выбрать что резервировать."
+                MiniFrame.showMessage("Нужно выбрать что бэкапить."
                         + System.lineSeparator()
-                        + "Для этого нужно выделить что-нибудь из вкладки с резервацией.");
+                        + "Для этого нужно выделить что-нибудь из вкладки с бэкапами.");
             } else {
                 UnimessageConductor.downloadJob(selectedTemplates).execute();
             }

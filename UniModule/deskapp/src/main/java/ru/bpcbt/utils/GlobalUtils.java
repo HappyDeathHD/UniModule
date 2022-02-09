@@ -7,6 +7,10 @@ import ru.bpcbt.rest.UnimessageConductor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class GlobalUtils {
 
@@ -63,6 +67,21 @@ public class GlobalUtils {
             }
         }
         return builder.toString();
+    }
+
+    public static String inputStreamToString(InputStream is) {
+        try {
+            final BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            final StringBuilder sb = new StringBuilder();
+            String output;
+            while ((output = br.readLine()) != null) {
+                sb.append(output);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            ReportPane.debug("Не удалось прочитать стрим", e);
+        }
+        return "";
     }
 
     public static void makeSovietRussiaButtons() {

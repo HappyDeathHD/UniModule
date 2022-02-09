@@ -3,6 +3,7 @@ package ru.bpcbt.rest;
 import com.grack.nanojson.JsonWriter;
 import ru.bpcbt.logger.ReportPane;
 import ru.bpcbt.utils.FileUtils;
+import ru.bpcbt.utils.GlobalUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -26,6 +27,26 @@ class UnimessageClient {
 
     boolean isAuth() {
         return token != null;
+    }
+
+    String templateInfo(long templateId) {
+        try {
+            final URL uploadUri = new URL(coreUrl + API_TEMPLATES + templateId);
+
+            final HttpURLConnection connection = (HttpURLConnection) uploadUri.openConnection();
+            setAuthorizationToConnection(connection);
+
+            final int httpResult = connection.getResponseCode();
+            if (httpResult == HttpURLConnection.HTTP_OK) {
+                return GlobalUtils.inputStreamToString(connection.getInputStream());
+            } else {
+                ReportPane.error("Ошибка при получении информации о шаблоне " + templateId + ": " +
+                        GlobalUtils.inputStreamToString(connection.getErrorStream()));
+            }
+        } catch (Exception e) {
+            ReportPane.error("Ошибка при получении информации о шаблоне " + templateId, e);
+        }
+        return null;
     }
 
     int uploadScript(File file, long templateId) {

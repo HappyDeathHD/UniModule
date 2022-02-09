@@ -1,9 +1,6 @@
 package ru.bpcbt.rest;
 
-import com.grack.nanojson.JsonArray;
-import com.grack.nanojson.JsonObject;
-import com.grack.nanojson.JsonParser;
-import com.grack.nanojson.JsonParserException;
+import com.grack.nanojson.*;
 import ru.bpcbt.MainFrame;
 import ru.bpcbt.Program;
 import ru.bpcbt.logger.ReportPane;
@@ -14,6 +11,7 @@ import ru.bpcbt.utils.*;
 import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -138,8 +136,8 @@ public class UnimessageConductor {
                 isRunning = true;
                 Program.getMainFrame().selectPaneTab(MainFrame.REPORT_TAB);
                 if (templates.isEmpty()) {
-                    ReportPane.warn("Нечего резервировать! Проверь вкладку резервации!");
-                    Narrator.warn("Нечего резервировать!");
+                    ReportPane.warn("Нечего бэкапить!");
+                    Narrator.warn("Нечего бэкапить!");
                     GlobalUtils.setEnabledToProcessButtons(true);
                     return null;
                 }
@@ -154,7 +152,7 @@ public class UnimessageConductor {
                 long start = System.currentTimeMillis();
                 final Date startDate = new Date(start);
                 ReportPane.normal("Начало выгрузки: " + startDate);
-                Narrator.normal("Резервирую верстки с сервера...");
+                Narrator.normal("Создаю бэкап...");
                 try {
                     for (String templateName : templates) {
                         // Список языков версток шаблона
@@ -195,13 +193,16 @@ public class UnimessageConductor {
                                 ReportPane.success("Верстка шаблона " + templateName + " с языком " + language + " успешно сохранена!");
                             }
                         }
+                        downloadTemplateData(
+                                Paths.get(reserveDir, osDateFormat.format(startDate), templateName),
+                                templateId, templateName);
                     }
                     if (errorCount == 0) {
-                        String conclusionSuccess = "Резервирование окончено!";
+                        String conclusionSuccess = "Создан бэкап!";
                         ReportPane.success(conclusionSuccess);
                         Narrator.success(conclusionSuccess);
                     } else {
-                        String conclusionWithErrors = "Резервирование окончено c ошибками! (" + errorCount + " шт.)";
+                        String conclusionWithErrors = "Во время бэкапа были ошибки! (" + errorCount + " шт.)";
                         ReportPane.warn(conclusionWithErrors);
                         Narrator.warn(conclusionWithErrors);
                     }
@@ -222,6 +223,25 @@ public class UnimessageConductor {
             return true;
         }
         return false;
+    }
+
+    private static void downloadTemplateData(Path path, Long templateId, String templateName) throws JsonParserException {
+        JsonObject templateInfo = JsonParser.object().from(client.templateInfo(templateId));
+        if (templateInfo == null) {
+            return;
+        }
+        Object preBuildScript = templateInfo.get("preBuildScript");
+        if (preBuildScript != null) {
+            FileUtils.writeToPath(Paths.get(path.toString(), "script.groovy")
+                    , (String) preBuildScript);
+            ReportPane.success("Скрипт " + templateName + " успешно сохранен!");
+        }
+        Object templateConfiguration = templateInfo.get("templateConfiguration");
+        if (templateConfiguration != null) {
+            FileUtils.writeToPath(Paths.get(path.toString(), "config.json")
+                    , JsonWriter.string(templateConfiguration));
+            ReportPane.success("Конфиг " + templateName + " успешно сохранен!");
+        }
     }
 
     private static void fillTemplates() {
@@ -274,7 +294,7 @@ public class UnimessageConductor {
             return uploadGroovy(templateName, file);
         }
         if (file.getName().equals("config.json")) {
-           return uploadConfig(templateName, file);
+            return uploadConfig(templateName, file);
         }
         final String language = getLanguage(file.getName());
         if (language != null) {
