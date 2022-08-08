@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class GlobalUtils {
 
@@ -53,6 +54,7 @@ public class GlobalUtils {
         } else {
             ReportPane.error("Ничего не было прервано!");
         }
+        setEnabledToProcessButtons(true);
     }
 
     public static String getErrorMessageWithException(String message, Exception e) {
@@ -82,6 +84,18 @@ public class GlobalUtils {
             ReportPane.debug("Не удалось прочитать стрим", e);
         }
         return "";
+    }
+
+    public static String getJsonValue(String json, String key) {
+        String valueStart = json.substring(json.indexOf("\"" + key + "\"")).substring(key.length() + 2);
+        valueStart = valueStart.substring(valueStart.indexOf("\"") + 1);
+        byte[] bytes = valueStart.getBytes(StandardCharsets.UTF_8);
+        for (int i = 0; i < bytes.length - 1; i++) {
+            if (bytes[i] != '\\' && bytes[i + 1] == '"') {
+                return new String(bytes, 0, i + 1);
+            }
+        }
+        return null;
     }
 
     public static void makeSovietRussiaButtons() {

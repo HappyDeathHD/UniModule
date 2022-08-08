@@ -76,4 +76,10 @@ public class ReservePanel extends BaseNavigatorTreePanel {
     List<String> getSelectedTemplates() {
         return templates.getSelectedValuesList();
     }
+
+    @Override
+    public void forceUpdateLater() {
+        templates.setModel(new DefaultListModel<>());
+        navigatorTree.setModel(null);
+    }
 }

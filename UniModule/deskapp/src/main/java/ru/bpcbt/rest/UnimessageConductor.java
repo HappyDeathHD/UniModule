@@ -172,20 +172,13 @@ public class UnimessageConductor {
                                     errorCount++;
                                     continue;
                                 }
-                                // Либа nanojson не вывозит значения в несколько сотен тысяч символов.
-                                int markupStart = rawMarkupsJson.indexOf("\"body\":\"");
-                                int markupEnd = rawMarkupsJson.lastIndexOf("\",\"fileName\":");
-                                if (markupStart != -1 && markupEnd == -1) { // Скорее всего верстка без имени
-                                    markupEnd = rawMarkupsJson.lastIndexOf("\"}");
-                                }
-                                if (markupStart == -1 || markupEnd == -1) {
+                                final String markup = GlobalUtils.getJsonValue(rawMarkupsJson, "body");
+                                if (markup == null) {
                                     ReportPane.error("Верстка шаблона " + templateName + " с языком " + language + " имеет неожиданный формат!");
                                     ReportPane.debug(rawMarkupsJson);
                                     errorCount++;
                                     continue;
                                 }
-
-                                final String markup = rawMarkupsJson.substring(markupStart + 8, markupEnd);
                                 FileUtils.writeToPath(
                                         Paths.get(reserveDir, osDateFormat.format(startDate), templateName,
                                                 templateName + "_" + language.toLowerCase() + ".html"),

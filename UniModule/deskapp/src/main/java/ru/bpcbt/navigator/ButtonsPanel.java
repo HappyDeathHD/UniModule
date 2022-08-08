@@ -162,10 +162,12 @@ public class ButtonsPanel extends JPanel {
                 Program.getMainFrame().selectPaneTab(MainFrame.SETTINGS_TAB);
                 MiniFrame.showMessage("Нужно выбрать место хранения выгрузки.");
             } else {
-                Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
-                if (templateIdMap != null) {
-                    UnimessageConductor.downloadJob(templateIdMap.keySet()).execute();
-                }
+                SwingUtilities.invokeLater(() -> {
+                    final Map<String, Long> templateIdMap = UnimessageConductor.getTemplateIdMap();
+                    if (templateIdMap != null) {
+                        UnimessageConductor.downloadJob(templateIdMap.keySet()).execute();
+                    }
+                });
             }
         });
         add(reserveAllB);

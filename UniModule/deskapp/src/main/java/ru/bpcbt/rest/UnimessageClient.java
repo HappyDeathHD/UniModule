@@ -260,8 +260,10 @@ class UnimessageClient {
                 }
                 reader.close();
                 ReportPane.fine("Получен новый токен");
-                final String rawResponse = sb.substring(sb.toString().indexOf("\"token\":\"")).substring(9);
-                token = rawResponse.substring(0, rawResponse.indexOf('\"'));
+                this.token = GlobalUtils.getJsonValue(sb.toString(), "token");
+                if (this.token == null) {
+                    ReportPane.error("Не удалось прочитать токен!");
+                }
             } else {
                 ReportPane.error("Не удалось получить токен:" + System.lineSeparator() +
                         connection.getResponseCode() + " " + connection.getResponseMessage());

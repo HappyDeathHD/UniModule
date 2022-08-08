@@ -8,6 +8,8 @@ import javax.swing.*;
 public class Narrator {
 
     private static final JLabel label;
+    private static String lastMessage = "";
+    private static Integer messageIterator = 0;
 
     static {
         label = new JLabel("Добро пожаловать! При первом запуске нужно указать три папки в настройках");
@@ -31,21 +33,31 @@ public class Narrator {
 
     public static void normal(String message) {
         label.setBackground(Style.GRAY);
-        label.setText(message);
+        setText(message);
     }
 
     public static void success(String message) {
         label.setBackground(Style.GREEN);
-        label.setText(message);
+        setText(message);
     }
 
     public static void warn(String message) {
         label.setBackground(Style.YELLOW);
-        label.setText(message);
+        setText(message);
     }
 
     public static void error(String message) {
         label.setBackground(Style.RED);
-        label.setText(message);
+        setText(message);
+    }
+
+    private static void setText(String message) {
+        if (lastMessage.equals(message)) {
+            label.setText(lastMessage + " (" + ++messageIterator + ")");
+        } else {
+            lastMessage = message;
+            messageIterator = 1;
+            label.setText(lastMessage);
+        }
     }
 }
